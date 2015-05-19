@@ -1,0 +1,36 @@
+{
+  "name": "solidify",
+  "version": "0.1.0",
+  "homepage": "https://github.com/solid-js/solidify",
+  "authors": [
+    "zouloux <zouloux@gmail.com>"
+  ],
+  "description": "Solidify typescript framework for robust and modular web applications",
+  "keywords": [
+    "solid",
+    "solidify",
+    "framework",
+    "typescript",
+    "module",
+    "modular",
+    "robust",
+    "web",
+    "webapp",
+    "application"
+  ],
+  "dependencies": {
+	"q": "latest",
+	"requirejs": "latest",
+	"underscore": "latest",
+	"jquery": "latest",
+	"gsap": "latest"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
