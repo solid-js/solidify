@@ -1,0 +1,208 @@
+/**
+ * borderImage
+ * @img {string}
+ * @number {number}
+ * @repeat {string}
+ * http://www.w3.org/TR/css3-background/#border-images
+ */
+.borderImage (@img, @number, @repeat: stretch)
+{
+  @val: @img @number @repeat;
+  border-image: @val;
+}
+
+/**
+ * Debug mixin
+ * @size {string}
+ * @color {string}
+ */
+.debug (@size: 1px, @color: red)
+{
+  outline: @size solid  @color;
+}
+
+/**
+ * Transitions CSS
+ */
+/*
+.transition(@duration: 0.5s, @easing: 'ease-out')
+{
+  transition: all @duration @easing;
+}
+*/
+
+/**
+ * Gradient
+ */
+.gradient (@startColor: #000, @endColor: #fff, @deg: to bottom)
+{
+  background: linear-gradient(@deg, @startColor, @endColor);
+
+  //Pour IE <= 9
+  @c-start: argb(@startColor);
+  @c-end:   argb(@endColor);
+  filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr='@{c-end}', endColorstr='@{c-start}', GradientType=0)";
+}
+
+
+/**
+ * Background image
+ */
+.background (@image; @repeat:no-repeat; @position:top left; @color:transparent)
+{
+  background: url('@{imagesPath}@{image}') @repeat @position @color;
+}
+
+/**
+ * Positionner un élement en absolu
+ */
+.place (@top:auto; @right:auto; @bottom:auto; @left:auto)
+{
+  position: absolute;
+  top: @top;
+  right: @right;
+  bottom: @bottom;
+  left: @left;
+}
+
+.topLeft (@top:auto; @left:auto)
+{
+  position: absolute;
+  top: @top;
+  left: @left;
+}
+
+/**
+ * Size
+ */
+.size (@width:auto; @height:auto)
+{
+  width: @width;
+  height: @height;
+}
+
+/**
+ * Box shadow
+ */
+.boxShadow (@color:rgba(0,0,0,0.3); @h:0px; @v:0px; @f:9px)
+{
+  box-shadow: @h @v @f @color;
+}
+
+/**
+ * No box shadow
+ */
+.noBoxShadow ()
+{
+  box-shadow: none;
+}
+
+/**
+ * Sprite
+ */
+.sprite (@positionX:0px; @positionY:0px; @repeat:no-repeat; @sprite:'sprite.png')
+{
+  .background(@sprite, @repeat, -@positionX -@positionY);
+  background-size: @spriteWidth / @spriteDensity @spriteHeight / @spriteDensity;
+}
+
+/**
+ * Target sprite
+ */
+.targetSprite (@sprite:'sprite.png')
+{
+  background-image: url('@{imagesPath}@{sprite}');
+  background-repeat: no-repeat;
+  background-size: @spriteWidth / @spriteDensity @spriteHeight / @spriteDensity;
+}
+
+/**
+ * Désactiver la sélection
+ */
+.disableSelection ()
+{
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/**
+ * Activer la sélection
+ */
+.enableSelection ()
+{
+  -webkit-touch-callout: all;
+  -webkit-user-select: all;
+  -khtml-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
+}
+
+/**
+ * Accélération matérielle 2D du pauvre
+ */
+.hwa2 ()
+{
+  transform: translate2D(0px, 0px);
+}
+
+/**
+ * Accélération matérielle 3D du pauvre
+ */
+.hwa3 ()
+{
+  transform: translate3D(0px, 0px, 0px);
+}
+
+/**
+ * Corrige la scroll smooth sur iPad / iPhone
+ * Supprime la scrollbar visible sur IE10+
+ * Masque la scrollbar sur chrome PC
+ */
+.scrollPatch ()
+{
+  // Compatibilité IE / iPad
+  overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch;
+
+  // Masquer les scrollBar sur ie10+
+  -ms-overflow-style: none;
+
+  // Masquer les scrollbar sur chrome
+  &::-webkit-scrollbar { width: 0 !important }
+}
+
+/**
+ * Active le scroll ainsi que le patch
+ */
+.verticalScroll ()
+{
+  // Scroll
+  overflow: hidden;
+  overflow-y: scroll;
+
+  .scrollPatch();
+}
+
+/**
+ * Déclarer et charger une typo en CSS3
+ */
+.declareFontFace (@basePath, @fontFileName, @fontFamilyName, @fontWeight: normal, @fontStyle: normal)
+{
+  @font-face
+  {
+    font-family: @fontFamilyName;
+
+    src:  url(~'@{basePath}@{fontFileName}.eot?#iefix')             format('embedded-opentype'),
+          url(~'@{basePath}@{fontFileName}.woff')                   format('woff'),
+          url(~'@{basePath}@{fontFileName}.ttf')                    format('truetype'),
+          url(~'@{basePath}@{fontFileName}.svg#AdihausDIN-Regular') format('svg');
+
+    font-weight: @fontWeight;
+    font-style: @fontStyle;
+  }
+}
