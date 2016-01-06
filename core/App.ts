@@ -1,13 +1,6 @@
-export = AppBase;
+import {ModuleBase} from "./ModuleBase";
 
-import Master = require("./Master");
-import DependencyManager = require("../helpers/DependencyManager");
-import ComponentsWatcher = require("../dom/ComponentsWatcher");
-import Central = require("../helpers/Central");
-import Bootstrap = require("lib/solidify/navigation/Bootstrap");
-import Router = require("lib/solidify/navigation/Router");
-
-class AppBase extends Master
+export class AppBase extends ModuleBase
 {
     // -------------------------------------------------------------------------
 
@@ -21,8 +14,6 @@ class AppBase extends Master
     private _router                         :Router;
 
     private _mainBootstrap                  :Bootstrap;
-
-    appNamespace                            :string;
 
     //private _urlBase                         :string;
     //get urlBase ():string { return this._urlBase; }

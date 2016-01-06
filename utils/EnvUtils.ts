@@ -1,91 +1,89 @@
-export = EnvUtils;
-
-module EnvUtils
+/**
+ * Listing of devices types available.
+ * Just handheld or desktop, no mobile / phone / laptop because we manage this via mediaQueries.
+ * If not found, will be desktop by default
+ */
+export enum DeviceType
 {
-	/**
-	 * Listing of devices types available.
-	 * Just handheld or desktop, no mobile / phone / laptop because we manage this via mediaQueries.
-	 * If not found, will be desktop by default
-	 */
-	export enum DeviceType
-	{
-		HANDHELD,
-		DESKTOP
-	}
+	HANDHELD,
+	DESKTOP
+}
 
-	/**
-	 * Available platforms.
-	 * Only the most common.
-	 */
-	export enum Platform
-	{
-		IOS,
-		ANDROID,
-		WINDOWS,
-		MAC,
-		UNKNOWN
-	}
+/**
+ * Available platforms.
+ * Only the most common.
+ */
+export enum Platform
+{
+	IOS,
+	ANDROID,
+	WINDOWS,
+	MAC,
+	UNKNOWN
+}
 
-	/**
-	 * Available browsers
-	 * Only the most common.
-	 */
-	export enum Browser
-	{
-		CHROME,
-		SAFARI,
-		IE,
-		MOZILLA,
-		OPERA,
-		UNKNOWN
-	}
-	/**
-	 * Available browsers engines
-	 * Only the most common.
-	 */
-	export enum BrowserEngine
-	{
-		WEBKIT,
-		TRIDENT,
-		GECKO,
-		UNKNOWN
-	}
+/**
+ * Available browsers
+ * Only the most common.
+ */
+export enum Browser
+{
+	CHROME,
+	SAFARI,
+	IE,
+	MOZILLA,
+	OPERA,
+	UNKNOWN
+}
+/**
+ * Available browsers engines
+ * Only the most common.
+ */
+export enum BrowserEngine
+{
+	WEBKIT,
+	TRIDENT,
+	GECKO,
+	UNKNOWN
+}
 
-	/**
-	 * Interface for the environment capabilities
-	 */
-	export interface ICapabilities
-	{
-		retina		:boolean;
-		touch		:boolean;
-		audio		:boolean;
-		video		:boolean;
-		pushState	:boolean;
-		geolocation	:boolean;
-		webGL		:boolean;
-	}
+/**
+ * Interface for the environment capabilities
+ */
+export interface ICapabilities
+{
+	retina		:boolean;
+	touch		:boolean;
+	audio		:boolean;
+	video		:boolean;
+	pushState	:boolean;
+	geolocation	:boolean;
+	webGL		:boolean;
+}
 
+export class EnvUtils
+{
 	/**
 	 * If we need a detection
 	 */
-	var __NEED_DETECTION	:boolean			= true;
+	private static __NEED_DETECTION		:boolean			= true;
 
 	/**
 	 * Client informations
 	 */
-	var __DEVICE_TYPE		:DeviceType;
-	var __PLATFORM			:Platform;
-	var __BROWSER			:Browser;
-	var __BROWSER_ENGINE	:BrowserEngine;
-	var __CAPABILITIES		:ICapabilities;
+	private static __DEVICE_TYPE		:DeviceType;
+	private static __PLATFORM			:Platform;
+	private static __BROWSER			:Browser;
+	private static __BROWSER_ENGINE		:BrowserEngine;
+	private static __CAPABILITIES		:ICapabilities;
 
 	/**
 	 * Init detection once and on demand.
 	 * Will collect all needed informations.
 	 */
-	function initDetection ():void
+	private static initDetection ():void
 	{
-		if (!__NEED_DETECTION) return;
+		if (!EnvUtils.__NEED_DETECTION) return;
 
 		// Get browser signature
 		var browserSignature = navigator.userAgent.toLowerCase();
@@ -93,98 +91,98 @@ module EnvUtils
 		// Detect device type and platform
 		if (/ipad|iphone|ipod/gi.test(browserSignature))
 		{
-			__DEVICE_TYPE = DeviceType.HANDHELD;
-			__PLATFORM = Platform.IOS;
+			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
+			EnvUtils.__PLATFORM = Platform.IOS;
 		}
 		else if (/android/gi.test(browserSignature))
 		{
-			__DEVICE_TYPE = DeviceType.HANDHELD;
-			__PLATFORM = Platform.ANDROID;
+			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
+			EnvUtils.__PLATFORM = Platform.ANDROID;
 		}
 		else if (/mac/gi.test(browserSignature))
 		{
-			__DEVICE_TYPE = DeviceType.DESKTOP;
-			__PLATFORM = Platform.MAC;
+			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
+			EnvUtils.__PLATFORM = Platform.MAC;
 		}
 		else if (/windows phone/gi.test(browserSignature))
 		{
-			__DEVICE_TYPE = DeviceType.HANDHELD;
-			__PLATFORM = Platform.WINDOWS;
+			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
+			EnvUtils.__PLATFORM = Platform.WINDOWS;
 		}
 		else if (/windows/gi.test(browserSignature))
 		{
-			__DEVICE_TYPE = DeviceType.DESKTOP;
-			__PLATFORM = Platform.WINDOWS;
+			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
+			EnvUtils.__PLATFORM = Platform.WINDOWS;
 		}
 		else
 		{
-			__DEVICE_TYPE = DeviceType.DESKTOP;
-			__PLATFORM = Platform.UNKNOWN;
+			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
+			EnvUtils.__PLATFORM = Platform.UNKNOWN;
 		}
 
 		// Detect browser
 		if (/chrome/gi.test(browserSignature))
 		{
-			__BROWSER = Browser.CHROME;
+			EnvUtils.__BROWSER = Browser.CHROME;
 		}
 		else if (/safari/gi.test(browserSignature))
 		{
-			__BROWSER = Browser.SAFARI;
+			EnvUtils.__BROWSER = Browser.SAFARI;
 		}
 		else if (/msie/gi.test(browserSignature) || ("ActiveXObject" in window))
 		{
-			__BROWSER = Browser.IE;
+			EnvUtils.__BROWSER = Browser.IE;
 		}
 		else if (/mozilla/gi.test(browserSignature))
 		{
-			__BROWSER = Browser.MOZILLA;
+			EnvUtils.__BROWSER = Browser.MOZILLA;
 		}
 		else if (/opera/gi.test(browserSignature))
 		{
-			__BROWSER = Browser.OPERA;
+			EnvUtils.__BROWSER = Browser.OPERA;
 		}
 		else
 		{
-			__BROWSER = Browser.UNKNOWN;
+			EnvUtils.__BROWSER = Browser.UNKNOWN;
 		}
 
 		// Detect browser engine
 		if (/webkit/gi.test(browserSignature))
 		{
-			__BROWSER_ENGINE = BrowserEngine.WEBKIT;
+			EnvUtils.__BROWSER_ENGINE = BrowserEngine.WEBKIT;
 		}
 		else if (/trident/gi.test(browserSignature))
 		{
-			__BROWSER_ENGINE = BrowserEngine.TRIDENT;
+			EnvUtils.__BROWSER_ENGINE = BrowserEngine.TRIDENT;
 		}
 		else if (/gecko/gi.test(browserSignature))
 		{
-			__BROWSER_ENGINE = BrowserEngine.GECKO;
+			EnvUtils.__BROWSER_ENGINE = BrowserEngine.GECKO;
 		}
 		else
 		{
-			__BROWSER_ENGINE = BrowserEngine.UNKNOWN;
+			EnvUtils.__BROWSER_ENGINE = BrowserEngine.UNKNOWN;
 		}
 
 		// Detect client capabilities
-		__CAPABILITIES = {
+		EnvUtils.__CAPABILITIES = {
 			retina		:(("devicePixelRatio" in window) && window.devicePixelRatio >= 1.5),
 			touch		:("ontouchstart" in document),
 			audio		:("canPlayType" in document.createElement("audio")),
 			video		:("canPlayType" in document.createElement("video")),
 			pushState	:("history" in window && "pushState" in history),
 			geolocation	:("geolocation" in navigator),
-			webGL		:(isWebglAvailable())
+			webGL		:(EnvUtils.isWebglAvailable())
 		};
 
 		// Don't need detection anymore
-		__NEED_DETECTION = false;
+		EnvUtils.__NEED_DETECTION = false;
 	}
 
 	/**
 	 * Detect WebGL capability
 	 */
-	function isWebglAvailable ()
+	static isWebglAvailable ():boolean
 	{
 		try
 		{
@@ -205,57 +203,57 @@ module EnvUtils
 	/**
 	 * Get the device type following enum DeviceType
 	 */
-	export function getDeviceType ():DeviceType
+	static getDeviceType ():DeviceType
 	{
-		initDetection();
-		return __DEVICE_TYPE;
+		EnvUtils.initDetection();
+		return EnvUtils.__DEVICE_TYPE;
 	}
 
 	/**
 	 * Check if we run in a specific device type.
 	 * See enum DeviceType
 	 */
-	export function isDeviceType (pDeviceType:DeviceType):boolean
+	static isDeviceType (pDeviceType:DeviceType):boolean
 	{
-		initDetection();
-		return getDeviceType() == pDeviceType;
+		EnvUtils.initDetection();
+		return EnvUtils.getDeviceType() == pDeviceType;
 	}
 
 
 	/**
 	 * Get the platform following enum Platform
 	 */
-	export function getPlatform ():Platform
+	static getPlatform ():Platform
 	{
-		initDetection();
-		return __PLATFORM;
+		EnvUtils.initDetection();
+		return EnvUtils.__PLATFORM;
 	}
 
 	/**
 	 * Check if we run in a specific platform.
 	 * See enum Platform
 	 */
-	export function isPlatform (pPlatform:Platform):boolean
+	static isPlatform (pPlatform:Platform):boolean
 	{
-		initDetection();
-		return getPlatform() == pPlatform;
+		EnvUtils.initDetection();
+		return EnvUtils.getPlatform() == pPlatform;
 	}
 
 
 	/**
 	 * Get the browser following enum Browser
 	 */
-	export function getBrowser ():Browser
+	static getBrowser ():Browser
 	{
-		initDetection();
-		return __BROWSER;
+		EnvUtils.initDetection();
+		return EnvUtils.__BROWSER;
 	}
 
 	/**
 	 * Get IE Version
 	 * Returns Number.POSITIVE_INFINITY if not IE, so you can test if version <= 9 for ex
 	 */
-	export function getIEVersion ():number
+	static getIEVersion ():number
 	{
 		var myNav = navigator.userAgent.toLowerCase();
 		return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1], 10) : Number.POSITIVE_INFINITY;
@@ -265,30 +263,30 @@ module EnvUtils
 	 * Check if we run in a specific browser.
 	 * See enum Browser
 	 */
-	export function isBrowser (pBrowser:Browser):boolean
+	static isBrowser (pBrowser:Browser):boolean
 	{
-		initDetection();
-		return getBrowser() == pBrowser;
+		EnvUtils.initDetection();
+		return EnvUtils.getBrowser() == pBrowser;
 	}
 
 
 	/**
 	 * Get the browser engine following enum BrowserEngine
 	 */
-	export function getBrowserEngine ():BrowserEngine
+	static getBrowserEngine ():BrowserEngine
 	{
-		initDetection();
-		return __BROWSER_ENGINE;
+		EnvUtils.initDetection();
+		return EnvUtils.__BROWSER_ENGINE;
 	}
 
 	/**
 	 * Check if we run in a specific browser engine.
 	 * See enum BrowserEngine
 	 */
-	export function isBrowserEngine (pBrowserEngine:BrowserEngine):boolean
+	static isBrowserEngine (pBrowserEngine:BrowserEngine):boolean
 	{
-		initDetection();
-		return getBrowserEngine() == pBrowserEngine;
+		EnvUtils.initDetection();
+		return EnvUtils.getBrowserEngine() == pBrowserEngine;
 	}
 
 
@@ -296,20 +294,24 @@ module EnvUtils
 	 * Get environment capabilities like retina / touch / geolocation ...
 	 * See class ICapabilities.
 	 */
-	export function getCapabilities ():ICapabilities
+	static getCapabilities ():ICapabilities
 	{
-		initDetection();
-		return __CAPABILITIES;
+		EnvUtils.initDetection();
+		return EnvUtils.__CAPABILITIES;
+	}
+
+
+	/**
+	 * Log stuff about your environment
+	 */
+	static log ():void
+	{
+		console.group("EnvUtils.log");
+		console.log("deviceType", EnvUtils.getDeviceType());
+		console.log("platform", EnvUtils.getPlatform());
+		console.log("browser", EnvUtils.getBrowser());
+		console.log("browserEngine", EnvUtils.getBrowserEngine());
+		console.log("capabilities", EnvUtils.getCapabilities());
+		console.groupEnd();
 	}
 }
-
-
-/*
- console.log("---------");
- console.log("deviceType", EnvUtils.getDeviceType());
- console.log("platform", EnvUtils.getPlatform());
- console.log("browser", EnvUtils.getBrowser());
- console.log("browserEngine", EnvUtils.getBrowserEngine());
- console.log("capabilities", EnvUtils.getCapabilities());
- console.log("---------");
- */

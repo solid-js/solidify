@@ -1,12 +1,10 @@
-export = TimerUtils;
-
-interface IFrameHandler
+export interface IFrameHandler
 {
 	externalHandler: (pEvent:Event) => void;
 	proxyHandler: (pEvent:Event) => void;
 }
 
-class TimerUtils
+export class TimerUtils
 {
 	/**
 	 * Stored handlers frames.
@@ -55,7 +53,8 @@ class TimerUtils
 		var found = false;
 
 		// Browse stored handlers
-		for (var i in this.__framesHandlers)
+		const total = this.__framesHandlers.length;
+		for (var i = 0; i < total; i ++)
 		{
 			// If this is our external handler, remove the listener on TweenLite
 			// And don't insert it in the new array
@@ -89,17 +88,5 @@ class TimerUtils
 
 		// Apply on tweenlite
 		TweenLite.ticker['fps'](this.__fps);
-	}
-
-	// todo : delay / cancelDelays
-
-	static delay (pTarget:any, pHandler:(...rest) => any, pDuration:number):void
-	{
-
-	}
-
-	static cancelDelaysTo (pTarget:any, pHandler:(...rest) => any):void
-	{
-
 	}
 }

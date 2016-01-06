@@ -1,6 +1,4 @@
-export = MathUtils;
-
-class MathUtils
+export class MathUtils
 {
 	/**
 	 * Get the angle between 3 points in radians

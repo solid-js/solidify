@@ -1,10 +1,8 @@
-export = Central;
-
-import Disposable = require("../core/Disposable");
+import {Disposable} from '../core/Disposable';
 
 // TODO : un méthode watch par instance de central pour loguer tout ce qu'il passe
 
-module Central
+export module Central
 {
 	/**
 	 * Handlers on actions

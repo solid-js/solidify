@@ -1,8 +1,8 @@
-export = DependencyManager;
+import {StringUtils} from '../utils/StringUtils';
+import {ModuleUtils} from '../utils/ModuleUtils';
+import {ArrayUtils} from '../utils/ArrayUtils';
 
-import StringUtils = require("../utils/StringUtils");
-import ModuleUtils = require("../utils/ModuleUtils");
-import ArrayUtils = require("../utils/ArrayUtils");
+// TODO : Virer la notion de namespace !
 
 // ----------------------------------------------------------------------------- INTERFACES
 
@@ -39,7 +39,7 @@ interface IDependency
 /**
  * Our public class
  */
-class DependencyManager
+export class DependencyManager
 {
     // ------------------------------------------------------------------------- SINGLETON
 
@@ -62,6 +62,7 @@ class DependencyManager
         return this.__instance;
     }
 
+
     // ------------------------------------------------------------------------- LOCALS
 
     /**
@@ -74,12 +75,14 @@ class DependencyManager
      */
     private _dependencies               :{[index:string] : IDependency}          = {};
 
+
     // ------------------------------------------------------------------------- CONSTRUCT
 
     /**
      * Constructor
      */
     constructor () { }
+
 
     // ------------------------------------------------------------------------- REGISTERING
 
@@ -157,6 +160,7 @@ class DependencyManager
             }
         }
     }
+
 
     // ------------------------------------------------------------------------- HELPERS
 

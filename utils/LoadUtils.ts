@@ -1,13 +1,6 @@
-export = LoadUtils;
-
-class LoadUtils
+export class LoadUtils
 {
-	/*
-	static preloadImage (pURL:string, pHandler:() => void):void
-	{
-		$('<img src="' + pURL + '" />').load(pHandler);
-	}
-	*/
+	// TODO : Doc !
 
 	static preloadImages (pURLs:string[], pHandler:() => void):void
 	{
@@ -20,7 +13,9 @@ class LoadUtils
 			{
 				pHandler();
 			}
-		}
+		};
+
+		// TODO : Vérifier si on n'a pas un leak ici (balise crée dans le vide avec un handler)
 
 		for (var i in pURLs)
 		{
@@ -28,7 +23,10 @@ class LoadUtils
 		}
 	}
 
-	//http://stackoverflow.com/questions/5680013/how-to-be-notified-once-a-web-font-has-loaded
+	// TODO : Doc !
+
+	// Dirty hack from http://stackoverflow.com/questions/5680013/how-to-be-notified-once-a-web-font-has-loaded
+
 	static preloadFont (fonts:string[], callback:() => void):void
 	{
 		var loadedFonts = 0;
@@ -84,7 +82,7 @@ class LoadUtils
 							fontLoaded();
 						}
 					}
-				};
+				}
 
 				interval = window.setInterval(checkFont, 100);
 

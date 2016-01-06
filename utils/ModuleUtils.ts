@@ -1,6 +1,4 @@
-export = ModuleUtils;
-
-class ModuleUtils
+export class ModuleUtils
 {
     /**
      * All defined and not loaded modules names in requirejs

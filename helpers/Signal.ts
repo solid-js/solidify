@@ -1,9 +1,9 @@
-export = Signal;
+import {Disposable} from "../core/Disposable";
 
 /**
  * Interface describing a listener.
  */
-interface IListener
+export interface IListener
 {
 	scope		:any;
 	handler		:() => any;
@@ -14,8 +14,7 @@ interface IListener
 /**
  * TODO : Faire en sorte qu'on puisse forcer les types des paramètres des handlers à l'instanciation
  */
-
-class Signal
+export class Signal extends Disposable
 {
 	// ------------------------------------------------------------------------- LOCALS
 
@@ -29,19 +28,19 @@ class Signal
 	 */
 	private _listeners				:IListener[]				= [];
 
+
 	// ------------------------------------------------------------------------- GETTERS
 
 	/**
 	 * Get total attached listeners
 	 */
-	get length ():number
-	{
-		return this._listeners.length;
-	}
+	get length ():number { return this._listeners.length; }
+
 
 	// ------------------------------------------------------------------------- CONSTRUCTION
 
 	constructor () { }
+
 
 	// ------------------------------------------------------------------------- ADDING / LISTENING
 
@@ -81,6 +80,7 @@ class Signal
 		return this._id;
 	}
 
+
 	// ------------------------------------------------------------------------- DISPATCHING
 
 	/**
@@ -95,7 +95,8 @@ class Signal
 		var listenersToRemove		:IListener[]	= [];
 
 		// Browse listeners
-		for (var listenerIndex in this._listeners)
+		const total = this._listeners.length;
+		for (var listenerIndex = 0; listenerIndex < total; listenerIndex ++)
 		{
 			// Target current listener
 			currentListener = this._listeners[listenerIndex];
@@ -141,10 +142,11 @@ class Signal
 		var listenerDeleted		:boolean		= false;
 
 		// Browse all listeners
-		for (var i in this._listeners)
+		const total = this._listeners.length;
+		for (var listenerIndex = 0; listenerIndex < total; listenerIndex ++)
 		{
 			// Target current listener
-			currentListener = this._listeners[i];
+			currentListener = this._listeners[listenerIndex];
 
 			// Check if we are on the listening to remove
 			if (
@@ -180,10 +182,12 @@ class Signal
 		return listenerDeleted;
 	}
 
+
 	// ------------------------------------------------------------------------- DESTRUCTION
 
 	dispose ():void
 	{
 		this._listeners = null;
+		super.dispose();
 	}
 }

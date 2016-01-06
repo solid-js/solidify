@@ -1,10 +1,6 @@
-export = ArrayUtils;
-
-class ArrayUtils
+export class ArrayUtils
 {
-
 	// TODO : Passer ses utils en generics pour garder le type
-
 
 	static inArray (pArray:any[], pElement:any):boolean
 	{
@@ -37,16 +33,4 @@ class ArrayUtils
 
 		return newArray;
 	}
-
-	/*
-	static concatInFirst (...rest:any[any:[]]):void
-	{
-		var first = rest[0];
-
-		for (var i in rest)
-		{
-
-		}
-	}
-	*/
 }

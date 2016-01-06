@@ -1,6 +1,4 @@
-export = StringUtils;
-
-class StringUtils
+export class StringUtils
 {
     /**
      * Add a trailing slash to the end of the path if not provided.
@@ -57,10 +55,9 @@ class StringUtils
     }
 
     // todo : cameltosnake
-    static camelToSnakeCase (pSource:string):string
-    {
-        return "todoLOL";
-    }
+	/*
+    static camelToSnakeCase (pSource:string):string { }
+    */
 
     /**
      * Micro template engine using regex and mustache like notation
@@ -75,6 +72,10 @@ class StringUtils
         });
     }
 
+	/**
+	 * Converting ASCII special chars to slug regular chars (ex: 'héhé lol' is converted to 'hehe-lol')
+	 * Handy for URLs
+	 */
     static SLUG_REGEX = [ {
             regex: /[\xC0-\xC6]/g,
             char: 'A'
@@ -115,7 +116,7 @@ class StringUtils
             regex: /[\xF1]/g,
             char: 'n'
         }
-    ]
+    ];
 
     /**
      * Converting a string for URL's.
@@ -123,7 +124,8 @@ class StringUtils
      */
     static slugify (pInput:string):string
     {
-        for (var i in this.SLUG_REGEX)
+		const total = this.SLUG_REGEX.length;
+        for (var i = 0; i < total; i ++)
         {
             pInput = pInput.replace(this.SLUG_REGEX[i].regex, this.SLUG_REGEX[i].char);
         }

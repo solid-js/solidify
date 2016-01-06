@@ -1,9 +1,7 @@
-export = Master;
+import {Disposable} from "./Disposable";
+import {DOMNode} from "../dom/DOMNode";
 
-import Disposable = require("./Disposable");
-import DOMNode = require("../dom/DOMNode");
-
-class Master extends Disposable
+export class Master extends Disposable
 {
 	public domNode					:DOMNode;
 

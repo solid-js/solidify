@@ -1,15 +1,13 @@
-export = BitmapUtils;
+// todo : SOLID doc pour les différents dégradé implémenter + throw error si pDirection pas bon
 
-module BitmapUtils
+export enum GradientTypes
 {
-	// todo : SOLID doc pour les différents dégradé implémenter + throw error si pDirection pas bon
+	LINEAR,
+	RADIAL
+}
 
-	export enum GradientTypes
-	{
-		LINEAR,
-		RADIAL
-	}
-
+export class BitmapUtils
+{
 	/**
 	 * Générer un bitmap dégradé
 	 * @param pWidth Largeur de l'image
@@ -19,7 +17,7 @@ module BitmapUtils
 	 * @param pDirection Direction du dégradé comme suit : x0 y0 x1 y1
 	 * @returns Le dégradé sous forme d'élément canvas
 	 */
-	export function generateGradient (pWidth:number, pHeight:number, pColorStops:any[][], pGradientType:GradientTypes, pDirection:number[] = [0, 0, pWidth, pHeight]):HTMLCanvasElement
+	static generateGradient (pWidth:number, pHeight:number, pColorStops:any[][], pGradientType:GradientTypes, pDirection:number[] = [0, 0, pWidth, pHeight]):HTMLCanvasElement
 	{
 		// Créer le canvas aux bonnes dimensions
 		var canvas = document.createElement('canvas');
@@ -73,7 +71,7 @@ module BitmapUtils
 
 	// todo : doc
 
-	export function generateText (pText:string, pWidth:number, pHeight:number, pFont:string = "12px Arial", pColor:string = "black", pAlign:string = "left", pVerticalOffset:number = 1):HTMLCanvasElement
+	static generateText (pText:string, pWidth:number, pHeight:number, pFont:string = "12px Arial", pColor:string = "black", pAlign:string = "left", pVerticalOffset:number = 1):HTMLCanvasElement
 	{
 		// Créer le canvas aux bonnes dimensions
 		var canvas = document.createElement('canvas');

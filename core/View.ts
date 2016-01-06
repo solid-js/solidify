@@ -1,10 +1,8 @@
-export = View;
-
 import Master = require("./Master");
 import DOMNode = require("../dom/DOMNode");
 import ComponentsWatcher = require("../dom/ComponentsWatcher");
 
-class View extends Master
+export class View extends Master
 {
 	static EXTERNAL_NODE_REPLACER = "s-external-replacer";
 	static INTERNAL_NODE_REPLACER = "s-internal-replacer";

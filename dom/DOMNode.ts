@@ -1,19 +1,17 @@
-export = DOMNode;
-
-import Disposable = require("../core/Disposable");
-import Master = require("../core/Master");
-import View = require("../core/View");
-import ArrayUtils = require("../utils/ArrayUtils");
-import ComponentsWatcher = require("../dom/ComponentsWatcher");
-import Signal = require("../helpers/Signal");
-import Central = require("../helpers/Central");
+import {Disposable} from '../core/Disposable';
+import {Master} from '../core/Master'
+import {View} from '../core/View'
+import {ArrayUtils} from '../utils/ArrayUtils'
+import {ComponentsWatcher} from '../dom/ComponentsWatcher'
+import {Signal} from '../helpers/Signal'
+import {Central} from '../helpers/Central'
 
 // ----------------------------------------------------------------------------- STRUCTS
 
 /**
  * Selector overload declaration
  */
-interface ISelectors
+export interface ISelectors
 {
     [index:string] : string;
 }
@@ -21,7 +19,7 @@ interface ISelectors
 /**
  * Binding overload declaration
  */
-interface IBindings
+export interface IBindings
 {
     [index:string] : (...rest) => any;
 }
@@ -29,7 +27,7 @@ interface IBindings
 /**
  * Registerd binding for removal
  */
-interface IMappedHandler
+export interface IMappedHandler
 {
     handler : (...rest) => void;
     target  : any;
@@ -39,7 +37,7 @@ interface IMappedHandler
 
 // ----------------------------------------------------------------------------- CLASS
 
-class DOMNode extends Disposable
+export class DOMNode extends Disposable
 {
     /**
      * Event detection to event types

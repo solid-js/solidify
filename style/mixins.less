@@ -1,38 +1,20 @@
-/**
- * borderImage
- * @img {string}
- * @number {number}
- * @repeat {string}
- * http://www.w3.org/TR/css3-background/#border-images
- */
-.borderImage (@img, @number, @repeat: stretch)
-{
-  @val: @img @number @repeat;
-  border-image: @val;
-}
+
+
+// ----------------------------------------------------------------------------- TOOLS
 
 /**
- * Debug mixin
- * @size {string}
- * @color {string}
+ * Debug an element with an outline with custom size and color.
  */
 .debug (@size: 1px, @color: red)
 {
   outline: @size solid  @color;
 }
 
-/**
- * Transitions CSS
- */
-/*
-.transition(@duration: 0.5s, @easing: 'ease-out')
-{
-  transition: all @duration @easing;
-}
-*/
+
+// ----------------------------------------------------------------------------- BACKGROUNDS
 
 /**
- * Gradient
+ * Set quick and dirty back gradient.
  */
 .gradient (@startColor: #000, @endColor: #fff, @deg: to bottom)
 {
@@ -45,16 +27,10 @@
 }
 
 
-/**
- * Background image
- */
-.background (@image; @repeat:no-repeat; @position:top left; @color:transparent)
-{
-  background: url('@{imagesPath}@{image}') @repeat @position @color;
-}
+// ----------------------------------------------------------------------------- POSITION AND SIZE
 
 /**
- * Positionner un élement en absolu
+ * Place an element absolute
  */
 .place (@top:auto; @right:auto; @bottom:auto; @left:auto)
 {
@@ -65,6 +41,9 @@
   left: @left;
 }
 
+/**
+ * Place an element absolute on top left
+ */
 .topLeft (@top:auto; @left:auto)
 {
   position: absolute;
@@ -73,7 +52,37 @@
 }
 
 /**
- * Size
+ * Place an element absolute on top right
+ */
+.topRight (@top:auto; @right:auto)
+{
+	position: absolute;
+	top: @top;
+	right: @right;
+}
+
+/**
+ * Place an element absolute on bottom right
+ */
+.bottomRight (@bottom:auto; @right:auto)
+{
+	position: absolute;
+	bottom: @bottom;
+	right: @right;
+}
+
+/**
+ * Place an element absolute on bottom left
+ */
+.bottomLeft (@bottom:auto; @left:auto)
+{
+	position: absolute;
+	bottom: @bottom;
+	left: @left;
+}
+
+/**
+ * Set width and height on en element
  */
 .size (@width:auto; @height:auto)
 {
@@ -81,43 +90,10 @@
   height: @height;
 }
 
-/**
- * Box shadow
- */
-.boxShadow (@color:rgba(0,0,0,0.3); @h:0px; @v:0px; @f:9px)
-{
-  box-shadow: @h @v @f @color;
-}
+// ----------------------------------------------------------------------------- SELECTION
 
 /**
- * No box shadow
- */
-.noBoxShadow ()
-{
-  box-shadow: none;
-}
-
-/**
- * Sprite
- */
-.sprite (@positionX:0px; @positionY:0px; @repeat:no-repeat; @sprite:'sprite.png')
-{
-  .background(@sprite, @repeat, -@positionX -@positionY);
-  background-size: @spriteWidth / @spriteDensity @spriteHeight / @spriteDensity;
-}
-
-/**
- * Target sprite
- */
-.targetSprite (@sprite:'sprite.png')
-{
-  background-image: url('@{imagesPath}@{sprite}');
-  background-repeat: no-repeat;
-  background-size: @spriteWidth / @spriteDensity @spriteHeight / @spriteDensity;
-}
-
-/**
- * Désactiver la sélection
+ * Disable text selection on an element
  */
 .disableSelection ()
 {
@@ -130,7 +106,7 @@
 }
 
 /**
- * Activer la sélection
+ * Enable text selection on an element
  */
 .enableSelection ()
 {
@@ -142,26 +118,12 @@
   user-select: all;
 }
 
-/**
- * Accélération matérielle 2D du pauvre
- */
-.hwa2 ()
-{
-  transform: translate2D(0px, 0px);
-}
+
+// ----------------------------------------------------------------------------- SCROLLS
 
 /**
- * Accélération matérielle 3D du pauvre
- */
-.hwa3 ()
-{
-  transform: translate3D(0px, 0px, 0px);
-}
-
-/**
- * Corrige la scroll smooth sur iPad / iPhone
- * Supprime la scrollbar visible sur IE10+
- * Masque la scrollbar sur chrome PC
+ * Patch scrolling on iOS
+ * Hide visible scrollBar on IE10+ and chrome PC
  */
 .scrollPatch ()
 {
@@ -177,7 +139,7 @@
 }
 
 /**
- * Active le scroll ainsi que le patch
+ * Enable vertical scroll on an element and patch it
  */
 .verticalScroll ()
 {
@@ -188,8 +150,11 @@
   .scrollPatch();
 }
 
+
+// ----------------------------------------------------------------------------- FONTS
+
 /**
- * Déclarer et charger une typo en CSS3
+ * Declare and load a font
  */
 .declareFontFace (@basePath, @fontFileName, @fontFamilyName, @fontWeight: normal, @fontStyle: normal)
 {
