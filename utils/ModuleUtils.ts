@@ -1,11 +1,17 @@
 export class ModuleUtils
 {
+	/**
+	 * Target the requirejs lib on global scope
+	 */
+	static REQUIRE 			= window['requirejs'];
+
+
     /**
      * All defined and not loaded modules names in requirejs
      */
     static getRegistryNames ():{[index:string] : any}
     {
-        return window['requirejs'].s.contexts['_'].registry;
+        return ModuleUtils.REQUIRE.s.contexts['_'].registry;
     }
 
     /**
@@ -13,25 +19,29 @@ export class ModuleUtils
      */
     static getLoadedModulesNames ():{[index:string] : any}
     {
-        return window['requirejs'].s.contexts['_'].defined;
+        return ModuleUtils.REQUIRE.s.contexts['_'].defined;
     }
 
     /**
      * A proxy method to the require global function from requirejs.
-     * If you load a module in sync mode (no handler), only the first module from dependencies list will be loaded.
      * In sync mode, all loaded have to be preloaded once in async mode.
-     * @param pDependencies List of dependencies needed
-     * @param pHandler Called when dependencies are loaded, each argument is a reference to the dependency from the list
-     * @returns nothing good for now
+     * @param pDependencyName Name of dependency needed
      */
-    static requireProxy (pDependencies:string[], pHandler:(...args) => void = null):any
+    static requireSync (pDependencyName:string):any
     {
-        // Scope the require global function
-        var r = window["requirejs"];
-
-        // Call with handler if provided
-        return (pHandler != null ? r(pDependencies, pHandler) : r(pDependencies[0]));
+		return ModuleUtils.REQUIRE(pDependencyName);
     }
+
+	/**
+	 * A proxy method to the require global function from requirejs.
+	 * In async mode, several dependencies can be loaded and module do not have to be preloaded.
+	 * @param pDependenciesNames List of dependencies needed
+	 * @param pHandler Called when modules are ready. Every module required is a new argument.
+	 */
+	static requireAsync (pDependenciesNames:string[], pHandler:(...args) => void):void
+	{
+		ModuleUtils.REQUIRE(pDependenciesNames, pHandler);
+	}
 
     /**
      * Instantiate a class with its reference and an arguments list.
@@ -91,7 +101,7 @@ export class ModuleUtils
                     modulesToLoad.push(moduleName);
 
                     // Use the require proxy to preload
-                    this.requireProxy([moduleName], () =>
+                    this.requireAsync([moduleName], () =>
                     {
                         // When loaded, count it
                         totalLoadedModules ++;

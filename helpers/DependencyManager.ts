@@ -2,23 +2,19 @@ import {StringUtils} from '../utils/StringUtils';
 import {ModuleUtils} from '../utils/ModuleUtils';
 import {ArrayUtils} from '../utils/ArrayUtils';
 
-// TODO : Virer la notion de namespace !
-
 // ----------------------------------------------------------------------------- INTERFACES
 
 /**
  * Internal interface for modules path
  */
-interface IModulePathStorage
+export interface IModulePathStorage
 {
     /**
      * {
-     *      "namespace" : {
-     *          "type" : ["path"]
-     *      }
+     * 		"type" : ["path"]
      * }
      */
-    [index:string]: {[index:string]: string[]};
+    [index:string]: string[];
 }
 
 /**
@@ -88,99 +84,74 @@ export class DependencyManager
 
     /**
      * Add a module path to be able to requireModule after.
-     * For ex : ("myNameSpace", "src/components/", "Component")
-     * will allow MenuComponent to be required from the path "src/component/MenuComponent" in namespace myNameSpace.
-     * NB1: Namespace and module types are stored to lower case.
+     * For ex : ("src/components/", "Component")
+     * will allow MenuComponent to be required from the path "src/component/MenuComponent"
+     * NB1: Types are stored to lower case.
      * NB2: You'll have to call updateModuleCache to be able to require synchronously.
      */
-    registerModulePath (pNamespace:string, pModulePath:string, pModuleType:string):void
+    registerModulePath (pModuleType:string, pModulePath:string):void
     {
-        // Namespace and type at lowerCase to avoid stupid things
-        pNamespace = pNamespace.toLowerCase();
+        // Type at lowerCase to avoid stupid things
         pModuleType = pModuleType.toLowerCase();
 
-        // Add this namespace if not yet registered
-        if (!(pNamespace in this._modulesPath))
-        {
-            this._modulesPath[pNamespace] = {};
-        }
-
         // Add this module type if not yet registered
-        if (!(pModuleType in this._modulesPath[pNamespace]))
+        if (!(pModuleType in this._modulesPath))
         {
-            this._modulesPath[pNamespace][pModuleType] = [];
+            this._modulesPath[pModuleType] = [];
         }
 
         // Record the path with trailing slash to the module type
-        this._modulesPath[pNamespace][pModuleType].push(StringUtils.addTrailingSlash(pModulePath));
+        this._modulesPath[pModuleType].push(StringUtils.addTrailingSlash(pModulePath));
     }
 
     /**
      * Register several modules at once (look at registerModulePath).
      * You have to follow IModulePathStorage implementation like so :
-     * namespace -> moduleType -> [modulePath]
-     * NB1: Namespace and module types are stored to lower case.
+     * moduleType -> [modulePath]
+     * NB1: Types are stored to lower case.
      * NB2: You'll have to call updateModuleCache to be able to require synchronously.
      */
     registerModulesPath (pPaths:IModulePathStorage):void
     {
-        var moduleNamespaceLowerCase:string;
+		// Browse module types
+		for (var moduleType in pPaths)
+		{
+			// To lowercase
+			moduleType = moduleType.toLowerCase();
 
-        // Browse namespaces
-        for (var moduleNamespace in pPaths)
-        {
-            // To lowercase
-            moduleNamespaceLowerCase = moduleNamespace.toLowerCase();
+			// Insert if not existent
+			if (!(moduleType in this._modulesPath))
+			{
+				this._modulesPath[moduleType] = [];
+			}
 
-            // Insert if not existent
-            if (!(moduleNamespaceLowerCase in this._modulesPath))
-            {
-                this._modulesPath[moduleNamespaceLowerCase] = {};
-            }
-
-            // Browse module types
-            for (var moduleType in pPaths[moduleNamespace])
-            {
-                // To lowercase
-                moduleType = moduleType.toLowerCase();
-
-                // Insert if not existent
-                if (!(moduleType in this._modulesPath[moduleNamespaceLowerCase]))
-                {
-                    this._modulesPath[moduleNamespaceLowerCase][moduleType] = [];
-                }
-
-                // Insert all paths for this module / namespace
-                for (var modulePathIndex in pPaths[moduleNamespace][moduleType])
-                {
-                    this._modulesPath[moduleNamespaceLowerCase][moduleType].push(
-                        StringUtils.addTrailingSlash(pPaths[moduleNamespace][moduleType][modulePathIndex])
-                    );
-                }
-            }
-        }
+			// Insert all paths for this module
+			for (var modulePathIndex in pPaths[moduleType])
+			{
+				this._modulesPath[moduleType].push(
+					StringUtils.addTrailingSlash(pPaths[moduleType][modulePathIndex])
+				);
+			}
+		}
     }
 
 
     // ------------------------------------------------------------------------- HELPERS
 
     /**
-     * Flat array of stored modules path (without namespace and type)
+     * Flat array of stored modules path (without type)
      */
     getFlatModulesPath ():string[]
     {
         var modulesPath:string[] = [];
 
-        for (var moduleNamespace in this._modulesPath)
-        {
-            for (var moduleType in this._modulesPath[moduleNamespace])
-            {
-                for (var pathIndex in this._modulesPath[moduleNamespace][moduleType])
-                {
-                    modulesPath.push(this._modulesPath[moduleNamespace][moduleType][pathIndex]);
-                }
-            }
-        }
+		for (var moduleType in this._modulesPath)
+		{
+			for (var pathIndex in this._modulesPath[moduleType])
+			{
+				modulesPath.push(this._modulesPath[moduleType][pathIndex]);
+			}
+		}
 
         return modulesPath;
     }
@@ -192,16 +163,13 @@ export class DependencyManager
     {
         var modulesType:string[] = [];
 
-        for (var moduleNamespace in this._modulesPath)
-        {
-            for (var moduleType in this._modulesPath[moduleNamespace])
-            {
-                if (!ArrayUtils.inArray(modulesType, moduleType))
-                {
-                    modulesType.push(moduleType);
-                }
-            }
-        }
+		for (var moduleType in this._modulesPath)
+		{
+			if (!ArrayUtils.inArray(modulesType, moduleType))
+			{
+				modulesType.push(moduleType);
+			}
+		}
 
         return modulesType;
     }
@@ -213,17 +181,15 @@ export class DependencyManager
      */
     updateModuleCache (pHandler:(pLoadedModules:string[]) => void):void
     {
-        //SLog.log(0, "Updating dependency manager cache...");
-        console.log("Updating dependency manager cache...");
-
         // Get flat version of all dynamic modules path
         var modulesPath = this.getFlatModulesPath();
 
         // Preload those modules and get beck via the handler
         ModuleUtils.preloadModules(modulesPath, (pLoadedModules:string[]):void =>
         {
-            //SLog.log(0, "-> " + pLoadedModules.length + " module(s) loaded.");
-            console.log("-> " + pLoadedModules.length + " module(s) loaded.");
+        	console.group(`DependencyManager.updateModuleCache // ${pLoadedModules.length} loaded`);
+			console.log(pLoadedModules);
+            console.groupEnd();
 
             // Relay
             pHandler(pLoadedModules);
@@ -234,39 +200,27 @@ export class DependencyManager
 
     /**
      * Require a module by name and type, from registered modules paths.
-     * TODO : Faire une version qui rend les namespace optionnels ? -> Peut être une mauvaise idée
-     * @param pNamespace The name of the namespace to get the module from.
+	 * Important : module have to be pre-loaded with updateModuleCache method !
      * @param pModuleName The name of the module to get, for ex: "Home" to get "HomeController"
      * @param pModuleType The type of the module to get, for ex: "Controller" to get "HomeController"
      * @param pConstructorArguments Pass an array of arguments to instantiate the module, if not provided, the module reference will be returned.
-     * @param pHandler Called when the module is ready, first parameter is your module reference or module instance.
+     * @param pExportName Name of the exported element to get (default is 'default', for ex : 'export default class Test' will work. Also, if there is no default exported element but an element is exported with the name of the module, it will works.
      * @returns The module if available in sync module. Otherwise module will be return by the handler.
      */
-    requireModule (pNamespace:string, pModuleName:string, pModuleType:string, pConstructorArguments:any[] = null, pHandler:(any) => void = null):any
+    requireModule (pModuleName:string, pModuleType:string, pConstructorArguments:any[] = null, pExportName:string = 'default'):any
     {
-		// TODO: Solid : ATTENTION si ici le namespace est undefined, rien n'est instancié ! BUG CHELOU
-		// TODO: Solid : Faire en sorte d'avoir un namespace par défaut
-
-        // Namespace and type at lowerCase to avoid stupid things
-        pNamespace = pNamespace.toLowerCase();
+        // Type at lowerCase to avoid stupid things
         pModuleType = pModuleType.toLowerCase();
 
-        // Get loaded and not loaded modules via requireJS
-        var registryModules     = ModuleUtils.getRegistryNames();
+        // Get loaded modules via requireJS
         var loadedModules       = ModuleUtils.getLoadedModulesNames();
 
-        // Convert all modules path to lowercase for safer search and keep in key for faster check
-        var lowerCaseLoadedModules:{[index: string]: any} = {};
-        var moduleName:string;
-        for (moduleName in registryModules)
+        // Keep in key for faster check
+        var loadedModulesByKey:{[index: string]: any} = {};
+        for (var moduleName in loadedModules)
         {
             // Lowercase in key, and keep the rich case version in value
-            lowerCaseLoadedModules[moduleName.toLowerCase()] = moduleName;
-        }
-        for (moduleName in loadedModules)
-        {
-            // Lowercase in key, and keep the rich case version in value
-            lowerCaseLoadedModules[moduleName.toLowerCase()] = moduleName;
+            loadedModulesByKey[moduleName.toLowerCase()] = moduleName;
         }
 
         // Target the module path
@@ -275,64 +229,69 @@ export class DependencyManager
         // Registered base path
         var localModulePath     :string;
 
-        // If we found our damn module
-        var moduleFound         :boolean = false;
-
-
-        // Check if wa have this namespace registered
-        if (!(pNamespace in this._modulesPath))
-        {
-            throw new Error('DependencyManager.requireModule // Namespace "' + pNamespace + '" not found.');
-        }
+		// Full path of the found module
+		var fullModulePath		:string;
 
         // Check if we have this module type registered
-        if (!(pModuleType in this._modulesPath[pNamespace]))
+        if (!(pModuleType in this._modulesPath))
         {
-            throw new Error('DependencyManager.requireModule // Module type "' + pModuleType + '" not found in namespace "' + pNamespace + '".');
+            throw new Error(`DependencyManager.requireModule // Module type ${pModuleType} not found when loading ${pModuleName}.`);
         }
 
         // Run on modules paths registered for this module type
-        for (var modulePathIndex in this._modulesPath[pNamespace][pModuleType])
+        for (var modulePathIndex in this._modulesPath[pModuleType])
         {
             // Get the path
-            localModulePath = this._modulesPath[pNamespace][pModuleType][modulePathIndex];
+            localModulePath = this._modulesPath[pModuleType][modulePathIndex];
 
             // Generate the module path with low case on the first letter
-            currentModulePath = (localModulePath + pModuleName + "/" + pModuleName + pModuleType).toLowerCase();
+            currentModulePath = (localModulePath + pModuleName + "/" + pModuleName).toLowerCase();
 
             // And check if this path exist in loaded requirejs libs
-            if (lowerCaseLoadedModules[currentModulePath] != null)
+            if (loadedModulesByKey[currentModulePath] != null)
             {
-                // We found it
-                moduleFound = true;
+                // We found it, get the full path
+				fullModulePath = loadedModulesByKey[currentModulePath];
                 break;
             }
         }
 
         // The lib was not found
-        if (!moduleFound)
+        if (fullModulePath == null)
         {
-            throw new Error('DependencyManager.requireModule // Module "' + pModuleName + '" not found with type "' + pModuleType + '" in namespace "' + pNamespace + '".');
+            throw new Error(`DependencyManager.requireModule // Module ${pModuleName} not found with type ${pModuleType}. Please check if the module is loaded or update modules caches.`);
         }
 
-        // If we are in async mode
-        if (pHandler != null)
-        {
-            // Call the require proxy to get the module by its path
-            ModuleUtils.requireProxy([lowerCaseLoadedModules[currentModulePath]], (pModuleReference) =>
-            {
-                // When its loaded, instantiate with arguments if needed and callback
-                pHandler(this.instanciateModule(pModuleReference, pConstructorArguments));
-            });
-        }
-        else
-        {
-            // Get the module in sync mode, instantiate if needed and return
-            return this.instanciateModule(
-                ModuleUtils.requireProxy([lowerCaseLoadedModules[currentModulePath]]),
-                pConstructorArguments
-            );
-        }
+		// Load the module
+		var module = ModuleUtils.requireSync(loadedModulesByKey[currentModulePath]);
+
+		// The exported element from the module to get
+		var moduleExport:any;
+
+		// Get the file name for the export class if export by name is not found
+		var moduleFileName:string = StringUtils.getFileFromPath(fullModulePath);
+
+		// Try to get the export via parameter
+		if (pExportName in module)
+		{
+			moduleExport = module[pExportName];
+		}
+
+		// Try via class name
+		else if (moduleFileName in module)
+		{
+			moduleExport = module[moduleFileName];
+		}
+
+		// Not found
+		else
+		{
+			console.log(module);
+			throw new Error(`DependencyManager.requireModule // Module ${pModuleName} is found with type ${pModuleType} but the export ${pExportName} is not found.`);
+		}
+
+		// Return the module export instanciated or not depending on constructor argument parameter
+		return this.instanciateModule(moduleExport, pConstructorArguments);
     }
 
     /**
@@ -357,7 +316,7 @@ export class DependencyManager
     {
         if (pName in this._dependencies)
         {
-            throw new Error('DependencyManager.register[Instance|Class] // ' + pName + ' is already registered. Please delete it with deleteDependecy before.');
+            throw new Error(`DependencyManager.register[Instance|Class] // ${pName} is already registered. Please delete it with deleteDependecy before.`);
         }
     }
 
@@ -368,8 +327,10 @@ export class DependencyManager
      */
     public registerInstance (pName:string, pInstance:any):void
     {
+		// Check if our dependency isn't already registered
         this.checkAlreadyRegisteredDependency(pName);
 
+		// Record instance
         this._dependencies[pName] = {
             instance: pInstance,
             classRef: null,
@@ -387,8 +348,10 @@ export class DependencyManager
      */
     public registerClass (pName:string, pClass:{new () : any}, pSingleton:boolean = false):void
     {
+		// Check if our dependency isn't already registered
         this.checkAlreadyRegisteredDependency(pName);
 
+		// Record class ref
         this._dependencies[pName] = {
             instance: null,
             classRef: pClass,
@@ -405,7 +368,7 @@ export class DependencyManager
     {
         if (!(pName in this._dependencies))
         {
-            throw new Error('DependencyManager.requireInstance // ' + pName + ' instance not found.');
+            throw new Error(`DependencyManager.requireInstance // ${pName} instance not found.`);
         }
 
         var currentDependency:IDependency = this._dependencies[pName];
@@ -426,10 +389,11 @@ export class DependencyManager
         return currentDependency.instance;
     }
 
-    // todo : getDependencies
+    // todo : getDependencies -> ??
     // todo : removeDependency
 
     public removeDependency (pName:string):void
     {
+
     }
 }

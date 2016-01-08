@@ -59,6 +59,41 @@ export class StringUtils
     static camelToSnakeCase (pSource:string):string { }
     */
 
+	/**
+	 * Get file name from any path.
+	 * Will return full string if no slash found.
+	 * ex : 'usr/bin/TestFile' will return 'TestFile'
+	 */
+	static getFileFromPath (pPath:string):string
+	{
+		var lastIndex = pPath.lastIndexOf('/');
+
+		if (lastIndex == -1)
+		{
+			lastIndex = 0;
+		}
+
+		return pPath.substring(lastIndex + 1, pPath.length);
+	}
+
+	/**
+	 * Get the base folder from any path.
+	 * Will include trailing slash.
+	 * Will return full string if no slash found.
+	 * ex: 'usr/bin/TestFile' will return 'usr/bin/'
+	 */
+	static getBaseFromPath (pPath:string):string
+	{
+		var lastIndex = pPath.lastIndexOf('/');
+
+		if (lastIndex == -1)
+		{
+			lastIndex = pPath.length;
+		}
+
+		return pPath.substring(0, lastIndex);
+	}
+
     /**
      * Micro template engine using regex and mustache like notation
      * @param pTemplate Base mustache like template (ex: "Hey {{userName}} !")

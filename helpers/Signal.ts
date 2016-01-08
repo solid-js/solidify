@@ -39,7 +39,10 @@ export class Signal extends Disposable
 
 	// ------------------------------------------------------------------------- CONSTRUCTION
 
-	constructor () { }
+	constructor ()
+	{
+		super();
+	}
 
 
 	// ------------------------------------------------------------------------- ADDING / LISTENING
@@ -93,10 +96,11 @@ export class Signal extends Disposable
 		var currentListener			:IListener;
 		var currentResult			:any;
 		var listenersToRemove		:IListener[]	= [];
+		var listenerIndex 							= 0;
 
 		// Browse listeners
-		const total = this._listeners.length;
-		for (var listenerIndex = 0; listenerIndex < total; listenerIndex ++)
+		let total = this._listeners.length;
+		for (listenerIndex = 0; listenerIndex < total; listenerIndex ++)
 		{
 			// Target current listener
 			currentListener = this._listeners[listenerIndex];
@@ -118,7 +122,8 @@ export class Signal extends Disposable
 		}
 
 		// Remove all once listeners
-		for (listenerIndex in listenersToRemove)
+		total = listenersToRemove.length;
+		for (listenerIndex = 0; listenerIndex < total; listenerIndex ++)
 		{
 			this.remove(listenersToRemove[listenerIndex].handler);
 		}

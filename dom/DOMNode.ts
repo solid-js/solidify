@@ -2,7 +2,7 @@ import {Disposable} from '../core/Disposable';
 import {Master} from '../core/Master'
 import {View} from '../core/View'
 import {ArrayUtils} from '../utils/ArrayUtils'
-import {ComponentsWatcher} from '../dom/ComponentsWatcher'
+//import {ComponentsWatcher} from '../dom/ComponentsWatcher'
 import {Signal} from '../helpers/Signal'
 import {Central} from '../helpers/Central'
 
@@ -225,7 +225,8 @@ export class DOMNode extends Disposable
             this._master[jquerySelectorName] = jqueryTargetedElement;
 
             // Browser selector for view components
-            viewComponents = ComponentsWatcher.getInstance().getViewsByJQuery(jqueryTargetedElement);
+			// TODO : Disabled
+            //viewComponents = ComponentsWatcher.getInstance().getViewsByJQuery(jqueryTargetedElement);
 
             // Insert groups into View[]
             if (this._master[selectorName] instanceof Array || viewComponents.length > 1)
