@@ -32,4 +32,33 @@ export class DOMUtils
 		// Oops
 		else return null;
 	}
+
+	/**
+	 * Get size of scrollbar following client env.
+	 * Warning hazardous code !
+	 * @returns the default size of a vertical scrollbar
+	 */
+	static getScrollBarSize ():Number
+	{
+		// Create temp scrollable div
+		var $scrollableDiv = $('<div></div>').addClass('verticalScroll').css({
+			position: 'absolute',
+			width: 100,
+			height: 100,
+			overflow: 'scroll',
+			top: -9999
+		});
+
+		// Append it to body
+		$scrollableDiv.appendTo($('body'));
+
+		// Measure inner and outer size
+		var scrollBarWidth = $scrollableDiv[0].offsetWidth - $scrollableDiv[0].clientWidth;
+
+		// Remove from dom
+		$scrollableDiv.remove();
+
+		// Return measured size and pray
+		return scrollBarWidth;
+	}
 }
