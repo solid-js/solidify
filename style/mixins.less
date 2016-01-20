@@ -7,7 +7,7 @@
  */
 .debug (@size: 1px, @color: red)
 {
-  outline: @size solid  @color;
+	outline: @size solid  @color;
 }
 
 
@@ -18,12 +18,12 @@
  */
 .gradient (@startColor: #000, @endColor: #fff, @deg: to bottom)
 {
-  background: linear-gradient(@deg, @startColor, @endColor);
+	background: linear-gradient(@deg, @startColor, @endColor);
 
-  //Pour IE <= 9
-  @c-start: argb(@startColor);
-  @c-end:   argb(@endColor);
-  filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr='@{c-end}', endColorstr='@{c-start}', GradientType=0)";
+	//Pour IE <= 9
+	@c-start: argb(@startColor);
+	@c-end:   argb(@endColor);
+	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr='@{c-end}', endColorstr='@{c-start}', GradientType=0)";
 }
 
 
@@ -34,11 +34,11 @@
  */
 .place (@top:auto; @right:auto; @bottom:auto; @left:auto)
 {
-  position: absolute;
-  top: @top;
-  right: @right;
-  bottom: @bottom;
-  left: @left;
+	position: absolute;
+	top: @top;
+	right: @right;
+	bottom: @bottom;
+	left: @left;
 }
 
 /**
@@ -46,9 +46,9 @@
  */
 .topLeft (@top:auto; @left:auto)
 {
-  position: absolute;
-  top: @top;
-  left: @left;
+	position: absolute;
+	top: @top;
+	left: @left;
 }
 
 /**
@@ -86,8 +86,8 @@
  */
 .size (@width:auto; @height:auto)
 {
-  width: @width;
-  height: @height;
+	width: @width;
+	height: @height;
 }
 
 // ----------------------------------------------------------------------------- SELECTION
@@ -97,12 +97,12 @@
  */
 .disableSelection ()
 {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 /**
@@ -110,12 +110,12 @@
  */
 .enableSelection ()
 {
-  -webkit-touch-callout: all;
-  -webkit-user-select: all;
-  -khtml-user-select: all;
-  -moz-user-select: all;
-  -ms-user-select: all;
-  user-select: all;
+	-webkit-touch-callout: all;
+	-webkit-user-select: all;
+	-khtml-user-select: all;
+	-moz-user-select: all;
+	-ms-user-select: all;
+	user-select: all;
 }
 
 
@@ -127,15 +127,15 @@
  */
 .scrollPatch ()
 {
-  // Compatibilité IE / iPad
-  overflow-scrolling: touch;
-  -webkit-overflow-scrolling: touch;
+	// Compatibilité IE / iPad
+	overflow-scrolling: touch;
+	-webkit-overflow-scrolling: touch;
 
-  // Masquer les scrollBar sur ie10+
-  -ms-overflow-style: none;
+	// Masquer les scrollBar sur ie10+
+	-ms-overflow-style: none;
 
-  // Masquer les scrollbar sur chrome
-  &::-webkit-scrollbar { width: 0 !important }
+	// Masquer les scrollbar sur chrome
+	&::-webkit-scrollbar { width: 0 !important }
 }
 
 /**
@@ -143,11 +143,11 @@
  */
 .verticalScroll ()
 {
-  // Scroll
-  overflow: hidden;
-  overflow-y: scroll;
+	// Scroll
+	overflow: hidden;
+	overflow-y: scroll;
 
-  .scrollPatch();
+	.scrollPatch();
 }
 
 
@@ -156,18 +156,30 @@
 /**
  * Declare and load a font
  */
-.declareFontFace (@basePath, @fontFileName, @fontFamilyName, @fontWeight: normal, @fontStyle: normal)
+.declareFontFace (@basePath, @fontFileName, @fontFamilyName, @fontWeight: normal, @fontStyle: normal, @SVGName: '')
 {
-  @font-face
-  {
-    font-family: @fontFamilyName;
+	@font-face
+	{
+		font-family: @fontFamilyName;
 
-    src:  url(~'@{basePath}@{fontFileName}.eot?#iefix')             format('embedded-opentype'),
-          url(~'@{basePath}@{fontFileName}.woff')                   format('woff'),
-          url(~'@{basePath}@{fontFileName}.ttf')                    format('truetype'),
-          url(~'@{basePath}@{fontFileName}.svg#AdihausDIN-Regular') format('svg');
+		src:  url(~'@{basePath}@{fontFileName}.eot?#iefix')             format('embedded-opentype'),
+		url(~'@{basePath}@{fontFileName}.woff')                   format('woff'),
+		url(~'@{basePath}@{fontFileName}.ttf')                    format('truetype'),
+		url(~'@{basePath}@{fontFileName}.svg#@{SVGName}') 				format('svg');
 
-    font-weight: @fontWeight;
-    font-style: @fontStyle;
-  }
+		font-weight: @fontWeight;
+		font-style: @fontStyle;
+	}
+}
+
+/**
+ * Smooth fonts
+ */
+.fontSmooth ()
+{
+	// Activer l'anti-aliasing
+	font-smooth: always;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
 }

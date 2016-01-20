@@ -2,16 +2,20 @@ export class LoadUtils
 {
 	// TODO : Doc !
 
-	static preloadImages (pURLs:string[], pHandler:() => void):void
+	static preloadImages (pURLs:string[], pHandler:(pImages:Element[]) => void):void
 	{
 		var total = pURLs.length;
 		var current = 0;
 
-		var handler = function ()
+		var images = [];
+
+		var handler = function (pEvent:JQueryEventObject)
 		{
-			if (current++ > total)
+			images.push(pEvent.target);
+
+			if (++ current == total)
 			{
-				pHandler();
+				pHandler(images);
 			}
 		};
 
@@ -19,7 +23,7 @@ export class LoadUtils
 
 		for (var i in pURLs)
 		{
-			$('<img src="' + pURLs[i] + '" />').load(pHandler);
+			$('<img src="' + pURLs[i] + '" />').load(handler);
 		}
 	}
 
