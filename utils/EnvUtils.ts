@@ -3,6 +3,7 @@
  * Just handheld or desktop, no mobile / phone / laptop because we manage this via mediaQueries.
  * If not found, will be desktop by default
  */
+import {StringUtils} from "./StringUtils";
 export enum DeviceType
 {
 	HANDHELD,
@@ -300,7 +301,6 @@ export class EnvUtils
 		return EnvUtils.__CAPABILITIES;
 	}
 
-
 	/**
 	 * Log stuff about your environment
 	 */
@@ -313,5 +313,40 @@ export class EnvUtils
 		console.log("browserEngine", EnvUtils.getBrowserEngine());
 		console.log("capabilities", EnvUtils.getCapabilities());
 		console.groupEnd();
+	}
+
+	/**
+	 * Will add capabilities classes to DOM Element via selector.
+	 * Can add for ex :
+	 * is-chrome
+	 * is-webkit
+	 * is-windows
+	 * And also capabilities like :
+	 * has-video
+	 * has-geolocation
+	 */
+	static addClasses (pToSelector:string = 'body', pPrefix = ''):void
+	{
+		// Get env properties
+		EnvUtils.initDetection();
+
+		// Wait DOM
+		$(() =>
+		{
+			// Target selector
+			var $domRoot = $(pToSelector);
+
+			// Add env properties classes
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(Browser[EnvUtils.__BROWSER]				, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(BrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(DeviceType[EnvUtils.__DEVICE_TYPE]			, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(Platform[EnvUtils.__PLATFORM]				, '_'));
+
+			// Add capabilites
+			for (var i in EnvUtils.__CAPABILITIES)
+			{
+				EnvUtils.__CAPABILITIES[i] && $domRoot.addClass(pPrefix + 'has-' + i);
+			}
+		});
 	}
 }
