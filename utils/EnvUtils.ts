@@ -1,3 +1,8 @@
+// TODO : Ajouter le test de l'autoplay : https://github.com/Modernizr/Modernizr/blob/master/feature-detects/video/autoplay.js
+// TODO : A faire optionnel (ajouté avec un import depuis l'extérieur de ce fichier)
+// TODO : Car la mini video embed dans le fichier pèse un minimum
+
+
 /**
  * Listing of devices types available.
  * Just handheld or desktop, no mobile / phone / laptop because we manage this via mediaQueries.

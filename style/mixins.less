@@ -32,9 +32,9 @@
 /**
  * Place an element absolute
  */
-.place (@top:auto; @right:auto; @bottom:auto; @left:auto)
+.place (@top:auto; @right:auto; @bottom:auto; @left:auto; @position:absolute)
 {
-	position: absolute;
+	position: @position;
 	top: @top;
 	right: @right;
 	bottom: @bottom;
@@ -44,9 +44,9 @@
 /**
  * Place an element absolute on top left
  */
-.topLeft (@top:auto; @left:auto)
+.topLeft (@top:auto; @left:auto; @position:absolute)
 {
-	position: absolute;
+	position: @position;
 	top: @top;
 	left: @left;
 }
@@ -54,9 +54,9 @@
 /**
  * Place an element absolute on top right
  */
-.topRight (@top:auto; @right:auto)
+.topRight (@top:auto; @right:auto; @position:absolute)
 {
-	position: absolute;
+	position: @position;
 	top: @top;
 	right: @right;
 }
@@ -64,9 +64,9 @@
 /**
  * Place an element absolute on bottom right
  */
-.bottomRight (@bottom:auto; @right:auto)
+.bottomRight (@bottom:auto; @right:auto; @position:absolute)
 {
-	position: absolute;
+	position: @position;
 	bottom: @bottom;
 	right: @right;
 }
@@ -74,9 +74,9 @@
 /**
  * Place an element absolute on bottom left
  */
-.bottomLeft (@bottom:auto; @left:auto)
+.bottomLeft (@bottom:auto; @left:auto; @position:absolute)
 {
-	position: absolute;
+	position: @position;
 	bottom: @bottom;
 	left: @left;
 }
