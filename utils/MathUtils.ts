@@ -43,9 +43,6 @@ export class MathUtils
 	 */
 	static cssToNumber (pValue:string):any[]
 	{
-		// Vérifier si c'est bien un string
-		if (!_.isString(pValue)) return [0, null];
-
 		// Chercher l'unité "px"
 		var indexToCut = pValue.indexOf("px");
 
@@ -60,14 +57,14 @@ export class MathUtils
 			// Si on n'a pas trouvé l'unité
 			indexToCut == -1
 
-				// On ne peut pas retourner
-				? [
+			// On ne peut pas retourner
+			? [
 				parseFloat(pValue),
 				null
 			]
 
-				// Séparer la valeur de l'unité
-				: [
+			// Séparer la valeur de l'unité
+			: [
 				parseFloat(pValue.substr(0, indexToCut)),
 				pValue.substr(indexToCut, pValue.length).toLowerCase()
 			]

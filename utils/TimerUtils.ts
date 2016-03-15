@@ -6,6 +6,26 @@ export interface IFrameHandler
 
 export class TimerUtils
 {
+	// TODO : Doc
+
+	static polyfillRequestAnimationFrame ()
+	{
+		if (!('requestAnimationFrame' in window))
+		{
+			window.requestAnimationFrame = (
+				window['webkitRequestAnimationFrame'] ||
+				window['mozRequestAnimationFrame'] ||
+				window['oRequestAnimationFrame'] ||
+				window['msRequestAnimationFrame'] ||
+				function (pCallback)
+				{
+					window.setTimeout(pCallback, 1000 / TimerUtils.__fps);
+				}
+			);
+		}
+	}
+
+
 	/**
 	 * Stored handlers frames.
 	 */
@@ -32,7 +52,7 @@ export class TimerUtils
 		};
 
 		// Listener the frames on the proxy
-		TweenLite.ticker.addEventListener("tick", proxyHandler);
+		TweenLite.ticker.addEventListener('tick', proxyHandler);
 
 		// Store the proxy and external handler association for future deletion
 		this.__framesHandlers.push({

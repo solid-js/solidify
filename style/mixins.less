@@ -90,6 +90,16 @@
 	height: @height;
 }
 
+/**
+ * Set width and height on an element and apply ratio
+ */
+.ratio (@width:1; @height:1; @ratio:1)
+{
+	width: @width * @ratio;
+	height: @height * @ratio;
+}
+
+
 // ----------------------------------------------------------------------------- SELECTION
 
 /**

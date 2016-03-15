@@ -1,6 +1,7 @@
 export class ArrayUtils
 {
 	// TODO : Passer ses utils en generics pour garder le type
+	// TODO : Virer var i in et passer en indexs
 
 	static inArray (pArray:any[], pElement:any):boolean
 	{
@@ -31,6 +32,19 @@ export class ArrayUtils
 			}
 		}
 
+		return newArray;
+	}
+
+	static removeElement (pArray:any[], pElement:any)
+	{
+		var newArray = [];
+		for (var i in pArray)
+		{
+			if (pArray[i] != pElement)
+			{
+				newArray.push(pArray[i]);
+			}
+		}
 		return newArray;
 	}
 }
