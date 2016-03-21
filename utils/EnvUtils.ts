@@ -37,6 +37,7 @@ export enum Browser
 	CHROME,
 	SAFARI,
 	IE,
+	EDGE,
 	MOZILLA,
 	OPERA,
 	UNKNOWN
@@ -127,7 +128,11 @@ export class EnvUtils
 		}
 
 		// Detect browser
-		if (/chrome/gi.test(browserSignature))
+		if (/edge/gi.test(browserSignature))
+		{
+			EnvUtils.__BROWSER = Browser.EDGE;
+		}
+		else if (/chrome/gi.test(browserSignature))
 		{
 			EnvUtils.__BROWSER = Browser.CHROME;
 		}
