@@ -3,6 +3,20 @@ import {Disposable} from "../core/Disposable";
 
 export const KONAMI_SEQUENCE = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
 
+// http://www.cambiaresearch.com/articles/15/javascript-key-codes
+
+export const ASCII_NUMBERS_KEY_RANGE = [47, 58];
+export const ASCII_NUMPAD_KEY_RANGE = [95, 112];
+export const ASCII_ALPHA_KEY_RANGE = [64, 91];
+
+export const ASCII_ENTER_KEY_CODE = 13;
+
+export const ASCII_SPACEBAR_KEY_CODE = 32;
+
+// TODO : A continuer
+
+// TODO : Une classe d'input de clavier
+
 export class Sequence extends Disposable
 {
 	// TODO : DOC
@@ -38,8 +52,8 @@ export class Sequence extends Disposable
 
 		this._currentIndex = (
 			pEvent.keyCode == this._sequence[this._currentIndex]
-			? this._currentIndex + 1
-			: 0
+				? this._currentIndex + 1
+				: 0
 		);
 
 		if (oldIndex != this._currentIndex)
