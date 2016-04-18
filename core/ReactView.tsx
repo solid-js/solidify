@@ -5,6 +5,8 @@
 
 //import {DOMNode} from "../dom/DOMNode";
 
+//import * as React from "react";
+
 
 export class ReactView<Props, States> extends __React.Component<Props, States>
 {
