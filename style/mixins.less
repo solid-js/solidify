@@ -26,6 +26,21 @@
 	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr='@{c-end}', endColorstr='@{c-start}', GradientType=0)";
 }
 
+/**
+ * Center a video in its parent.
+ * Equivalent to the 'cover' background position but for video
+ */
+.videoBackground
+{
+	.topLeft(50%, 50%);;
+	.size(auto, auto);
+
+	transform: translate(-50%,-50%);
+
+	min-width: 100%;
+	min-height: 100%;
+}
+
 
 // ----------------------------------------------------------------------------- POSITION AND SIZE
 
