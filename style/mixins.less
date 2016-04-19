@@ -19,26 +19,40 @@
 .gradient (@startColor: #000, @endColor: #fff, @deg: to bottom)
 {
 	background: linear-gradient(@deg, @startColor, @endColor);
-
-	//Pour IE <= 9
-	@c-start: argb(@startColor);
-	@c-end:   argb(@endColor);
-	filter: ~"progid:DXImageTransform.Microsoft.gradient(startColorstr='@{c-end}', endColorstr='@{c-start}', GradientType=0)";
 }
 
 /**
  * Center a video in its parent.
  * Equivalent to the 'cover' background position but for video
  */
-.videoBackground
+.videoBackground ()
 {
+	// Center
 	.topLeft(50%, 50%);;
-	.size(auto, auto);
-
 	transform: translate(-50%,-50%);
 
+	// Set size to always get in screen
+	.size(auto, auto);
 	min-width: 100%;
 	min-height: 100%;
+}
+
+
+// ----------------------------------------------------------------------------- IMAGES
+
+/**
+ * Disable antialias on img tags.
+ * Does not work on backgrounds.
+ */
+.disableAntialias
+{
+	image-rendering: optimizeSpeed;
+	image-rendering: -moz-crisp-edges;
+	image-rendering: -o-crisp-edges;
+	image-rendering: -webkit-optimize-contrast;
+	image-rendering: pixelated;
+	image-rendering: optimize-contrast;
+	-ms-interpolation-mode: nearest-neighbor;
 }
 
 
@@ -188,7 +202,7 @@
 	{
 		font-family: @fontFamilyName;
 
-		src:  url(~'@{basePath}@{fontFileName}.eot?#iefix')             format('embedded-opentype'),
+		src:  url(~'@{basePath}@{fontFileName}.eot?#iefix')       format('embedded-opentype'),
 		url(~'@{basePath}@{fontFileName}.woff')                   format('woff'),
 		url(~'@{basePath}@{fontFileName}.ttf')                    format('truetype'),
 		url(~'@{basePath}@{fontFileName}.svg#@{SVGName}') 				format('svg');
@@ -208,4 +222,40 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
+}
+
+
+// ----------------------------------------------------------------------------- RWD
+
+/**
+ * Apply rules for width greater than value
+ */
+.responsiveMinWidth (@minWidth; @rules)
+{
+	@media only screen and (min-width: @minWidth)
+	{
+		@rules();
+	}
+}
+
+/**
+ * Apply rules for width less than value
+ */
+.responsiveMaxWidth (@maxWidth; @rules)
+{
+	@media only screen and (max-width: @maxWidth)
+	{
+		@rules();
+	}
+}
+
+/**
+ * Apply rules for width between value
+ */
+.responsiveMinMaxWidth (@minWidth; @maxWidth; @rules)
+{
+	@media only screen and (min-width: @minWidth) and (max-width: @maxWidth)
+	{
+		@rules();
+	}
 }
