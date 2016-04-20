@@ -1,23 +1,35 @@
 import {Disposable} from "./Disposable";
 
+/**
+ * This is a simple JQuery based view.
+ */
 export class JView extends Disposable
 {
-	$root:JQuery;
+	// ------------------------------------------------------------------------- DOM
+
+	// Starting node of our component
+	$root			:JQuery;
+
+	// ------------------------------------------------------------------------- INIT
 
 	constructor ($pRoot:JQuery = null)
 	{
+		// Relay
 		super();
 
+		// Set root from parameter
 		if ($pRoot != null)
 		{
 			this.$root = $pRoot;
 		}
 
-		('readyState' in document && document.readyState == 'complete')
-		? this.init()
-		: $(() => this.init());
+		// Initialise
+		this.init();
 	}
 
+	/**
+	 * Start init sequence
+	 */
 	protected init ()
 	{
 		this.beforeInit();
@@ -27,28 +39,28 @@ export class JView extends Disposable
 		this.afterInit();
 	}
 
-	protected beforeInit ()
-	{
+	/**
+	 * Middleware called just before init sequence
+	 */
+	protected beforeInit () { }
 
-	}
+	/**
+	 * Target our root if not already defined via constructor params
+	 */
+	protected targetRoot () { }
 
-	protected targetRoot ()
-	{
+	/**
+	 * Prepare node targeting from $root
+	 */
+	protected prepareNodes () { }
 
-	}
+	/**
+	 * Prepare events
+	 */
+	protected prepareEvents () { }
 
-	protected prepareNodes ()
-	{
-
-	}
-
-	protected prepareEvents ()
-	{
-
-	}
-
-	protected afterInit ()
-	{
-
-	}
+	/**
+	 * Middleware called just after init sequence
+	 */
+	protected afterInit () { }
 }

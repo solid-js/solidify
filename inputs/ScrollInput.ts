@@ -159,8 +159,8 @@ export class ScrollDispatcher extends Disposable
 		// Target parent
 		this.$parent = (
 			$pTarget.is(document)
-				? this.$parent = $(window)
-				: this.$parent = $pTarget.parent()
+				? $(window)
+				: $pTarget.parent()
 		);
 
 		// Init scroll listening
