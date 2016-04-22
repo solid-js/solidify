@@ -1,6 +1,7 @@
 import {Disposable} from "./Disposable";
 
 import {DependencyManager} from "../helpers/DependencyManager";
+import {Config} from "./Config";
 
 /**
  * Basic app parameters.
@@ -8,10 +9,11 @@ import {DependencyManager} from "../helpers/DependencyManager";
  */
 export interface IAppParams
 {
-	env			:string;
-	root		:JQuery;
-	locale		:any;
-	base		:string;
+	env					:string;
+	root				:JQuery;
+	locale				:any;
+	localeAndCountry	:string;
+	base				:string;
 }
 
 
@@ -21,13 +23,6 @@ export class App<AppParamsType> extends Disposable
 
 
 	// ------------------------------------------------------------------------- PROPERTIES
-
-	/**
-	 * Params of the app.
-	 * Set from construction.
-	 */
-	protected _params					:AppParamsType;
-	get params ():AppParamsType { return this._params; }
 
 	/**
 	 * Dependency manager to bind elements between them without hard coding dependencies.
@@ -48,11 +43,11 @@ export class App<AppParamsType> extends Disposable
 		// Relay
 		super();
 
-		// Init app parameters
-		this.initAppParams(pAppParams);
-
 		// Patch de app base on parameters
-		this.patchAppBase();
+		this.patchAppBase(pAppParams);
+
+		// Init app parameters
+		this.initConfig(pAppParams);
 
 		// Init dependencies managment
 		this.initDependencyManager();
@@ -66,22 +61,22 @@ export class App<AppParamsType> extends Disposable
 	}
 
 	/**
-	 * Init app parameters
+	 * Inject app params into Config
 	 * @param pAppParams specify params at app construction. See IAppParams.
 	 */
-	protected initAppParams (pAppParams:AppParamsType)
+	protected initConfig (pAppParams:AppParamsType)
 	{
-		this._params = pAppParams;
+		Config.instance.inject(pAppParams)
 	}
 
 	/**
 	 * Patch the base parameter from app params.
 	 * Will check the base meta if base is not provided from constructor.
 	 */
-	protected patchAppBase ():void
+	protected patchAppBase (pAppParams:AppParamsType):void
 	{
 		// If we don't have base param
-		if (!('base' in this._params))
+		if (!('base' in pAppParams))
 		{
 			// Target base meta tag
 			var $baseMeta = $('head > base');
@@ -89,7 +84,7 @@ export class App<AppParamsType> extends Disposable
 			// If we have one, get base from this meta
 			if ($baseMeta.length > 0)
 			{
-				this._params['base'] = $baseMeta.attr('href');
+				pAppParams['base'] = $baseMeta.attr('href');
 			}
 		}
 	}

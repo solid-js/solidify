@@ -29,3 +29,6 @@ EDIT : Sûr ? Peut être 2 problématiques différentes, une de ciblage des él�
 
 
 ### Models
+
+
+- Object `Config` dispo partout et fed automatiquement depuis l'app
