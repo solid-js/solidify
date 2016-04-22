@@ -1,124 +1,168 @@
-import {ModuleBase} from "./ModuleBase";
+import {Disposable} from "./Disposable";
 
-export class AppBase extends ModuleBase
+import {DependencyManager} from "../helpers/DependencyManager";
+
+/**
+ * Basic app parameters.
+ * Can be extended to allow more parameters.
+ */
+export interface IAppParams
 {
-    // -------------------------------------------------------------------------
-
-    // todo : doc
-	// TODO : Méthode pour voir si un controlleur / action existe avant le dispatch
-
-    private _dependencyManager              :DependencyManager;
-
-    private _componentsWatcher              :ComponentsWatcher;
-
-    private _router                         :Router;
-
-    private _mainBootstrap                  :Bootstrap;
-
-    //private _urlBase                         :string;
-    //get urlBase ():string { return this._urlBase; }
+	env			:string;
+	root		:JQuery;
+	locale		:any;
+	base		:string;
+}
 
 
-    get dependencyManager ():DependencyManager { return this._dependencyManager; }
-
-    get componentsWatcher ():ComponentsWatcher { return this._componentsWatcher; }
-
-    get router ():Router { return this._router; }
-
-    get mainBootstrap ():Bootstrap { return this._mainBootstrap; }
+export class App<AppParamsType> extends Disposable
+{
+	// ------------------------------------------------------------------------- STATICS
 
 
-    constructor ()
-    {
-        super();
+	// ------------------------------------------------------------------------- PROPERTIES
 
-        //this.initURLBase();
-        this.configure();
+	/**
+	 * Params of the app.
+	 * Set from construction.
+	 */
+	protected _params					:AppParamsType;
+	get params ():AppParamsType { return this._params; }
 
-        this.initBootstrap();
-        this.initRouterManager();
-        this.initRoutes();
+	/**
+	 * Dependency manager to bind elements between them without hard coding dependencies.
+	 */
+	protected _dependencyManager              :DependencyManager;
+	get dependencyManager ():DependencyManager { return this._dependencyManager; }
 
-        this.initDependencyManager();
-        this.initDependencies();
 
-        this.initAppResizeListening();
+	// ------------------------------------------------------------------------- INIT
 
-        this.initModulePreloading();
-    }
+	/**
+	 * App constructor.
+	 * No need to override if there is no specific AppParams to add.
+	 * @param pAppParams specify params at app construction. See IAppParams.
+	 */
+	constructor (pAppParams:AppParamsType)
+	{
+		// Relay
+		super();
 
-	/*
-    initURLBase ():void
-    {
-        this._urlBase = $('head > base').attr('href');
-    }
-    */
+		// Init app parameters
+		this.initAppParams(pAppParams);
 
-    configure ():void
-    {
-        // todo : throw error car strategy
-    }
+		// Patch de app base on parameters
+		this.patchAppBase();
 
-    initDependencyManager ():void
-    {
-        this._dependencyManager = DependencyManager.getInstance();
-    }
+		// Init dependencies managment
+		this.initDependencyManager();
+		this.initDependencies();
 
-    initDependencies ():void
-    {
-        // todo : throw error strategy
-    }
+		// Listen to app resize
+		this.initAppResizeListening();
 
-    initBootstrap ():void
-    {
-        this._mainBootstrap = new Bootstrap(this.appNamespace);
-    }
+		// Start modules preparation
+		this.initModulePreloading();
+	}
 
-    initRouterManager ():void
-    {
-        this._router = Router.getInstance();
+	/**
+	 * Init app parameters
+	 * @param pAppParams specify params at app construction. See IAppParams.
+	 */
+	protected initAppParams (pAppParams:AppParamsType)
+	{
+		this._params = pAppParams;
+	}
 
-        this._router.onRouteChanged.add(this, this.routeChangedHandler);
-        this._router.onRouteNotFound.add(this, this.routeNotFoundHandler);
-    }
+	/**
+	 * Patch the base parameter from app params.
+	 * Will check the base meta if base is not provided from constructor.
+	 */
+	protected patchAppBase ():void
+	{
+		// If we don't have base param
+		if (!('base' in this._params))
+		{
+			// Target base meta tag
+			var $baseMeta = $('head > base');
 
-    routeNotFoundHandler ():void { }
+			// If we have one, get base from this meta
+			if ($baseMeta.length > 0)
+			{
+				this._params['base'] = $baseMeta.attr('href');
+			}
+		}
+	}
 
-    routeChangedHandler ():void { }
 
-    initRoutes ():void
-    {
-        // todo : throw error strategy
-    }
+	// ------------------------------------------------------------------------- DEPENDENCY MANAGER
 
-    initAppResizeListening ():void
-    {
-        $(window).resize(() =>
-        {
-            Central.getInstance("app").dispatch("resize");
-        });
-    }
+	initDependencyManager ():void
+	{
+		this._dependencyManager = DependencyManager.getInstance();
+	}
 
-    initModulePreloading ():void
-    {
-        this.dependencyManager.updateModuleCache((pLoadedModules) =>
-        {
-            this.initComponentsWatcher();
-        });
-    }
+	initDependencies ():void
+	{
+		throw new Error(`App.initDependencies // This method is strategy and have to be override.`);
+	}
 
-    initComponentsWatcher ():void
-    {
-        this._componentsWatcher = ComponentsWatcher.getInstance();
 
-        this._componentsWatcher.registerTypes(
-            this._dependencyManager.getFlatModulesTypes()
-        );
+	// ------------------------------------------------------------------------- MODULES LOADING
 
-        this._componentsWatcher.update();
+	initModulePreloading ():void
+	{
+		this.dependencyManager.updateModuleCache((pLoadedModules) =>
+		{
+			// Init route managment
+			this.initBootstrap();
+			this.initRouterManager();
+			this.initRoutes();
 
-        this.ready();
-    }
+			// Our app is ready
+			this.ready();
+		});
+	}
 
-    ready ():void { }
+
+	// ------------------------------------------------------------------------- ROUTING
+
+	initBootstrap ():void
+	{
+		//this._mainBootstrap = new Bootstrap(this.appNamespace);
+	}
+
+	initRouterManager ():void
+	{
+		//this._router = Router.getInstance();
+
+		//this._router.onRouteChanged.add(this, this.routeChangedHandler);
+		//this._router.onRouteNotFound.add(this, this.routeNotFoundHandler);
+	}
+
+	routeNotFoundHandler ():void { }
+
+	routeChangedHandler ():void { }
+
+	initRoutes ():void
+	{
+		// todo : throw error strategy
+	}
+
+	// ------------------------------------------------------------------------- APP RESIZE
+
+	initAppResizeListening ():void
+	{
+		/*
+		 $(window).resize(() =>
+		 {
+		 Central.getInstance("app").dispatch("resize");
+		 });
+		 */
+	}
+
+
+	// ------------------------------------------------------------------------- READY
+
+	ready ():void { }
 }
