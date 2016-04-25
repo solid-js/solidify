@@ -32,3 +32,8 @@ EDIT : Sûr ? Peut être 2 problématiques différentes, une de ciblage des él�
 
 
 - Object `Config` dispo partout et fed automatiquement depuis l'app
+
+- Routeur connecté à Grapnel
+- Bootstrap connecté au routeur
+- Possibilité de connecter une ReactView au bootstrap pour gérer seul les vues selon la route
+- PlayIn / playOut / shouldPlayOut sur les pages

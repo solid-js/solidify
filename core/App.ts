@@ -25,6 +25,11 @@ export class App<AppParamsType> extends Disposable
 	// ------------------------------------------------------------------------- PROPERTIES
 
 	/**
+	 * App parameters. Shorthand for Config.param as reference.
+	 */
+	protected _params			:AppParamsType;
+
+	/**
 	 * Dependency manager to bind elements between them without hard coding dependencies.
 	 */
 	protected _dependencyManager              :DependencyManager;
@@ -51,13 +56,27 @@ export class App<AppParamsType> extends Disposable
 
 		// Init dependencies managment
 		this.initDependencyManager();
+		this.initModules();
 		this.initDependencies();
 
-		// Listen to app resize
-		this.initAppResizeListening();
-
 		// Start modules preparation
-		this.initModulePreloading();
+		this.dependencyManager.updateModuleCache((pLoadedModules) =>
+		{
+			// Listen to app resize
+			this.initAppResizeListening();
+
+			// Init app view before routes
+			this.initAppView();
+
+			// Init boostrap managment
+			this.initBootstrap();
+
+			// Init routes
+			this.initRoutes();
+
+			// Our app is ready
+			this.ready();
+		});
 	}
 
 	/**
@@ -66,7 +85,11 @@ export class App<AppParamsType> extends Disposable
 	 */
 	protected initConfig (pAppParams:AppParamsType)
 	{
-		Config.instance.inject(pAppParams)
+		// Store in config
+		Config.instance.inject(pAppParams);
+
+		// Get reference
+		this._params = Config.getAll<AppParamsType>();
 	}
 
 	/**
@@ -92,62 +115,74 @@ export class App<AppParamsType> extends Disposable
 
 	// ------------------------------------------------------------------------- DEPENDENCY MANAGER
 
-	initDependencyManager ():void
+	/**
+	 * Init dependency manager.
+	 * No need to override it.
+	 */
+	protected initDependencyManager ():void
 	{
 		this._dependencyManager = DependencyManager.getInstance();
 	}
 
-	initDependencies ():void
+	/**
+	 * Init module path declarations.
+	 */
+	protected initModules ():void
 	{
-		throw new Error(`App.initDependencies // This method is strategy and have to be override.`);
+		throw new Error(`App.initModules // Please override App.initModule method to register module paths using DependencyManager.registerModulePath.`);
 	}
 
-
-	// ------------------------------------------------------------------------- MODULES LOADING
-
-	initModulePreloading ():void
+	/**
+	 * Init app dependencies.
+	 */
+	protected initDependencies ():void
 	{
-		this.dependencyManager.updateModuleCache((pLoadedModules) =>
-		{
-			// Init route managment
-			this.initBootstrap();
-			this.initRouterManager();
-			this.initRoutes();
-
-			// Our app is ready
-			this.ready();
-		});
+		throw new Error(`App.initDependencies // Please override App.initDependencies to map app dependencies using DependencyManager.registerClass or DependencyManager.registerInstance.`);
 	}
 
+	// ------------------------------------------------------------------------- APP VIEW
+
+	/**
+	 * Init app view.
+	 * Called before routes initialisation to have appView instance available in routes delcarations.
+	 */
+	protected initAppView ():void
+	{
+		throw new Error(`App.initAppView // Please override App.initAppView to create application main view.`);
+	}
 
 	// ------------------------------------------------------------------------- ROUTING
 
-	initBootstrap ():void
+	/**
+	 * Init bootstrap
+	 */
+	protected initBootstrap ():void
 	{
+		// TODO : Mapper le bootstrap sur l'appView pour automatiser le truc
 		//this._mainBootstrap = new Bootstrap(this.appNamespace);
 	}
 
-	initRouterManager ():void
+	protected routeNotFoundHandler ():void { }
+
+	protected routeChangedHandler ():void { }
+
+	/**
+	 * Init routes
+	 */
+	protected initRoutes ():void
 	{
-		//this._router = Router.getInstance();
-
-		//this._router.onRouteChanged.add(this, this.routeChangedHandler);
-		//this._router.onRouteNotFound.add(this, this.routeNotFoundHandler);
-	}
-
-	routeNotFoundHandler ():void { }
-
-	routeChangedHandler ():void { }
-
-	initRoutes ():void
-	{
-		// todo : throw error strategy
+		// TODO : Initialiser les routes via la classe Router, qui elle même compose Bootstrap et utilise Grapnel
+		throw new Error(`App.initRoutes // Please override App.initRoutes to map app routes.`);
 	}
 
 	// ------------------------------------------------------------------------- APP RESIZE
 
-	initAppResizeListening ():void
+	/**
+	 * Init app resizing listening
+	 */
+	protected initAppResizeListening ():void
 	{
+		// TODO : Maper ça sur le nouveau Central
 		/*
 		 $(window).resize(() =>
 		 {
@@ -159,5 +194,8 @@ export class App<AppParamsType> extends Disposable
 
 	// ------------------------------------------------------------------------- READY
 
-	ready ():void { }
+	/**
+	 * When all the app is ready
+	 */
+	protected ready ():void { }
 }

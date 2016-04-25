@@ -33,7 +33,6 @@ export class Config
 
 	inject (pProps)
 	{
-		console.log('inject', pProps);
 		for (var i in pProps)
 		{
 			this._params[i] = pProps[i];

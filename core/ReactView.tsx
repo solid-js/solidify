@@ -21,7 +21,12 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 
 	protected initState ():States
 	{
-		return {} as States;
+		return null;
+	}
+
+	protected getRefNode (pRefName:string):JQuery
+	{
+		return $(ReactDom.findDOMNode(this.refs[pRefName]));
 	}
 }
 
