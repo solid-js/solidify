@@ -16,7 +16,13 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 	constructor (props:Props, context:{})
 	{
 		super(props, context);
+		this.prepare();
 		this.state = this.initState();
+	}
+
+	protected prepare ()
+	{
+
 	}
 
 	protected initState ():States
