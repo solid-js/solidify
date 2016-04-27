@@ -61,4 +61,19 @@ export class DOMUtils
 		// Return measured size and pray
 		return scrollBarWidth;
 	}
+
+	/**
+	 * Get the height of a JQuery element at size 'auto'.
+	 * Will measure height at auto and rollback to previous height in a blink.
+	 * @param $pElement
+	 * @returns {number} The height in pixels
+	 */
+	static getAutoHeight ($pElement:JQuery):number
+	{
+		var currentHeightValue = $pElement.css('height');
+		$pElement.css({height: 'auto'});
+		var descriptionHeight = $pElement.height();
+		$pElement.css({height: currentHeightValue});
+		return descriptionHeight;
+	}
 }
