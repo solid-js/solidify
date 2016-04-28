@@ -40,11 +40,8 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 */
 	componentWillReceiveProps (pNewProps:any)
 	{
-		// Add enumerable properties in props
-		for (var i in pNewProps)
-		{
-			this.props[i] = pNewProps[i];
-		}
+		// Set new props
+		this.props = pNewProps;
 
 		// Recall action with new props
 		this.action();
