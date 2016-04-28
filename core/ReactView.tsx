@@ -10,16 +10,13 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 
 	// ------------------------------------------------------------------------- INIT
 
-	constructor (props:Props, context:{})
+	constructor (props:Props, context:any)
 	{
 		// Relay construction
 		super(props, context);
 
 		// Prepare component
 		this.prepare();
-
-		// Then we can init state
-		this.state = this.initState();
 	}
 
 	/**
@@ -28,13 +25,27 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 	protected prepare () { }
 
 	/**
-	 * Init state to be compliant with States interface before init
+	 * Set or init new state for component.
+	 * Will securely set state if state is null.
+	 * Will update state with setState if state is already present.
+	 * @param pState New state
+	 * @param pCallback When state is ready
 	 */
-	protected initState ():States
+	protected initState (pState:States, pCallback?: () => any):void
 	{
-		return {} as States;
-	}
+		// If have no current state
+		if (this.state == null)
+		{
+			// Securely set state
+			this.state = pState;
 
+			// Callback if needed
+			pCallback && pCallback();
+		}
+
+		// Juste relay state udpate
+		else super.setState(pState, pCallback);
+	}
 
 	// ------------------------------------------------------------------------- REFS
 
