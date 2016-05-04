@@ -2,6 +2,7 @@ import {Disposable} from "./Disposable";
 
 import {DependencyManager} from "../helpers/DependencyManager";
 import {Config} from "./Config";
+import {EnvUtils} from "../utils/EnvUtils";
 
 /**
  * Basic app parameters.
@@ -59,6 +60,9 @@ export class App<AppParamsType> extends Disposable
 		this.initModules();
 		this.initDependencies();
 
+		// Init env stuff
+		this.initEnv();
+
 		// Start modules preparation
 		this.dependencyManager.updateModuleCache((pLoadedModules) =>
 		{
@@ -110,6 +114,19 @@ export class App<AppParamsType> extends Disposable
 				pAppParams['base'] = $baseMeta.attr('href');
 			}
 		}
+	}
+
+
+	// ------------------------------------------------------------------------- ENV
+
+	/**
+	 * Init env dependent stuff.
+	 * Will add env detection classes helpers to the body.
+	 * Can be overrided.
+	 */
+	protected initEnv ():void
+	{
+		EnvUtils.addClasses();
 	}
 
 

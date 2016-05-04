@@ -57,17 +57,38 @@ export class MathUtils
 			// Si on n'a pas trouvé l'unité
 			indexToCut == -1
 
-			// On ne peut pas retourner
-			? [
+				// On ne peut pas retourner
+				? [
 				parseFloat(pValue),
 				null
 			]
 
-			// Séparer la valeur de l'unité
-			: [
+				// Séparer la valeur de l'unité
+				: [
 				parseFloat(pValue.substr(0, indexToCut)),
 				pValue.substr(indexToCut, pValue.length).toLowerCase()
 			]
 		)
+	}
+
+	/**
+	 * Return an offset value in a range from 0 to max.
+	 * For exemple :
+	 * 1. if currentValue is 8, max is 9 and you set an offset of 1, you'll get back to 0.
+	 *
+	 * It also works for negative offsets :
+	 * 2. If currentValue is 0, max is 9 and you set an offset of -1, you'll get to 8
+	 *
+	 * It works with all offsets as real numbers less than max :
+	 * 3. If currentValue is 3, max is 9 and you set an offset of 8, you'll get to 2
+	 *
+	 * @param pCurrentValue
+	 * @param pMax
+	 * @param pOffset
+	 * @returns {number}
+	 */
+	static circularRange (pCurrentValue:number, pMax:number, pOffset:number):number
+	{
+		return (((pCurrentValue + pOffset) % pMax) + pMax) % pMax;
 	}
 }

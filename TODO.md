@@ -39,3 +39,9 @@ EDIT : Sûr ? Peut être 2 problématiques différentes, une de ciblage des él�
 - PlayIn / playOut / shouldPlayOut sur les pages
 
 - Passer l'action et ses paramètres en props ! et ouai pas de double init !
+
+
+
+### Outils
+
+- Faire un helper less pour hériter des dimensions d'un sprite sans hériter de l'image
