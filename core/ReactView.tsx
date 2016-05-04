@@ -112,9 +112,9 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 
 		// Convert the component collection as a jquery collection
 		this[jqueryName] = $(
-			this[arrayName].map((pComponent:any) =>
+			Object.keys(this[arrayName]).map((pComponent:any) =>
 			{
-				return ReactDom.findDOMNode(pComponent);
+				return ReactDom.findDOMNode(this[arrayName][pComponent]);
 			})
 		);
 	}
