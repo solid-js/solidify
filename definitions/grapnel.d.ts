@@ -22,6 +22,7 @@ declare class GrapnelEvent
 {
 	parent:() => void;
 	preventDefault:() => void;
+	stopPropagation:() => void;
 }
 
 declare class Grapnel
