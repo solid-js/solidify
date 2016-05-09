@@ -1,45 +1,52 @@
 # TODO solidify
 
+Framework front office basé sur Less et Typescript pour gérer sous forme de modules des pages simples et complèxes.
+Gestion de vues JQuery et React.
+Permet de créer scripts simples pour des pages avec DOM, mais aussi des web-apps complètes avec système de routage avancé.
+Workflow établi et librairie d'utilitaires en tous genres.
+
+
 ### Fonctionnalité vue solidify
 
 Nous devons mixer les vues classiques et les vues React, les 2 ne servent pas à faire les mêmes choses.
 Nos vues classiques vont nous aider à créer des composants rapidement avec une DOM déjà posée par PHP.
 Les composants React vont plutôt servir a du full web-app.
+Au final, les composants react pourront aussi être appelés depuis la DOM, mais il faut bien être conscient du fonctionnement pour les devs qui utiliseront les composants.
 
-EDIT : Sûr ? Peut être 2 problématiques différentes, une de ciblage des éléments jQuery et une seconde de génération de contenu HTML dynamique.
 
 #### Vues classiques
 - Gestion des vues classiques avec séléction jQuery + évènements + Central.
-- L'idée ici est d'avoir des scripts instanciés depuis notre DOM
-- Génération de ces composants depuis la DOM et le script
-- Pas besoin de trucs de folie, juste les bons helpers
-- Librairie pour gérer la vie de ces composants (récupérer l'instance depuis la DOM, instancier, détruire, etc)
-- S'inspirer de la notion d'état de React
-- S'inspirer de la notion de props de React
+- Instancié depuis le code
+- Liste de helpers pour gérer les
+- Workflow pour gérer le ciblage jQuery et intéractions DOM (DOMNode)
+- Workflow pour gérer les états (updateState)
+- [V2] Instancié et configuré directement depuis la DOM
+- [V2] Librairie pour gérer la vie de ces composants (récupérer l'instance depuis la DOM, instancier, détruire, etc)
+
 
 #### Vues react
-- Gestion des vues React pour de la génération full JS
-- Génération de ces composants depuis la DOM et le script
-- Doit aussi avoir les fonctionnalité de ciblage globales (helpers jQuery) mais pas locales (pas besoin de cibler dans le template, React fait ça très bien)
+- [DONE] Gestion des vues React pour de la génération full JS
+- Doit aussi avoir les fonctionnalité de ciblage globales
+- [DONE] Doit avoir un helper de ciblage local qui prend en compte la DOM virtuelle
 - Doit pouvoir aussi gérer Central
-- Librairie pour gérer la vie de ces composants (récupérer l'instance depuis la DOM, instancier, détruire, etc)
+- [V2] Instancié et configuré directement depuis la DOM
+- [V2] Librairie pour gérer la vie de ces composants (récupérer l'instance depuis la DOM, instancier, détruire, etc)
 
 
 ### Navigation, routage et controlleurs
 
+- Gestion du routage depuis Grapnel vers les vues
+- Gestion de l'arrêt d'une route (compliqué !) sans niquer la nav précédent / suivant
+- Gestion du routage inverse (controlleur vers route)
+- Gestion du bootstrap (route + bloquage + instanciation + destruction)
+- Gestion d'une viewStack React depuis le bootstrap
+- [DONE] PlayIn / playOut / shouldPlayOut sur les reactPages
+
 
 ### Models
 
-
-- Object `Config` dispo partout et fed automatiquement depuis l'app
-
-- Routeur connecté à Grapnel
-- Bootstrap connecté au routeur
-- Possibilité de connecter une ReactView au bootstrap pour gérer seul les vues selon la route
-- PlayIn / playOut / shouldPlayOut sur les pages
-
-- Passer l'action et ses paramètres en props ! et ouai pas de double init !
-
+- [DOC] Object `Config` dispo partout et fed automatiquement depuis l'app
+- [DONE] Passer l'action et ses paramètres en props ! et ouai pas de double init !
 
 
 ### Outils
