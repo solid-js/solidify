@@ -33,6 +33,9 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 	 */
 	protected initState (pState:States, pCallback?: () => any):void
 	{
+		// TODO : Voir si ça ne fait pas doublon avec getInitialState !
+		// http://brewhouse.io/blog/2015/03/24/best-practices-for-component-state-in-reactjs.html
+
 		// If have no current state
 		if (this.state == null)
 		{

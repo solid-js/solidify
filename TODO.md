@@ -31,7 +31,7 @@ Au final, les composants react pourront aussi être appelés depuis la DOM, mais
 - Doit pouvoir aussi gérer Central
 - [V2] Instancié et configuré directement depuis la DOM
 - [V2] Librairie pour gérer la vie de ces composants (récupérer l'instance depuis la DOM, instancier, détruire, etc)
-
+- Patcher le doublon initState et getInitialState (http://brewhouse.io/blog/2015/03/24/best-practices-for-component-state-in-reactjs.html)
 
 ### Navigation, routage et controlleurs
 

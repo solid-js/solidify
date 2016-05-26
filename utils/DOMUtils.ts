@@ -65,15 +65,27 @@ export class DOMUtils
 	/**
 	 * Get the height of a JQuery element at size 'auto'.
 	 * Will measure height at auto and rollback to previous height in a blink.
-	 * @param $pElement
+	 * Element have to be in DOM. Preferable to have it visible (with no display:none parents)
+	 * @param $pElement The jquery element to measure. Only one element please :)
+	 * @param pIncludeBorderAndPadding If we have to include padding and border in measurement
+	 * @param pIncludeMargins If we have to include padding and border in measurement
 	 * @returns {number} The height in pixels
 	 */
-	static getAutoHeight ($pElement:JQuery):number
+	static getAutoHeight ($pElement:JQuery, pIncludeBorderAndPadding = false, pIncludeMargins = false):number
 	{
+		// Get the current height value
 		var currentHeightValue = $pElement.css('height');
+
+		// Set to auto
 		$pElement.css({height: 'auto'});
-		var descriptionHeight = $pElement.height();
+
+		// Measure the auto height
+		var descriptionHeight = pIncludeBorderAndPadding ? $pElement.outerHeight(pIncludeMargins) : $pElement.height();
+
+		// Roll back to the first measured height value
 		$pElement.css({height: currentHeightValue});
+
+		// Return auto height
 		return descriptionHeight;
 	}
 }
