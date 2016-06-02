@@ -178,6 +178,15 @@
 }
 
 /**
+ * Force scrollBar to be shown
+ */
+.showScrollBar ()
+{
+	-ms-overflow-style: scrollbar;
+	&::-webkit-scrollbar { width: auto; }
+}
+
+/**
  * Enable vertical scroll on an element and patch it.
  * NOTE : This is not a mixin because we need this declaration from javascript.
  */
