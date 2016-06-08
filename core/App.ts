@@ -10,10 +10,10 @@ import {EnvUtils} from "../utils/EnvUtils";
  */
 export interface IAppParams
 {
-	env					:string;
+	// Root node where the app will be append
 	root				:JQuery;
-	locale				:any;
-	localeAndCountry	:string;
+
+	// Base http path to access to the app
 	base				:string;
 }
 
@@ -103,7 +103,7 @@ export class App<AppParamsType> extends Disposable
 	protected patchAppBase (pAppParams:AppParamsType):void
 	{
 		// If we don't have base param
-		if (!('base' in pAppParams))
+		if (pAppParams == null || !('base' in pAppParams))
 		{
 			// Target base meta tag
 			var $baseMeta = $('head > base');
