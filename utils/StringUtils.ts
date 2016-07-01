@@ -60,6 +60,26 @@ export class StringUtils
 	 */
 
 	/**
+	 * Convertir un enum en string, camelCase ou snakeCase.
+	 * Va convertir un EMonEnum.MA_VALEUR en "maValeur" ou "ma-valeur"
+	 * @param pEnumValue La valeur de l'enum ( EMonEnum.MA_VALEUR )
+	 * @param pEnumClass La classe de l'enum ( EMonEnum )
+	 * @param pCamelCase si true on ressort "maValeur" si false on ressort "ma-valeur"
+	 * @returns {string} Le nom en camelCase ou snake-case
+	 */
+	static enumToString (pEnumValue:number, pEnumClass:Object, pCamelCase = true):string
+	{
+		// On récupère le string en underscore depuis notre enum
+		var enumStringValue = pEnumClass[pEnumValue] as string;
+
+		// On converti en snakeCase
+		var enumSnakeValue = enumStringValue.toLowerCase().split('_').join('-');
+
+		// On retourne en camel ou en snake
+		return pCamelCase ? StringUtils.snakeToCamelCase(enumSnakeValue) : enumSnakeValue;
+	}
+
+	/**
 	 * Get file name from any path.
 	 * Will return full string if no slash found.
 	 * ex : 'usr/bin/TestFile' will return 'TestFile'
