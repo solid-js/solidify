@@ -80,6 +80,41 @@ export class StringUtils
 	}
 
 	/**
+	 * Trouver un index enum depuis son nom en string.
+	 * Ne prend en charge que le nom exacte de l'enum, par exemple ENum.MY_VALUE sera associé uniquement avec le string "MY_VALUE"
+	 * Cette méthode va convertir automatiquement le snake-case vers FORMAT_ENUM
+	 * Retourne -1 si la valeur n'a pas été trouvée.
+	 * @param pString Le nom de la valeur à trouver, par ex : "MY_VALUE"
+	 * @param pEnumClass La classe de l'enum, par ex: ENum
+	 * @returns {number} L'index de notre valeur enum qui correspond au string. -1 si non trouvé.
+	 * TODO : Prendre en charge le snake-case pour être au top avec enumToString
+	 */
+	static stringToEnum (pString:string, pEnumClass:Object):number
+	{
+		// Patcher notre snake-case
+		var patchedString = pString.toUpperCase().split('-').join('_');
+
+		// Parcourir tous les indexs
+		var index = 0;
+		do
+		{
+			// Si notre index correspond à la valeur recherchée
+			if (pEnumClass[index] == patchedString)
+			{
+				// On retourne l'index
+				return index;
+			}
+
+			// Sinon on passe au suivant
+			index++;
+		}
+		while (index in pEnumClass);
+
+		// On n'a pas trouvé
+		return -1;
+	}
+
+	/**
 	 * Get file name from any path.
 	 * Will return full string if no slash found.
 	 * ex : 'usr/bin/TestFile' will return 'TestFile'
