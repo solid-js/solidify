@@ -174,7 +174,11 @@
 	-ms-overflow-style: none;
 
 	// Masquer les scrollbar sur chrome
-	&::-webkit-scrollbar { width: 0 !important }
+	&::-webkit-scrollbar
+	{
+		width: 0 !important;
+		height: 0 !important;
+	}
 }
 
 /**
@@ -183,7 +187,11 @@
 .showScrollBar ()
 {
 	-ms-overflow-style: scrollbar;
-	&::-webkit-scrollbar { width: auto; }
+	&::-webkit-scrollbar
+	{
+		width: auto;
+		height: auto;
+	}
 }
 
 /**
@@ -195,6 +203,18 @@
 	// Scroll
 	overflow: hidden;
 	overflow-y: scroll;
+
+	.scrollPatch();
+}
+
+/**
+ * Enable horizontal scroll on an element and patch it.
+ * NOTE : This is not a mixin because we need this declaration from javascript.
+ */
+.horizontalScroll
+{
+	overflow: hidden;
+	overflow-x: scroll;
 
 	.scrollPatch();
 }
