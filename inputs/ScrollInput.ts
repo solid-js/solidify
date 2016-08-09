@@ -1,11 +1,20 @@
 import {Disposable} from "../core/Disposable";
 import {ArrayUtils} from "../utils/ArrayUtils";
 
+// FIXME : Refaire cette classe, trop de trucs déconne ....
+// Faire une API IN / OUT screen avec la direction
+// Le delegate IScrollInputDelegate qui n'a qu'un handler ne sert à RIEN !
+// Faire en sorte qu'on puisse ajouter plusieurs objets sans que ça écrase (pas de dico mais bien un système de clé, envoyée au handler pour la suppression)
+//		Ou alors des signaux ?
+// Rendre l'API plus claire et plus complète
+// De manière générale se déssolidariser de jQuery, passer des éléments DOM en paramètre est mieux
+
 // TODO : Finir doc
 
 // TODO : Proposer une API qui permet de récupérer le ratio d'un élément sur la page, sans se faire chier à calculer les positions.
 // TODO : Par exemple : registerElementForRangeTrigger($pElement, handler, EventType, topRatio, bottomRatio)
 // TODO : Le top ratio est le ratio en partant du haut de l'écran, et le bottom ratio en partant du bas
+
 
 /**
  * Delegate for scroll events
@@ -33,7 +42,9 @@ export enum ScrollInputEventType
 	/**
 	 * When range or element is scrolling through trigger point
 	 */
-	SCROLLING = 4
+	SCROLLING = 4,
+
+	AFTER = 8
 }
 
 /**
@@ -245,11 +256,16 @@ export class ScrollDispatcher extends Disposable
 		// If our element just go out of range
 		var justGotOut = false;
 
-		var isPosition = (pTrigger.range.length == 1);
+		var isPosition = (
+			pTrigger.range.length == 1
+			||
+			((pTrigger.eventTypes & ScrollInputEventType.AFTER) > 0)
+		);
 
 		// ----- CHECK TRIGGER ENTERING
 
-		if (
+		if
+		(
 			isPosition
 				? (
 				triggerPosition >= pTrigger.range[0]
@@ -268,10 +284,15 @@ export class ScrollDispatcher extends Disposable
 				pTrigger.state = TriggerStates.IN;
 
 				// If handler is valid and required
-				if (
+				if
+				(
 					pTrigger.handler != null
 					&&
-					(pTrigger.eventTypes & ScrollInputEventType.ENTER) > 0
+					(
+						(pTrigger.eventTypes & ScrollInputEventType.ENTER) > 0
+						||
+						(pTrigger.eventTypes & ScrollInputEventType.AFTER) > 0
+					)
 				)
 				{
 					pTrigger.handler(targetForHandler, ScrollInputEventType.ENTER);
