@@ -33,7 +33,7 @@ export class LoadUtils
 		else
 		{
 			// The image is not loaded, attach handler
-			$pElement.load( (pEvent) => pHandler($pElement, pEvent) );
+			$pElement.one('load', (pEvent) => pHandler($pElement, pEvent) );
 		}
 	}
 
