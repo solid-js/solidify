@@ -19,7 +19,7 @@ export enum DeviceType
  * Available platforms.
  * Only the most common.
  */
-export enum Platform
+export enum EPlatform
 {
 	IOS,
 	ANDROID,
@@ -32,7 +32,7 @@ export enum Platform
  * Available browsers
  * Only the most common.
  */
-export enum Browser
+export enum EBrowser
 {
 	CHROME,
 	SAFARI,
@@ -46,7 +46,7 @@ export enum Browser
  * Available browsers engines
  * Only the most common.
  */
-export enum BrowserEngine
+export enum EBrowserEngine
 {
 	WEBKIT,
 	TRIDENT,
@@ -79,9 +79,9 @@ export class EnvUtils
 	 * Client informations
 	 */
 	private static __DEVICE_TYPE		:DeviceType;
-	private static __PLATFORM			:Platform;
-	private static __BROWSER			:Browser;
-	private static __BROWSER_ENGINE		:BrowserEngine;
+	private static __PLATFORM			:EPlatform;
+	private static __BROWSER			:EBrowser;
+	private static __BROWSER_ENGINE		:EBrowserEngine;
 	private static __CAPABILITIES		:ICapabilities;
 
 	/**
@@ -99,80 +99,80 @@ export class EnvUtils
 		if (/ipad|iphone|ipod/gi.test(browserSignature))
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
-			EnvUtils.__PLATFORM = Platform.IOS;
+			EnvUtils.__PLATFORM = EPlatform.IOS;
 		}
 		else if (/android/gi.test(browserSignature))
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
-			EnvUtils.__PLATFORM = Platform.ANDROID;
+			EnvUtils.__PLATFORM = EPlatform.ANDROID;
 		}
 		else if (/mac/gi.test(browserSignature))
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
-			EnvUtils.__PLATFORM = Platform.MAC;
+			EnvUtils.__PLATFORM = EPlatform.MAC;
 		}
 		else if (/windows phone/gi.test(browserSignature))
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
-			EnvUtils.__PLATFORM = Platform.WINDOWS;
+			EnvUtils.__PLATFORM = EPlatform.WINDOWS;
 		}
 		else if (/windows/gi.test(browserSignature))
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
-			EnvUtils.__PLATFORM = Platform.WINDOWS;
+			EnvUtils.__PLATFORM = EPlatform.WINDOWS;
 		}
 		else
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
-			EnvUtils.__PLATFORM = Platform.UNKNOWN;
+			EnvUtils.__PLATFORM = EPlatform.UNKNOWN;
 		}
 
 		// Detect browser
 		if (/edge/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER = Browser.EDGE;
+			EnvUtils.__BROWSER = EBrowser.EDGE;
 		}
 		else if (/chrome/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER = Browser.CHROME;
+			EnvUtils.__BROWSER = EBrowser.CHROME;
 		}
 		else if (/safari/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER = Browser.SAFARI;
+			EnvUtils.__BROWSER = EBrowser.SAFARI;
 		}
 		else if (/msie/gi.test(browserSignature) || ("ActiveXObject" in window))
 		{
-			EnvUtils.__BROWSER = Browser.IE;
+			EnvUtils.__BROWSER = EBrowser.IE;
 		}
 		else if (/mozilla/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER = Browser.MOZILLA;
+			EnvUtils.__BROWSER = EBrowser.MOZILLA;
 		}
 		else if (/opera/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER = Browser.OPERA;
+			EnvUtils.__BROWSER = EBrowser.OPERA;
 		}
 		else
 		{
-			EnvUtils.__BROWSER = Browser.UNKNOWN;
+			EnvUtils.__BROWSER = EBrowser.UNKNOWN;
 		}
 
 		// Detect browser engine
 		if (/webkit/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER_ENGINE = BrowserEngine.WEBKIT;
+			EnvUtils.__BROWSER_ENGINE = EBrowserEngine.WEBKIT;
 		}
 		else if (/trident/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER_ENGINE = BrowserEngine.TRIDENT;
+			EnvUtils.__BROWSER_ENGINE = EBrowserEngine.TRIDENT;
 		}
 		else if (/gecko/gi.test(browserSignature))
 		{
-			EnvUtils.__BROWSER_ENGINE = BrowserEngine.GECKO;
+			EnvUtils.__BROWSER_ENGINE = EBrowserEngine.GECKO;
 		}
 		else
 		{
-			EnvUtils.__BROWSER_ENGINE = BrowserEngine.UNKNOWN;
+			EnvUtils.__BROWSER_ENGINE = EBrowserEngine.UNKNOWN;
 		}
 
 		// Detect client capabilities
@@ -197,7 +197,7 @@ export class EnvUtils
 	{
 		try
 		{
-			var canvas = document.createElement("canvas");
+			let canvas = document.createElement("canvas");
 			return !!(
 				window["WebGLRenderingContext"] &&
 				(canvas.getContext("webgl") ||
@@ -232,9 +232,9 @@ export class EnvUtils
 
 
 	/**
-	 * Get the platform following enum Platform
+	 * Get the platform following enum EPlatform
 	 */
-	static getPlatform ():Platform
+	static getPlatform ():EPlatform
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.__PLATFORM;
@@ -242,9 +242,9 @@ export class EnvUtils
 
 	/**
 	 * Check if we run in a specific platform.
-	 * See enum Platform
+	 * See enum EPlatform
 	 */
-	static isPlatform (pPlatform:Platform):boolean
+	static isPlatform (pPlatform:EPlatform):boolean
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.getPlatform() == pPlatform;
@@ -252,9 +252,9 @@ export class EnvUtils
 
 
 	/**
-	 * Get the browser following enum Browser
+	 * Get the browser following enum EBrowser
 	 */
-	static getBrowser ():Browser
+	static getBrowser ():EBrowser
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.__BROWSER;
@@ -266,25 +266,44 @@ export class EnvUtils
 	 */
 	static getIEVersion ():number
 	{
-		var myNav = navigator.userAgent.toLowerCase();
+		let myNav = navigator.userAgent.toLowerCase();
 		return (myNav.indexOf('msie') != -1) ? parseInt(myNav.split('msie')[1], 10) : Number.POSITIVE_INFINITY;
 	}
 
 	/**
-	 * Check if we run in a specific browser.
-	 * See enum Browser
+	 * Get iOS Version
+	 * Returns Number.POSITIVE_INFINITY if not iOS, so you can test if version <= 9 for ex
 	 */
-	static isBrowser (pBrowser:Browser):boolean
+	static getIOSVersion ():number
+	{
+		EnvUtils.initDetection();
+
+		if (EnvUtils.__PLATFORM == EPlatform.IOS && !window['MSStream'])
+		{
+			if (!!window['indexedDB'])											return 8;
+			else if (!!window['SpeechSynthesisUtterance'])						return 7;
+			else if (!!window['webkitAudioContext'])							return 6;
+			else if (!!window['matchMedia'])									return 5;
+			else if (!!window['history'] && 'pushState' in window.history)		return 4;
+			else																return 1;
+		}
+		else return Number.POSITIVE_INFINITY;
+	}
+
+	/**
+	 * Check if we run in a specific browser.
+	 * See enum EBrowser
+	 */
+	static isBrowser (pBrowser:EBrowser):boolean
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.getBrowser() == pBrowser;
 	}
 
-
 	/**
-	 * Get the browser engine following enum BrowserEngine
+	 * Get the browser engine following enum EBrowserEngine
 	 */
-	static getBrowserEngine ():BrowserEngine
+	static getBrowserEngine ():EBrowserEngine
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.__BROWSER_ENGINE;
@@ -292,9 +311,9 @@ export class EnvUtils
 
 	/**
 	 * Check if we run in a specific browser engine.
-	 * See enum BrowserEngine
+	 * See enum EBrowserEngine
 	 */
-	static isBrowserEngine (pBrowserEngine:BrowserEngine):boolean
+	static isBrowserEngine (pBrowserEngine:EBrowserEngine):boolean
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.getBrowserEngine() == pBrowserEngine;
@@ -344,16 +363,16 @@ export class EnvUtils
 		$(() =>
 		{
 			// Target selector
-			var $domRoot = $(pToSelector);
+			let $domRoot = $(pToSelector);
 
 			// Add env properties classes
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(Browser[EnvUtils.__BROWSER]				, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(BrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowser[EnvUtils.__BROWSER]				, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(DeviceType[EnvUtils.__DEVICE_TYPE]			, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(Platform[EnvUtils.__PLATFORM]				, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EPlatform[EnvUtils.__PLATFORM]				, '_'));
 
 			// Add capabilites
-			for (var i in EnvUtils.__CAPABILITIES)
+			for (let i in EnvUtils.__CAPABILITIES)
 			{
 				EnvUtils.__CAPABILITIES[i] && $domRoot.addClass(pPrefix + 'has-' + i);
 			}

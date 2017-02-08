@@ -73,20 +73,20 @@ export class ModuleUtils
     static preloadModules (pModulesPath:string[], pLoadedHandler:(pLoadedModules:string[]) => void):void
     {
         // Get the requirejs registry
-        var registry            :{[index:string] : any} = this.getRegistryNames();
+        let registry            :{[index:string] : any} = this.getRegistryNames();
 
         // And the loaded modules list from requirejs
-        var loadedModules       :{[index:string] : any} = this.getLoadedModulesNames();
+        let loadedModules       :{[index:string] : any} = this.getLoadedModulesNames();
 
         // Modules loaded and to load
-        var modulesToLoad       :string[]   = [];
-        var totalLoadedModules  :number     = 0;
+        let modulesToLoad       :string[]   = [];
+        let totalLoadedModules  :number     = 0;
 
         // Browse path we have to load
-        for (var modulePathIndex in pModulesPath)
+        for (let modulePathIndex in pModulesPath)
         {
-            // Browser modules list
-            for (var moduleName in registry)
+            // EBrowser modules list
+            for (let moduleName in registry)
             {
                 if (
                         // If our module name start with a needed module path
