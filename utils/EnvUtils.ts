@@ -283,6 +283,7 @@ export class EnvUtils
 		{
 			// http://stackoverflow.com/questions/8348139/detect-ios-version-less-than-5-with-javascript/11129615#11129615
 			let v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
+			if (v == null || v.length < 2) return [Number.POSITIVE_INFINITY];
 			return [
 				parseInt(v[1], 10),
 				parseInt(v[2], 10),
