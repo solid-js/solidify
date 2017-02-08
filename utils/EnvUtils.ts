@@ -9,7 +9,7 @@
  * If not found, will be desktop by default
  */
 import {StringUtils} from "./StringUtils";
-export enum DeviceType
+export enum EDeviceType
 {
 	HANDHELD,
 	DESKTOP
@@ -78,7 +78,7 @@ export class EnvUtils
 	/**
 	 * Client informations
 	 */
-	private static __DEVICE_TYPE		:DeviceType;
+	private static __DEVICE_TYPE		:EDeviceType;
 	private static __PLATFORM			:EPlatform;
 	private static __BROWSER			:EBrowser;
 	private static __BROWSER_ENGINE		:EBrowserEngine;
@@ -99,32 +99,32 @@ export class EnvUtils
 		// !window['MSStream'] -> https://www.neowin.net/news/ie11-fakes-user-agent-to-fool-gmail-in-windows-phone-81-gdr1-update
 		if (/ipad|iphone|ipod/gi.test(browserSignature) && !window['MSStream'])
 		{
-			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
+			EnvUtils.__DEVICE_TYPE = EDeviceType.HANDHELD;
 			EnvUtils.__PLATFORM = EPlatform.IOS;
 		}
 		else if (/android/gi.test(browserSignature))
 		{
-			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
+			EnvUtils.__DEVICE_TYPE = EDeviceType.HANDHELD;
 			EnvUtils.__PLATFORM = EPlatform.ANDROID;
 		}
 		else if (/mac/gi.test(browserSignature))
 		{
-			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
+			EnvUtils.__DEVICE_TYPE = EDeviceType.DESKTOP;
 			EnvUtils.__PLATFORM = EPlatform.MAC;
 		}
 		else if (/windows phone/gi.test(browserSignature))
 		{
-			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
+			EnvUtils.__DEVICE_TYPE = EDeviceType.HANDHELD;
 			EnvUtils.__PLATFORM = EPlatform.WINDOWS;
 		}
 		else if (/windows/gi.test(browserSignature))
 		{
-			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
+			EnvUtils.__DEVICE_TYPE = EDeviceType.DESKTOP;
 			EnvUtils.__PLATFORM = EPlatform.WINDOWS;
 		}
 		else
 		{
-			EnvUtils.__DEVICE_TYPE = DeviceType.DESKTOP;
+			EnvUtils.__DEVICE_TYPE = EDeviceType.DESKTOP;
 			EnvUtils.__PLATFORM = EPlatform.UNKNOWN;
 		}
 
@@ -213,9 +213,9 @@ export class EnvUtils
 
 
 	/**
-	 * Get the device type following enum DeviceType
+	 * Get the device type following enum EDeviceType
 	 */
-	static getDeviceType ():DeviceType
+	static getDeviceType ():EDeviceType
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.__DEVICE_TYPE;
@@ -223,9 +223,9 @@ export class EnvUtils
 
 	/**
 	 * Check if we run in a specific device type.
-	 * See enum DeviceType
+	 * See enum EDeviceType
 	 */
-	static isDeviceType (pDeviceType:DeviceType):boolean
+	static isDeviceType (pDeviceType:EDeviceType):boolean
 	{
 		EnvUtils.initDetection();
 		return EnvUtils.getDeviceType() == pDeviceType;
@@ -371,7 +371,7 @@ export class EnvUtils
 			// Add env properties classes
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowser[EnvUtils.__BROWSER]				, '_'));
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(DeviceType[EnvUtils.__DEVICE_TYPE]			, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EDeviceType[EnvUtils.__DEVICE_TYPE]			, '_'));
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EPlatform[EnvUtils.__PLATFORM]				, '_'));
 
 			// Add capabilites
