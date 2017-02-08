@@ -93,10 +93,11 @@ export class EnvUtils
 		if (!EnvUtils.__NEED_DETECTION) return;
 
 		// Get browser signature
-		var browserSignature = navigator.userAgent.toLowerCase();
+		let browserSignature = navigator.userAgent.toLowerCase();
 
 		// Detect device type and platform
-		if (/ipad|iphone|ipod/gi.test(browserSignature))
+		// !window['MSStream'] -> https://www.neowin.net/news/ie11-fakes-user-agent-to-fool-gmail-in-windows-phone-81-gdr1-update
+		if (/ipad|iphone|ipod/gi.test(browserSignature) && !window['MSStream'])
 		{
 			EnvUtils.__DEVICE_TYPE = DeviceType.HANDHELD;
 			EnvUtils.__PLATFORM = EPlatform.IOS;
@@ -274,20 +275,21 @@ export class EnvUtils
 	 * Get iOS Version
 	 * Returns Number.POSITIVE_INFINITY if not iOS, so you can test if version <= 9 for ex
 	 */
-	static getIOSVersion ():number
+	static getIOSVersion ():number[]
 	{
 		EnvUtils.initDetection();
 
-		if (EnvUtils.__PLATFORM == EPlatform.IOS && !window['MSStream'])
+		if (EnvUtils.__PLATFORM == EPlatform.IOS)
 		{
-			if (!!window['indexedDB'])											return 8;
-			else if (!!window['SpeechSynthesisUtterance'])						return 7;
-			else if (!!window['webkitAudioContext'])							return 6;
-			else if (!!window['matchMedia'])									return 5;
-			else if (!!window['history'] && 'pushState' in window.history)		return 4;
-			else																return 1;
+			// http://stackoverflow.com/questions/8348139/detect-ios-version-less-than-5-with-javascript/11129615#11129615
+			let v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
+			return [
+				parseInt(v[1], 10),
+				parseInt(v[2], 10),
+				parseInt(v[3] || 0, 10)
+			];
 		}
-		else return Number.POSITIVE_INFINITY;
+		else return [Number.POSITIVE_INFINITY];
 	}
 
 	/**
