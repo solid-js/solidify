@@ -1,14 +1,33 @@
 export class StringUtils
 {
 	/**
-	 * Add a trailing slash to the end of the path if not provided.
-	 * For ex: "/lib/test" become "/lib/test/".
+	 * Add or remove the trailing slash at the end of the path.
+	 * For ex:
+	 * - "/lib/test" becomes "/lib/test/" if pAdd is true
+	 * - "/lib/test/" becomes "/lib/test" if pAdd is false
 	 * @param pPath String path with or without trailing slash
-	 * @returns patched path with trailing slash
+	 * @param pAdd Will add slash or remove slash.
+	 * @returns patched path with or without trailing slash
 	 */
-	static addTrailingSlash (pPath:string):string
+	static trailingSlash (pPath:string, pAdd = true):string
 	{
-		return (pPath.lastIndexOf("/") != pPath.length - 1 ? pPath + "/" : pPath);
+		// If we currently have a trailing slash
+		const hasTrailingSlash = ( pPath.lastIndexOf("/") == pPath.length - 1 );
+
+		// If we have to add trailing slash
+		if (pAdd && !hasTrailingSlash)
+		{
+			return pPath + '/';
+		}
+
+		// If we have to remove trailing slash
+		else if (!pAdd && hasTrailingSlash)
+		{
+			return pPath.substr(0, pPath.length - 1);
+		}
+
+		// Do nothing
+		else return pPath;
 	}
 
 	/**

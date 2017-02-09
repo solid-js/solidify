@@ -101,7 +101,7 @@ export class DependencyManager
         }
 
         // Record the path with trailing slash to the module type
-        this._modulesPath[pModuleType].push(StringUtils.addTrailingSlash(pModulePath));
+        this._modulesPath[pModuleType].push(StringUtils.trailingSlash(pModulePath));
     }
 
     /**
@@ -129,7 +129,7 @@ export class DependencyManager
 			for (var modulePathIndex in pPaths[moduleType])
 			{
 				this._modulesPath[moduleType].push(
-					StringUtils.addTrailingSlash(pPaths[moduleType][modulePathIndex])
+					StringUtils.trailingSlash(pPaths[moduleType][modulePathIndex])
 				);
 			}
 		}
