@@ -55,17 +55,17 @@ export class StringUtils
 	static snakeToCamelCase (pSource:string, pSeparator:string = '-'):string
 	{
 		// Seperate dashs
-		var splitted = pSource.toLowerCase().split(pSeparator);
-		var total = splitted.length;
+		let splitted = pSource.toLowerCase().split(pSeparator);
+		let total = splitted.length;
 
 		// Return raw if it's not a snake
 		if (total < 2) return pSource.toLowerCase();
 
 		// The first is not uppercase
-		var out = splitted[0];
+		let out = splitted[0];
 
 		// Others are upper cased first
-		for (var i = 1; i < total; i ++)
+		for (let i = 1; i < total; i ++)
 		{
 			out += (i == 0 ? splitted[i] : StringUtils.upperCaseFirstChar(splitted[i]));
 		}
@@ -89,10 +89,10 @@ export class StringUtils
 	static enumToString (pEnumValue:number, pEnumClass:Object, pCamelCase = true):string
 	{
 		// On récupère le string en underscore depuis notre enum
-		var enumStringValue = pEnumClass[pEnumValue] as string;
+		let enumStringValue = pEnumClass[pEnumValue] as string;
 
 		// On converti en snakeCase
-		var enumSnakeValue = enumStringValue.toLowerCase().split('_').join('-');
+		let enumSnakeValue = enumStringValue.toLowerCase().split('_').join('-');
 
 		// On retourne en camel ou en snake
 		return pCamelCase ? StringUtils.snakeToCamelCase(enumSnakeValue) : enumSnakeValue;
@@ -111,10 +111,10 @@ export class StringUtils
 	static stringToEnum (pString:string, pEnumClass:Object):number
 	{
 		// Patcher notre snake-case
-		var patchedString = pString.toUpperCase().split('-').join('_');
+		let patchedString = pString.toUpperCase().split('-').join('_');
 
 		// Parcourir tous les indexs
-		var index = 0;
+		let index = 0;
 		do
 		{
 			// Si notre index correspond à la valeur recherchée
@@ -140,7 +140,7 @@ export class StringUtils
 	 */
 	static getFileFromPath (pPath:string):string
 	{
-		var lastIndex = pPath.lastIndexOf('/');
+		let lastIndex = pPath.lastIndexOf('/');
 
 		if (lastIndex == -1)
 		{
@@ -158,7 +158,7 @@ export class StringUtils
 	 */
 	static getBaseFromPath (pPath:string):string
 	{
-		var lastIndex = pPath.lastIndexOf('/');
+		let lastIndex = pPath.lastIndexOf('/');
 
 		if (lastIndex == -1)
 		{
@@ -166,6 +166,28 @@ export class StringUtils
 		}
 
 		return pPath.substring(0, lastIndex);
+	}
+
+	/**
+	 * Get the local path from a full path and a base.
+	 * For ex : will extract /dir/file.html from /my/base/dir/file.html with base /my/base
+	 * To work, pBase have to be the exact beginning of pPath. This is to avoid issues with bases like '/'
+	 * If base is invalid, pPath will be returned.
+	 * No error thrown.
+	 * If you want starting slash or not, please use StringUtils.trailingSlash method on pPath and / or pBase
+	 */
+	static extractPathFromBase (pPath:string, pBase:string):string
+	{
+		// Get the index of base within the path
+		let baseStartIndex = pPath.indexOf( pBase );
+
+		return (
+			// Base is starting path so its ok
+			baseStartIndex == 0
+			? pPath.substr( pBase.length, pPath.length )
+			// Invalid base for this path, do nothing
+			: pPath
+		);
 	}
 
 	/**
@@ -234,7 +256,7 @@ export class StringUtils
 	static slugify (pInput:string):string
 	{
 		const total = this.SLUG_REGEX.length;
-		for (var i = 0; i < total; i ++)
+		for (let i = 0; i < total; i ++)
 		{
 			pInput = pInput.replace(this.SLUG_REGEX[i].regex, this.SLUG_REGEX[i].char);
 		}
@@ -259,10 +281,10 @@ export class StringUtils
 	static parseQueryString (pQueryString:string):{[index:string]:string}
 	{
 		let varSplitters = ['&', '='];
-		var queryStarters = ['?', '#'];
+		let queryStarters = ['?', '#'];
 
 		// Start parsing after query starters
-		for (var j in queryStarters)
+		for (let j in queryStarters)
 		{
 			// Check that query start are before var spliiters
 			if (pQueryString.indexOf(queryStarters[j]) < pQueryString.indexOf(varSplitters[1]))
@@ -272,14 +294,14 @@ export class StringUtils
 		}
 
 		// Split every parameters on &
-		var queryParameters = pQueryString.split(varSplitters[0]);
+		let queryParameters = pQueryString.split(varSplitters[0]);
 
 		// Output parameters
-		var params:{[index:string]:string} = {};
+		let params:{[index:string]:string} = {};
 
 		// Parse parameters
-		var pair:string[];
-		for (var i = queryParameters.length - 1; i >= 0; i--)
+		let pair:string[];
+		for (let i = queryParameters.length - 1; i >= 0; i--)
 		{
 			// Get var name and value pair
 			pair = queryParameters[i].split(varSplitters[1]);
