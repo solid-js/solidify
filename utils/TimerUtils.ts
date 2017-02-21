@@ -6,8 +6,9 @@ export interface IFrameHandler
 
 export class TimerUtils
 {
-	// TODO : Doc
-
+	/**
+	 * Install polyfill for requestAnimationFrame if browser does't already have it.
+	 */
 	static polyfillRequestAnimationFrame ()
 	{
 		if (!('requestAnimationFrame' in window))
@@ -24,7 +25,6 @@ export class TimerUtils
 			);
 		}
 	}
-
 
 	/**
 	 * Stored handlers frames.
@@ -46,7 +46,7 @@ export class TimerUtils
 	static addFrameHandler (pTarget:any, pHandler:(pEvent:Event) => void):void
 	{
 		// Wrap the handler in a proxy function to keep the scope target
-		var proxyHandler = function (pEvent:Event):void
+		let proxyHandler = function (pEvent:Event):void
 		{
 			pHandler.call(pTarget, pEvent);
 		};
@@ -69,12 +69,12 @@ export class TimerUtils
 	static removeFrameHandler (pHandler:(pEvent:Event) => void):boolean
 	{
 		// Create a new array to remove the handler
-		var newFramesHandlers:IFrameHandler[] = [];
-		var found = false;
+		let newFramesHandlers:IFrameHandler[] = [];
+		let found = false;
 
 		// Browse stored handlers
 		const total = this.__framesHandlers.length;
-		for (var i = 0; i < total; i ++)
+		for (let i = 0; i < total; i ++)
 		{
 			// If this is our external handler, remove the listener on TweenLite
 			// And don't insert it in the new array
@@ -94,6 +94,7 @@ export class TimerUtils
 		// Store the new handlers array
 		this.__framesHandlers = newFramesHandlers;
 
+		// Return if we found it
 		return found;
 	}
 

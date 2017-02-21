@@ -32,12 +32,19 @@ export class JView extends Disposable
 	 */
 	protected init ()
 	{
+		this.prepareDependencies();
 		this.beforeInit();
 		this.targetRoot();
 		this.prepareNodes();
 		this.prepareEvents();
 		this.afterInit();
+		this.initComponents();
 	}
+
+	/**
+	 * Prepare dependencies with DependenciyManager
+	 */
+	protected prepareDependencies () {}
 
 	/**
 	 * Middleware called just before init sequence
@@ -63,4 +70,9 @@ export class JView extends Disposable
 	 * Middleware called just after init sequence
 	 */
 	protected afterInit () { }
+
+	/**
+	 * Init components after init
+	 */
+	protected initComponents () {}
 }

@@ -217,9 +217,9 @@ export class TouchDispatcher extends Disposable
 		// If this is a move, check if we have the mouse point registered
 		if (pEvent.type == 'mousemove')
 		{
-			var hasMouseInput = false;
+			let hasMouseInput = false;
 
-			for (var i = 0; i < this._points.length; i ++)
+			for (let i = 0; i < this._points.length; i ++)
 			{
 				if (this._points[i].id == TouchDispatcher.MOUSE_ID)
 				{
@@ -253,10 +253,10 @@ export class TouchDispatcher extends Disposable
 		if (!this._enabled || !(this._inputTypes & InputTypes.TOUCH)) return;
 
 		// Get the original points
-		var originalPoints = this.getOriginalTouches(pEvent);
+		let originalPoints = this.getOriginalTouches(pEvent);
 
 		// Browse our points
-		for (var i = 0; i < originalPoints.length; i ++)
+		for (let i = 0; i < originalPoints.length; i ++)
 		{
 			this.processTouchEvent(pEvent, originalPoints[i]);
 		}
@@ -268,10 +268,10 @@ export class TouchDispatcher extends Disposable
 	private processTouchEvent (pEvent:JQueryEventObject, pOriginalPoint:IOriginalTouch):void
 	{
 		// Get the target
-		var target = $(pEvent.target);
+		let target = $(pEvent.target);
 
 		// Current point
-		var currentPoint:IPoint;
+		let currentPoint:IPoint;
 
 		// Stop propagation
 		pEvent.stopPropagation();
@@ -313,7 +313,7 @@ export class TouchDispatcher extends Disposable
 			}
 
 			// Browse our current normalized points
-			for (var i in this._points)
+			for (let i in this._points)
 			{
 				// Target this point
 				currentPoint = this._points[i];
@@ -384,7 +384,7 @@ export class TouchDispatcher extends Disposable
 		if (this._points.length == 1 && this._currentDirection != InputDirection.UNKNOWN)
 		{
 			// Target the main point
-			var mainPoint = this._points[0];
+			let mainPoint = this._points[0];
 
 			// And notify on the delegate
 			this._delegate.inputDragging(
@@ -397,7 +397,7 @@ export class TouchDispatcher extends Disposable
 		}
 
 		// Cancel velocity on all points
-		for (var i = 0; i < this._points.length; i ++)
+		for (let i = 0; i < this._points.length; i ++)
 		{
 			this._points[i].deltaX = 0;
 			this._points[i].deltaY = 0;

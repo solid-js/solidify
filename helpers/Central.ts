@@ -1,5 +1,7 @@
 import {Disposable} from '../core/Disposable';
 
+// TODO : A refaire en virant ce qui est inutile.
+
 // TODO : un méthode watch par instance de central pour loguer tout ce qu'il passe
 
 export module Central

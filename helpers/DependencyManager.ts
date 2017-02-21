@@ -114,7 +114,7 @@ export class DependencyManager
     registerModulesPath (pPaths:IModulePathStorage):void
     {
 		// Browse module types
-		for (var moduleType in pPaths)
+		for (let moduleType in pPaths)
 		{
 			// To lowercase
 			moduleType = moduleType.toLowerCase();
@@ -126,7 +126,7 @@ export class DependencyManager
 			}
 
 			// Insert all paths for this module
-			for (var modulePathIndex in pPaths[moduleType])
+			for (let modulePathIndex in pPaths[moduleType])
 			{
 				this._modulesPath[moduleType].push(
 					StringUtils.trailingSlash(pPaths[moduleType][modulePathIndex])
@@ -143,16 +143,14 @@ export class DependencyManager
      */
     getFlatModulesPath ():string[]
     {
-        var modulesPath:string[] = [];
-
-		for (var moduleType in this._modulesPath)
+        let modulesPath:string[] = [];
+		for (let moduleType in this._modulesPath)
 		{
-			for (var pathIndex in this._modulesPath[moduleType])
+			for (let pathIndex in this._modulesPath[moduleType])
 			{
 				modulesPath.push(this._modulesPath[moduleType][pathIndex]);
 			}
 		}
-
         return modulesPath;
     }
 
@@ -161,16 +159,14 @@ export class DependencyManager
      */
     getFlatModulesTypes ():string[]
     {
-        var modulesType:string[] = [];
-
-		for (var moduleType in this._modulesPath)
+        let modulesType:string[] = [];
+		for (let moduleType in this._modulesPath)
 		{
 			if (!ArrayUtils.inArray(modulesType, moduleType))
 			{
 				modulesType.push(moduleType);
 			}
 		}
-
         return modulesType;
     }
 
@@ -182,7 +178,7 @@ export class DependencyManager
     updateModuleCache (pHandler:(pLoadedModules:string[]) => void):void
     {
         // Get flat version of all dynamic modules path
-        var modulesPath = this.getFlatModulesPath();
+        let modulesPath = this.getFlatModulesPath();
 
         // Preload those modules and get beck via the handler
         ModuleUtils.preloadModules(modulesPath, (pLoadedModules:string[]):void =>
@@ -213,24 +209,24 @@ export class DependencyManager
         pModuleType = pModuleType.toLowerCase();
 
         // Get loaded modules via requireJS
-        var loadedModules       = ModuleUtils.getLoadedModulesNames();
+        let loadedModules       = ModuleUtils.getLoadedModulesNames();
 
         // Keep in key for faster check
-        var loadedModulesByKey:{[index: string]: any} = {};
-        for (var moduleName in loadedModules)
+        let loadedModulesByKey:{[index: string]: any} = {};
+        for (let moduleName in loadedModules)
         {
             // Lowercase in key, and keep the rich case version in value
             loadedModulesByKey[moduleName.toLowerCase()] = moduleName;
         }
 
         // Target the module path
-        var currentModulePath   :string;
+        let currentModulePath   :string;
 
         // Registered base path
-        var localModulePath     :string;
+        let localModulePath     :string;
 
 		// Full path of the found module
-		var fullModulePath		:string;
+		let fullModulePath		:string;
 
         // Check if we have this module type registered
         if (!(pModuleType in this._modulesPath))
@@ -239,7 +235,7 @@ export class DependencyManager
         }
 
         // Run on modules paths registered for this module type
-        for (var modulePathIndex in this._modulesPath[pModuleType])
+        for (let modulePathIndex in this._modulesPath[pModuleType])
         {
             // Get the path
             localModulePath = this._modulesPath[pModuleType][modulePathIndex];
@@ -263,13 +259,13 @@ export class DependencyManager
         }
 
 		// Load the module
-		var module = ModuleUtils.requireSync(loadedModulesByKey[currentModulePath]);
+		let module = ModuleUtils.requireSync(loadedModulesByKey[currentModulePath]);
 
 		// The exported element from the module to get
-		var moduleExport:any;
+		let moduleExport:any;
 
 		// Get the file name for the export class if export by name is not found
-		var moduleFileName:string = StringUtils.getFileFromPath(fullModulePath);
+		let moduleFileName:string = StringUtils.getFileFromPath(fullModulePath);
 
 		// Try to get the export via parameter
 		if (pExportName in module)
@@ -312,6 +308,11 @@ export class DependencyManager
 
     // ------------------------------------------------------------------------- NO MODULES
 
+	/**
+	 * Check if a dependency is already registered, by its name.
+	 * @param pName Name of dependency to search for.
+	 * @throws Error if dependency is already registered
+	 */
     private checkAlreadyRegisteredDependency (pName:string):void
     {
         if (pName in this._dependencies)
@@ -360,19 +361,23 @@ export class DependencyManager
     }
 
     /**
-     * todo : doc
-     * @param pName
+     * Create the instance of a require dependency by its name.
+     * @param pName Name of the dependency to create.
      * @returns {any}
+	 * @throws Error if dependency not found in require.
      */
     public requireInstance (pName:string):any
     {
+    	// If not declared
         if (!(pName in this._dependencies))
         {
             throw new Error(`DependencyManager.requireInstance // ${pName} instance not found.`);
         }
 
-        var currentDependency:IDependency = this._dependencies[pName];
-
+        // Check if
+		// - we have the instance
+		// - this is a singleton
+        let currentDependency:IDependency = this._dependencies[pName];
         if (
                 (
                     currentDependency.classRef != null
@@ -383,17 +388,18 @@ export class DependencyManager
                 !currentDependency.singleton
             )
         {
+        	// Create new instance and store it
             currentDependency.instance = new currentDependency.classRef;
         }
 
+        // Return instance
         return currentDependency.instance;
     }
 
     // todo : getDependencies -> ??
     // todo : removeDependency
-
     public removeDependency (pName:string):void
     {
-
+		throw new Error('DependencyManager.error // TODO');
     }
 }

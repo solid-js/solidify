@@ -1,36 +1,36 @@
 {
-  "name": "solidify",
-  "version": "0.4.13",
-  "homepage": "https://github.com/solid-js/solidify",
-  "authors": [
-    "zouloux <info@zouloux.com>"
-  ],
-  "description": "Solidify typescript framework for robust and modular web applications",
-  "keywords": [
-    "solid",
-    "solidify",
-    "framework",
-    "typescript",
-    "module",
-    "modular",
-    "robust",
-    "web",
-    "webapp",
-    "application"
-  ],
-  "dependencies": {
-	"q": "latest",
-	"requirejs": "latest",
-	"underscore": "latest",
-	"jquery": "latest",
-	"gsap": "latest"
-  },
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ]
+	"name": "solidify",
+	"version": "0.5.0",
+	"homepage": "https://github.com/solid-js/solidify",
+	"authors": [
+		"zouloux <info@zouloux.com>"
+	],
+	"description": "Solidify typescript framework for robust and modular web applications",
+	"keywords": [
+		"solid",
+		"solidify",
+		"framework",
+		"typescript",
+		"module",
+		"modular",
+		"robust",
+		"web",
+		"webapp",
+		"application"
+	],
+	"dependencies": {
+		"requirejs": "latest",
+		"jquery": "latest",
+		"gsap": "latest",
+		"q": ">1.0.0 <2.0",
+		"normalize-css": "normalize.css#~3.0.3"
+	},
+	"license": "MIT",
+	"ignore": [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests"
+	]
 }

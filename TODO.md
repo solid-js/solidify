@@ -1,9 +1,10 @@
 # TODO solidify
 
-Framework front office basé sur Less et Typescript pour gérer sous forme de modules des pages simples et complèxes.
-Gestion de vues JQuery et React.
-Permet de créer scripts simples pour des pages avec DOM, mais aussi des web-apps complètes avec système de routage avancé.
-Workflow établi et librairie d'utilitaires en tous genres.
+Cap : 
+- Framework front office basé sur Less et Typescript pour gérer sous forme de modules des pages simples et complèxes.
+- Gestion de vues JQuery et React.
+- Permet de créer scripts simples pour des pages avec DOM, mais aussi des web-apps complètes avec système de routage avancé.
+- Workflow établi et librairie d'utilitaires en tous genres.
 
 
 ### Fonctionnalité vue solidify
@@ -17,9 +18,9 @@ Au final, les composants react pourront aussi être appelés depuis la DOM, mais
 #### Vues classiques
 - Gestion des vues classiques avec séléction jQuery + évènements + Central.
 - Instancié depuis le code
-- Liste de helpers pour gérer les
-- Workflow pour gérer le ciblage jQuery et intéractions DOM (DOMNode)
+- Workflow pour gérer le ciblage jQuery et intéractions DOM
 - Workflow pour gérer les états (updateState)
+- Mini templating sans Handlebars
 - [V2] Instancié et configuré directement depuis la DOM
 - [V2] Librairie pour gérer la vie de ces composants (récupérer l'instance depuis la DOM, instancier, détruire, etc)
 
@@ -35,12 +36,12 @@ Au final, les composants react pourront aussi être appelés depuis la DOM, mais
 
 ### Navigation, routage et controlleurs
 
-- Gestion du routage depuis Grapnel vers les vues
+- Gestion du routage
 - Gestion de l'arrêt d'une route (compliqué !) sans niquer la nav précédent / suivant
-- Gestion du routage inverse (controlleur vers route)
+- Gestion du routage inverse
 - Gestion du bootstrap (route + bloquage + instanciation + destruction)
 - Gestion d'une viewStack React depuis le bootstrap
-- [DONE] PlayIn / playOut / shouldPlayOut sur les reactPages
+- [DONE] PlayIn / playOut / shouldPlayIn / shouldPlayOut sur les reactPages
 
 
 ### Models

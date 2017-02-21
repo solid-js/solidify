@@ -65,7 +65,7 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 		if (Array.isArray(pRefName))
 		{
 			// Map each ref DOM node to a jQuery collection
-			return $(pRefName.map((pSubName) =>
+			return $((pRefName as string[]).map((pSubName) =>
 			{
 				return ReactDom.findDOMNode(this.refs[pSubName]);
 			}));

@@ -48,7 +48,7 @@ export class Sequence extends Disposable
 
 	keyDownHandler = (pEvent:JQueryEventObject):void =>
 	{
-		var oldIndex = this._currentIndex;
+		let oldIndex = this._currentIndex;
 
 		this._currentIndex = (
 			pEvent.keyCode == this._sequence[this._currentIndex]

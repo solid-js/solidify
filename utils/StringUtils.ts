@@ -73,10 +73,30 @@ export class StringUtils
 		return out;
 	}
 
-	// todo : cameltosnake
-	/*
-	 static camelToSnakeCase (pSource:string):string { }
+	/**
+	 * Convert camelCase to snake_case or snake-case or SNAKE_CASE and event SNAKE-CASE
+	 * @param pSource camelCase string
+	 * @param pSeparator Used separator between words. Default is dash -
+	 * @param pUpperCase If we have to uppercase every words. Default is no thanks.
+	 * @returns {string} snake_case_string
 	 */
+	static camelToSnakeCase (pSource:string, pSeparator = '-', pUpperCase = false):string
+	{
+		return pSource.replace(
+			/([A-Z])/g,
+			(part) =>
+			{
+				return (
+					pSeparator
+					+ (
+						pUpperCase
+						? part.toUpperCase()
+						: part.toLowerCase()
+					)
+				);
+			}
+		);
+	}
 
 	/**
 	 * Convertir un enum en string, camelCase ou snakeCase.
@@ -106,7 +126,6 @@ export class StringUtils
 	 * @param pString Le nom de la valeur à trouver, par ex : "MY_VALUE"
 	 * @param pEnumClass La classe de l'enum, par ex: ENum
 	 * @returns {number} L'index de notre valeur enum qui correspond au string. -1 si non trouvé.
-	 * TODO : Prendre en charge le snake-case pour être au top avec enumToString
 	 */
 	static stringToEnum (pString:string, pEnumClass:Object):number
 	{
@@ -208,45 +227,45 @@ export class StringUtils
 	 * Handy for URLs
 	 */
 	static SLUG_REGEX = [ {
-		regex: /[\xC0-\xC6]/g,
-		char: 'A'
-	}, {
-		regex: /[\xE0-\xE6]/g,
-		char: 'a'
-	}, {
-		regex: /[\xC8-\xCB]/g,
-		char: 'E'
-	}, {
-		regex: /[\xE8-\xEB]/g,
-		char: 'e'
-	}, {
-		regex: /[\xCC-\xCF]/g,
-		char: 'I'
-	}, {
-		regex: /[\xEC-\xEF]/g,
-		char: 'i'
-	}, {
-		regex: /[\xD2-\xD6]/g,
-		char: 'O'
-	}, {
-		regex: /[\xF2-\xF6]/g,
-		char: 'o'
-	}, {
-		regex: /[\xD9-\xDC]/g,
-		char: 'U'
-	}, {
-		regex: /[\xF9-\xFC]/g,
-		char: 'u'
-	}, {
-		regex: /[\xC7-\xE7]/g,
-		char: 'c'
-	}, {
-		regex: /[\xD1]/g,
-		char: 'N'
-	}, {
-		regex: /[\xF1]/g,
-		char: 'n'
-	}
+			regex: /[\xC0-\xC6]/g,
+			char: 'A'
+		}, {
+			regex: /[\xE0-\xE6]/g,
+			char: 'a'
+		}, {
+			regex: /[\xC8-\xCB]/g,
+			char: 'E'
+		}, {
+			regex: /[\xE8-\xEB]/g,
+			char: 'e'
+		}, {
+			regex: /[\xCC-\xCF]/g,
+			char: 'I'
+		}, {
+			regex: /[\xEC-\xEF]/g,
+			char: 'i'
+		}, {
+			regex: /[\xD2-\xD6]/g,
+			char: 'O'
+		}, {
+			regex: /[\xF2-\xF6]/g,
+			char: 'o'
+		}, {
+			regex: /[\xD9-\xDC]/g,
+			char: 'U'
+		}, {
+			regex: /[\xF9-\xFC]/g,
+			char: 'u'
+		}, {
+			regex: /[\xC7-\xE7]/g,
+			char: 'c'
+		}, {
+			regex: /[\xD1]/g,
+			char: 'N'
+		}, {
+			regex: /[\xF1]/g,
+			char: 'n'
+		}
 	];
 
 	/**
@@ -261,10 +280,12 @@ export class StringUtils
 			pInput = pInput.replace(this.SLUG_REGEX[i].regex, this.SLUG_REGEX[i].char);
 		}
 
-		return pInput.toLowerCase()
+		return (
+			pInput.toLowerCase()
 			.replace(/\s+/g, '-')           // Replacing spaces by dashes
 			.replace(/[^a-z0-9-]/g, '')     // Deleting non alphanumeric chars
-			.replace(/\-{2,}/g,'-');        // Deleting multiple dashes
+			.replace(/\-{2,}/g,'-')         // Deleting multiple dashes
+		);
 	}
 
 

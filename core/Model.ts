@@ -1,9 +1,10 @@
-export = Model;
 
-class Model
+
+
+export class Model
 {
-    constructor ()
-    {
+	constructor ()
+	{
 
-    }
+	}
 }

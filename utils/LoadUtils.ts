@@ -46,14 +46,14 @@ export class LoadUtils
 	static preloadImages (pURLs:string[], pHandler:(pImages:Element[]) => void):void
 	{
 		// Count images
-		var total = pURLs.length;
-		var current = 0;
+		let total = pURLs.length;
+		let current = 0;
 
 		// Images elements
-		var images:HTMLImageElement[] = [];
+		let images:HTMLImageElement[] = [];
 
 		// Called when an image is loaded
-		var handler = function ($pElement:JQuery)
+		let handler = function ($pElement:JQuery)
 		{
 			// Add image element to list
 			images.push($pElement[0] as HTMLImageElement);
@@ -70,7 +70,7 @@ export class LoadUtils
 		};
 
 		// Browse URL's to load
-		for (var i in pURLs)
+		for (let i in pURLs)
 		{
 			// Load image
 			LoadUtils.patchedImageLoad(
@@ -96,7 +96,7 @@ export class LoadUtils
 	 */
 	static preloadFont (fonts:string[], callback:() => void):void
 	{
-		var loadedFonts = 0;
+		let loadedFonts = 0;
 
 		function fontLoaded ()
 		{
@@ -106,10 +106,10 @@ export class LoadUtils
 			}
 		}
 
-		for (var i = 0, l = fonts.length; i < l; ++i)
+		for (let i = 0, l = fonts.length; i < l; ++i)
 		{
 			(function(font) {
-				var node = document.createElement('span');
+				let node = document.createElement('span');
 				// Characters that vary significantly among different fonts
 				node.innerHTML = 'giItT1WQy@!-/#';
 				// Visible - so we can measure it - but not on the screen
@@ -127,12 +127,12 @@ export class LoadUtils
 				document.body.appendChild(node);
 
 				// Remember width with no applied web font
-				var width = node.offsetWidth;
+				let width = node.offsetWidth;
 
 				node.style.fontFamily = font;
 
-				var interval;
-				var checked = 0;
+				let interval;
+				let checked = 0;
 				function checkFont()
 				{
 					//console.log("CHECK", node.offsetWidth, width);

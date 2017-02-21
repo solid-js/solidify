@@ -39,22 +39,20 @@ export class Signal extends Disposable
 
 	// ------------------------------------------------------------------------- CONSTRUCTION
 
-	constructor ()
-	{
-		super();
-	}
+	constructor () { super(); }
 
 
 	// ------------------------------------------------------------------------- ADDING / LISTENING
-
-	// todo : doc du scope
 
 	/**
 	 * Add a listener. The handler will be called each time dispatch is called.
 	 * The handler will get the dispatch parameters.
 	 * Will return the id of the listening, for removing later.
+	 * @param pHandler Called when signal is dispatched.
+	 * @param pScope Scope to apply to handler. Let null to keep default.
+	 * @returns {number} The register index, to remove easily.
 	 */
-	add (pScope:any, pHandler:(...rest) => any):number
+	add (pHandler:(...rest) => any, pScope:any = null):number
 	{
 		return this.register(pScope, pHandler, false);
 
@@ -62,8 +60,11 @@ export class Signal extends Disposable
 
 	/**
 	 * Same as add, but will be removed when dispatched once.
+	 * @param pHandler Called when signal is dispatched.
+	 * @param pScope Scope to apply to handler. Let null to keep default.
+	 * @returns {number} The register index, to remove easily.
 	 */
-	addOnce (pScope:any, pHandler:(...rest) => any):number
+	addOnce (pHandler:(...rest) => any, pScope:any = null):number
 	{
 		return this.register(pScope, pHandler, true);
 	}
@@ -92,11 +93,11 @@ export class Signal extends Disposable
 	 */
 	dispatch (...rest):any[]
 	{
-		var results					:any[]			= [];
-		var currentListener			:IListener;
-		var currentResult			:any;
-		var listenersToRemove		:IListener[]	= [];
-		var listenerIndex 							= 0;
+		let results					:any[]			= [];
+		let currentListener			:IListener;
+		let currentResult			:any;
+		let listenersToRemove		:IListener[]	= [];
+		let listenerIndex 							= 0;
 
 		// Browse listeners
 		let total = this._listeners.length;
@@ -142,13 +143,13 @@ export class Signal extends Disposable
 	remove (pId:number):boolean;
 	remove (pHandlerId:any):boolean
 	{
-		var newListeners		:IListener[]	= [];
-		var currentListener		:IListener;
-		var listenerDeleted		:boolean		= false;
+		let newListeners		:IListener[]	= [];
+		let currentListener		:IListener;
+		let listenerDeleted		:boolean		= false;
 
 		// Browse all listeners
 		const total = this._listeners.length;
-		for (var listenerIndex = 0; listenerIndex < total; listenerIndex ++)
+		for (let listenerIndex = 0; listenerIndex < total; listenerIndex ++)
 		{
 			// Target current listener
 			currentListener = this._listeners[listenerIndex];
@@ -190,6 +191,9 @@ export class Signal extends Disposable
 
 	// ------------------------------------------------------------------------- DESTRUCTION
 
+	/**
+	 * Destroy this signal and every registered handler.
+	 */
 	dispose ():void
 	{
 		this._listeners = null;

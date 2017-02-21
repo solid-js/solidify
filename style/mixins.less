@@ -128,6 +128,21 @@
 	height: @height * @ratio;
 }
 
+/**
+ * Set bigger hitzone with :after.
+ * Will set position: relative to current selector.
+ */
+.hitZone (@size: 10, @color: transparent)
+{
+	position: relative;
+
+	&:after
+	{
+		content: '';
+		background-color: @color;
+		.place(-@size, -@size, -@size, -@size);
+	}
+}
 
 // ----------------------------------------------------------------------------- SELECTION
 

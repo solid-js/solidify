@@ -26,6 +26,16 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 
 	/**
 	 * Can be overrided.
+	 * Can return false if the page can't be activated from router.
+	 * Return true by default to always accept page changing.
+	 */
+	shouldPlayIn ():boolean
+	{
+		return true;
+	}
+
+	/**
+	 * Can be overrided.
 	 * Can return false if the page can't be changed with router.
 	 * Return true by default to always accept page changing.
 	 */

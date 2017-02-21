@@ -41,7 +41,7 @@ export class DOMUtils
 	static getScrollBarSize ():Number
 	{
 		// Create temp scrollable div
-		var $scrollableDiv = $('<div></div>').addClass('verticalScroll').css({
+		let $scrollableDiv = $('<div></div>').addClass('verticalScroll').css({
 			position: 'absolute',
 			width: 100,
 			height: 100,
@@ -53,7 +53,7 @@ export class DOMUtils
 		$scrollableDiv.appendTo($('body'));
 
 		// Measure inner and outer size
-		var scrollBarWidth = $scrollableDiv[0].offsetWidth - $scrollableDiv[0].clientWidth;
+		let scrollBarWidth = $scrollableDiv[0].offsetWidth - $scrollableDiv[0].clientWidth;
 
 		// Remove from dom
 		$scrollableDiv.remove();
@@ -74,18 +74,70 @@ export class DOMUtils
 	static getAutoHeight ($pElement:JQuery, pIncludeBorderAndPadding = false, pIncludeMargins = false):number
 	{
 		// Get the current height value
-		var currentHeightValue = $pElement.css('height');
+		let currentHeightValue = $pElement.css('height');
 
 		// Set to auto
 		$pElement.css({height: 'auto'});
 
 		// Measure the auto height
-		var descriptionHeight = pIncludeBorderAndPadding ? $pElement.outerHeight(pIncludeMargins) : $pElement.height();
+		let descriptionHeight = pIncludeBorderAndPadding ? $pElement.outerHeight(pIncludeMargins) : $pElement.height();
 
 		// Roll back to the first measured height value
 		$pElement.css({height: currentHeightValue});
 
 		// Return auto height
 		return descriptionHeight;
+	}
+
+	/**
+	 * Get number value from a jquery css property.
+	 * Will return an array with the number parsed value and the unit.
+	 * Can parse % and px values.
+	 * Will return [0, null] in case of error.
+	 * Exemple : cssToNumber("35px") -> [35, "px"]
+	 * @param pValue The returned value from jQuery css
+	 * @return First value is the number value, second index is the unit ("px" or "%")
+	 */
+	static cssToNumber (pValue:string):any[]
+	{
+		// Chercher l'unité "px"
+		let indexToCut = pValue.indexOf("px");
+
+		// Chercher l'unité "%""
+		if (indexToCut == -1)
+		{
+			indexToCut = pValue.indexOf("%");
+		}
+
+		// Résultat
+		return (
+			// Si on n'a pas trouvé l'unité
+			indexToCut == -1
+
+			// On ne peut pas retourner
+			? [
+				parseFloat(pValue),
+				null
+			]
+
+			// Séparer la valeur de l'unité
+			: [
+				parseFloat(pValue.substr(0, indexToCut)),
+				pValue.substr(indexToCut, pValue.length).toLowerCase()
+			]
+		)
+	}
+
+	/**
+	 * Get scaled value of any DOM element even if scale is modified by a parent.
+	 * @param pElement The element (not jquery this time) to check
+	 * @returns {[number,number]} Will return an array with width and height values.
+	 */
+	static getGlobalScale (pElement:Element):number[]
+	{
+		return [
+			pElement.getBoundingClientRect().width / pElement['offsetWidth'],
+			pElement.getBoundingClientRect().height / pElement['offsetHeight']
+		];
 	}
 }

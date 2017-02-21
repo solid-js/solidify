@@ -53,7 +53,8 @@ export class App<AppParamsType> extends Disposable
 		this.patchAppBase(pAppParams);
 
 		// Init app parameters
-		this.initConfig(pAppParams);
+		this.initConfig();
+		this.injectConfig(pAppParams);
 
 		// Init dependencies managment
 		this.initDependencyManager();
@@ -84,19 +85,6 @@ export class App<AppParamsType> extends Disposable
 	}
 
 	/**
-	 * Inject app params into Config
-	 * @param pAppParams specify params at app construction. See IAppParams.
-	 */
-	protected initConfig (pAppParams:AppParamsType)
-	{
-		// Store in config
-		Config.instance.inject(pAppParams);
-
-		// Get reference
-		this._params = Config.getAll<AppParamsType>();
-	}
-
-	/**
 	 * Patch the base parameter from app params.
 	 * Will check the base meta if base is not provided from constructor.
 	 */
@@ -106,7 +94,7 @@ export class App<AppParamsType> extends Disposable
 		if (pAppParams == null || !('base' in pAppParams))
 		{
 			// Target base meta tag
-			var $baseMeta = $('head > base');
+			let $baseMeta = $('head > base');
 
 			// If we have one, get base from this meta
 			if ($baseMeta.length > 0)
@@ -114,6 +102,27 @@ export class App<AppParamsType> extends Disposable
 				pAppParams['base'] = $baseMeta.attr('href');
 			}
 		}
+	}
+
+	/**
+	 * Init configuration
+	 */
+	protected initConfig ()
+	{
+		// Can be override
+	}
+
+	/**
+	 * Inject app params into Config
+	 * @param pAppParams specify params at app construction. See IAppParams.
+	 */
+	protected injectConfig (pAppParams:AppParamsType)
+	{
+		// Store in config
+		Config.instance.inject(pAppParams);
+
+		// Get reference
+		this._params = Config.getAll<AppParamsType>();
 	}
 
 
