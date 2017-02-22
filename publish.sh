@@ -7,11 +7,14 @@ if [ $# -ne 1 ]; then
 	exit;
 fi
 
+# Reading parameters
+message="$1"
+
 # Reading version from bower.json with node
 version=$(node --eval "console.log(require('./bower.json').version)")
 
 echo "> Version: $version";
-echo "> Message: $1";
+echo "> Message: $message";
 echo "";
 
 echo "> Adding files..."
@@ -20,13 +23,13 @@ git status
 echo "> Done";
 echo ""
 
-echo "> Commiting $1..."
-git commit -m "$1"
+echo "> Commiting ${message}..."
+git commit -m "${message}"
 echo "> Done";
 echo ""
 
 echo "> Creating tag..."
-git tag -a "v${version}" -m $1
+git tag -a "v${version}" -m "${message}"
 echo "> Done";
 echo ""
 
