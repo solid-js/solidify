@@ -17,15 +17,20 @@ echo "";
 echo "> Adding files..."
 git add --all
 git status
+echo "> Done";
+echo ""
 
 echo "> Commiting $1..."
-git commit -m $1
+git commit -m "$1"
+echo "> Done";
+echo ""
 
 echo "> Creating tag..."
 git tag -a "v${version}" -m $1
+echo "> Done";
+echo ""
 
 echo "> Pushing to github..."
-git push
+git push origin master
 git push --tags
-
 echo "> Done !"
