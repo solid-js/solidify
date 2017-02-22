@@ -29,3 +29,6 @@ _/
 
 # Mac poops
 .DS_Store
+
+# Publishing script
+publish.sh
