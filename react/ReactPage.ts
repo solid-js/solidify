@@ -1,5 +1,5 @@
 import {React, ReactDom, ReactView} from "./ReactView";
-import {IPage} from "../definitions/IPage";
+import {IPage} from "../navigation/IPage";
 
 /**
  * Default interface for page properties
@@ -58,14 +58,14 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	}
 
 	/**
-	 * Action on this page.
 	 * Have to be override.
+	 * Action on this page.
 	 * Have to check props.action and props.params to show proper content.
 	 */
 	action () { }
 
 	/**
-	 * Play in animation.
+	 * Play intro animation.
 	 * Have to return a promise when animation is ended.
 	 */
 	playIn ():Q.Promise<any>
@@ -74,7 +74,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	}
 
 	/**
-	 * Play out animation.
+	 * Play outro animation.
 	 * Have to return a promise when animation is ended.
 	 */
 	playOut ():Q.Promise<any>

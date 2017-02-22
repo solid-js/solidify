@@ -1,681 +1,581 @@
-export = Router;
-
-import Disposable = require("../core/Disposable");
-import Signal = require("../helpers/Signal");
-import StringUtils = require("../utils/StringUtils");
-import EnvUtils = require("../utils/EnvUtils");
-
-interface IRoute
+import {StringUtils} from "../utils/StringUtils";
+import {ArrayUtils} from "../utils/ArrayUtils";
+/**
+ * Interface for action parameters.
+ * This is an associative array.
+ * Value can be either string or number.
+ */
+export interface IActionParameters
 {
-	/**
-	 * The route pattern for url checking
-	 */
-	pattern			:RegExp;
-
-	/**
-	 * The route pattern for quick params replacement when reverse routing
-	 */
-	reverseRoute	:string;
-
-	/**
-	 * Listing parameters and their types (name in key, type in value)
-	 */
-	params			:{[index:string] : string};
-
-	/**
-	 * Les index de chaque param pour les récupérer depuis la regex
-	 */
-	paramsIndexes	:string[];
-
-	/**
-	 * Action and controller names
-	 */
-	controllerName	:string;
-	actionName		:string;
+	[index:string] : string|number;
 }
 
 /**
- * Returned when checking if an route is corresponding to an URL
+ * TODO DOC
  */
-interface IRouteOutput
+export interface IRouteMatch
 {
-	name		:string;
-	controller	:string;
-	action		:string;
-	params		:{[index:string]: any};
+	/**
+	 * Page name.
+	 * Can be a page to show in stack or any name that is fine to you.
+	 */
+	page				:string;
+
+	/**
+	 * Action to execute on page.
+	 * Default is "index"
+	 */
+	action				?:string;
+
+	/**
+	 * Stack name which have to show page.
+	 * Default is "main"
+	 */
+	stack				?:string;
+
+	/**
+	 * Parameters matching with this route.
+	 */
+	parameters			?:IActionParameters;
 }
 
 /**
- * Called when the URL is corresponding to a route
+ * Interface for a declared route
  */
-interface IInsideHandler
+export interface IRoute
 {
-	(pControllerName:string, pActionName:string, pParams:any):void
+	/**
+	 * Link to trigger this route, without base and with leading slash.
+	 */
+	url					:string;
+
+	/**
+	 * Page name.
+	 * Can be a page to show in stack or any name that is fine to you.
+	 */
+	page				:string;
+
+	/**
+	 * Action to execute on page.
+	 * Default is "index"
+	 */
+	action				?:string;
+
+	/**
+	 * Optional, called when route is triggered.
+	 * @param pActionName Running action
+	 * @param pParams Params extracted from route URL
+	 */
+	handler				?:(pActionName:string, pParams:IActionParameters) => void;
+
+	/**
+	 * Stack name which have to show page.
+	 * Default is "main"
+	 */
+	stack				?:string;
+
+	/**
+	 * Route regex for matching.
+	 * Will be created by router when adding. Do not touch :)
+	 */
+	_matchingRegex		?:RegExp;
+
+	/**
+	 * Params name for matching.
+	 * Will be created by router when adding. Do not touch :)
+	 */
+	_matchingParameter	?:string[];
 }
+
 
 /**
- * Called when the URL is not corresponding to a route
+ * This router uses pushState.
+ * See coverage at http://caniuse.com/#search=pushstate
+ * IE 10+
  */
-interface IOutsideHandler
+export class Router
 {
-	():void
-}
+	// ------------------------------------------------------------------------- SINGLETON
 
-/**
- * A routes-handler containing routes and external handlers
- */
-interface IRouteHandler
-{
-	routes			:IRoute[];
-	insideHandler	:IInsideHandler;
-	outsideHandler	:IOutsideHandler;
-}
-
-class Router extends Disposable
-{
-	/**
-	 * Meta rule allowing parameter to be an integer
-	 */
-	static META_RULE_NUMBER = "([0-9]+)";
+	// Our router singleton instance
+	protected static __INSTANCE	:Router;
 
 	/**
-	 * Meta rule allowing parameter to be a slug type string (like "im-a-slug-55")
-	 * Ne special char, dash separated.
+	 * Get router instance.
+	 * Please create and configure it without this getter before.
+	 * @returns {Router}
 	 */
-	static META_RULE_STRING = "([0-9a-zA-Z_\%\+-]+)";
+	static get instance ():Router
+	{
+		// If instance does'n exists
+		if (Router.__INSTANCE == null)
+		{
+			// This is no good.
+			throw new Error('Router.instance // Please create router in app Main file before using it.');
+		}
+
+		// Return instance
+		return Router.__INSTANCE;
+	}
+
+	// ------------------------------------------------------------------------- STATICS
+
+	// TODO : doc
+	static LEFT_PARAMETERS_DELIMITER = '{';
+	static RIGHT_PARAMETER_DELIMITER = '}';
+
+	static PARAMETER_RULE = '([0-9a-zA-Z\_\%\+\-]+)';
+
+
+	// ------------------------------------------------------------------------- LOCALS
+
+
+	// ------------------------------------------------------------------------- PROPERTIES
 
 	/**
-	 * Meta rule allowing parameter to be anything (will force the URL to end with this)
+	 * The base is the HTTP path between your server and your app.
+	 *
+	 * For example, if your app is here :
+	 * http://www.my-server.com/any-folder/to/my-app/
+	 *
+	 * then your base is :
+	 * /any-folder/to/my-app/
+	 *
+	 * Leading and trailing slash will be added if not present.
 	 */
-	static META_RULE_ANY = "(.+)";
+	protected _base				:string;
+	get base ():string { return this._base }
+	set base (value:string)
+	{
+		// Add leading and trailing slash
+		value = StringUtils.leadingSlash(value, true);
+		value = StringUtils.trailingSlash(value, true);
+
+		// Set
+		this._base = value;
+	}
 
 	/**
-	 * All available meta rules, by names
+	 * List of declared routes
 	 */
-	static META_RULES = {
-		"number"	: Router.META_RULE_NUMBER,
-		"string"	: Router.META_RULE_STRING,
-		"any"		: Router.META_RULE_ANY
+	protected _routes			:IRoute[] 			= [];
+	get routes ():IRoute[] { return this._routes; }
+
+	/**
+	 * Current path, including base.
+	 */
+	protected _currentPath		:string;
+	get currentPath ():string { return this._currentPath; }
+
+
+	// ------------------------------------------------------------------------- INIT
+
+	/**
+	 * Router constructor.
+	 * Please use before accessing with singleton static methods.
+	 * @param pBase The base of the app from the server. @see Router.base
+	 * @param pRoutes List of declared routes.
+	 */
+	constructor (pBase:string = '', pRoutes:IRoute[] = null)
+	{
+		// Register instance
+		Router.__INSTANCE = this;
+
+		// Set base
+		this.base = pBase;
+
+		// Add routes
+		this.addRoutes(pRoutes);
+
+		// Listen to popstate
+		window.addEventListener('popstate', this.popStateHandler );
+	}
+
+
+	/**
+	 * Register new set of routes.
+	 * Will be added to previously registered routes.
+	 * @param pRoutes
+	 */
+	addRoutes (pRoutes:IRoute[])
+	{
+		// Do nothing if no routes
+		if (pRoutes == null) return;
+
+		// Add all routes
+		pRoutes.map((route:IRoute) =>
+		{
+			// Prepare route
+			this.prepareRoute( route );
+
+			// Add route
+			this._routes.push( route );
+		});
+	}
+
+	/**
+	 * Prepare route regex to optimise route matching phase.
+	 * @param pRoute Route to prepare.
+	 */
+	protected prepareRoute (pRoute:IRoute)
+	{
+		// Check route config
+		if (pRoute.page == null || pRoute.page == '')
+		{
+			throw new Error(`Router.prepareRoute // Invalid route "${pRoute.url}", property "page" have to be not null ans not empty.`);
+		}
+
+		// Default action to "index"
+		if (pRoute.action == null || pRoute.action == '')
+		{
+			pRoute.action = 'index';
+		}
+
+		// Default stack to "main"
+		if (pRoute.stack == null || pRoute.stack == '')
+		{
+			pRoute.stack = 'main';
+		}
+
+		// Get url shortcut
+		let url = pRoute.url;
+
+		// Index to detect params boundaries
+		let start = url.indexOf( Router.LEFT_PARAMETERS_DELIMITER );
+		let end = 0;
+
+		// Initialize the new pattern for quick detection
+		let pattern = '';
+
+		// Setup route parameters name for matching
+		pRoute._matchingParameter = [];
+
+		// Check if we have another incomming parameter on the route pattern declaration
+		while (start != -1 && end != -1)
+		{
+			// Get boundaries for this param
+			start = url.indexOf( Router.LEFT_PARAMETERS_DELIMITER );
+			end = url.indexOf( Router.RIGHT_PARAMETER_DELIMITER );
+
+			// Get parameter name and store it inside route for matching
+			pRoute._matchingParameter.push( url.substring(start + 1, end) );
+
+			// Add parameter flag to replace with regex down bellow
+			pattern += url.substring(0, start) + '%%PARAMETER%%';
+
+			// Cut the hash for the next param detection iteration
+			url = url.substring(end + 1, url.length);
+			start = url.indexOf( Router.LEFT_PARAMETERS_DELIMITER );
+		}
+
+		// Add the end of pattern to the detect pattern
+		pattern += url.substring(0, url.length);
+
+		// Replace regex reserved chars on pattern
+		// We do it before parameter flag this is important, to avoid doubling escaping
+		pattern = pattern
+			.replace(/\./g, '\\.')
+			.replace(/\+/g, '\\+')
+			.replace(/\*/g, '\\*')
+			.replace(/\$/g, '\\$')
+			.replace(/\/$/, '/?'); // Optional last slash
+
+		// Remplace all parameter flag to corresponding regex for parameter detection
+		pattern = pattern.replace(new RegExp("(\%\%PARAMETER\%\%)", 'g'), Router.PARAMETER_RULE);
+
+		// Convert it to regex and store it inside route
+		pRoute._matchingRegex = new RegExp(`^${pattern}$`);
+	}
+
+
+	// ------------------------------------------------------------------------- ROUTE IS CHANGING
+
+	/**
+	 * When state is poped
+	 * @param pEvent
+	 */
+	popStateHandler = (pEvent:Event) =>
+	{
+		//console.log('POP STATE', pEvent, this);
+
+		this.updateCurrentRoute();
 	};
 
 	/**
-	 * Current instance of the router
+	 * State is changed, update current route.
 	 */
-	static __instance:Router;
-
-	/**
-	 * Get the only Router instance
-	 */
-	static getInstance ():Router
+	updateCurrentRoute ()
 	{
-		if (this.__instance == null)
+		// If router is running
+		if (this._isStarted)
 		{
-			this.__instance = new Router();
-		}
+			// Record path
+			this._currentPath = location.pathname;
 
-		return this.__instance;
-	}
+			console.info('Router.updateCurrentRoute // Route', this._currentPath);
 
-	/**
-	 * When the route has changed
-	 */
-	private _onRouteChanged:Signal = new Signal();
-	get onRouteChanged ():Signal { return this._onRouteChanged; }
+			// Convert URL to route
+			let routeMatch = this.URLToRoute( this._currentPath );
 
-	/**
-	 * When the route is not found (in any route-handlers)
-	 */
-	private _onRouteNotFound:Signal = new Signal();
-	get onRouteNotFound ():Signal { return this._onRouteNotFound; }
-
-	/**
-	 * If the router is started and ready to catch url changes
-	 */
-	private _started:boolean = false;
-	get started ():boolean { return this._started; }
-
-	/**
-	 * Pause the router (will not trigger new route if address bar URL has changed)
-	 */
-	private _paused:boolean = false;
-	get paused ():boolean { return this._paused; }
-	set paused (pValue:boolean)
-	{
-		// If changed
-		if (this._paused != pValue)
-		{
-			this._paused = pValue;
-
-			// Update
-			this.routeChangedHandler();
-		}
-	}
-
-	/**
-	 * Get the baseURL if pushstate is activated
-	 */
-	get baseURL ():string
-	{
-		// Get base URL from pushState
-		var baseURL:string = $['address'].state();
-
-		// Patch if we are in hashbang mode
-		if (baseURL == null || baseURL == undefined)
-		{
-			return "";
-		}
-		else if (baseURL.lastIndexOf("/") == baseURL.length - 1)
-		{
-			return baseURL.substr(0, baseURL.length - 1);
-		}
-		else return baseURL;
-	}
-
-	/**
-	 * The current URL on the address bar
-	 */
-	private _currentURL			:string;
-	get currentURL ():string { return this._currentURL; }
-	set currentURL (pValue:string)
-	{
-		// If changed
-		if (this._currentURL != pValue)
-		{
-			// Update but don't store (wait for the event)
-			$['address'].value(pValue);
-		}
-	}
-
-	/**
-	 * The current route corresponding to the current URL.
-	 * Use Router.open to open a route.
-	 * Read only, can be null.
-	 */
-	private _currentRoute		:IRouteOutput;
-	get currentRoute ():IRouteOutput { return this._currentRoute; }
-
-	/**
-	 * All routes handlers
-	 */
-	private _handlers:{[index:string]: IRouteHandler} = {};
-
-
-	/**
-	 * Internal method for processing external API routes into prepared IRoutes[].
-	 * Will create a reverse URL pattern for quick URL creating.
-	 * Will also create a route pattern for quick route matching from current address.
-	 */
-	private processRoutes (pRoutes:string[][]):IRoute[]
-	{
-		// Output array of processed routes
-		var processedRoutes	:IRoute[] = [];
-
-		// Loop vars
-		var currentRoute	:string[];
-		var convertedRoute	:IRoute;
-		var hashPattern		:string;
-		var newPattern		:string;
-		var splittedAction	:string[];
-		var start			:number;
-		var end				:number;
-		var splittedParam	:string[];
-		var i, j;
-
-		// Browse external API routes
-		for (i in pRoutes)
-		{
-			// Target current external route
-			currentRoute = pRoutes[i];
-
-			// Check if we have both action and route
-			if (currentRoute.length != 2)
+			// If our route is not found
+			if (routeMatch == null)
 			{
-				throw new Error('Router.addRoutes // Routes declarations has to be like : ["Controller.action", "route/pattern.html"]');
+				console.warn('Not found');
+				// TODO : Dispatch onNotFound
 			}
 
-			// Split action in controllerName and actionName
-			splittedAction = currentRoute[0].split(".");
-
-			// Check if we have both controller and action names
-			if (splittedAction.length != 2)
-			{
-				throw new Error('Router.addRoutes // Controller name and action name has to be dot separated, like : "Controller.action"');
-			}
-
-			// Create the converted route object
-			convertedRoute = {
-				pattern: null,
-				reverseRoute: "",
-				params: {},
-				controllerName: splittedAction[0],
-				actionName: splittedAction[1],
-				paramsIndexes: []
-			};
-
-			// Copy route pattern declaration for params hashing
-			hashPattern = currentRoute[1];
-
-			// Index to detect params boundaries
-			start = hashPattern.indexOf("{");
-			end = 0;
-
-			// Initialize the new pattern for quick detection
-			newPattern = "";
-
-			// Check if we have another incomming parameter on the route pattern declaration
-			while (start != -1 && end != -1)
-			{
-				// Get boundaries for this param
-				start = hashPattern.indexOf("{");
-				end = hashPattern.indexOf("}");
-
-				// Split the name from the meta
-				splittedParam = hashPattern.substring(start + 1, end).split(":");
-
-				// If we don't have param type, choose string by default
-				if (splittedParam.length == 1)
-				{
-					splittedParam[1] = "string";
-				}
-
-				// Check if we have a name and a meta
-				else if (splittedParam.length != 2 || !(splittedParam[1] in Router.META_RULES))
-				{
-					throw new Error('Router.processRoutes // Invalid param type in route ' + currentRoute[1] + ' has to be : "{paramName:paramType}", param types are available in Router statics (number / string / any)');
-				}
-
-				// Add param index
-				convertedRoute.paramsIndexes.push(splittedParam[0]);
-
-				// Add this hashed part to the reverse route width mustache boundaries and the param name (for quick replacement)
-				convertedRoute.reverseRoute += hashPattern.substring(0, start) + "{{" + splittedParam[0] + "}}";
-
-				// The same for the match pattern but with the meta (for quick checking)
-				newPattern += hashPattern.substring(0, start) + "{{" + splittedParam[1] + "}}";
-
-				// Register the param name in key and the meta in value
-				convertedRoute.params[splittedParam[0]] = splittedParam[1];
-
-				// Cut the hash for the next param detection iteration
-				hashPattern = hashPattern.substring(end + 1, hashPattern.length);
-				start = hashPattern.indexOf("{");
-			}
-
-			// Add the end of pattern to the reverse and match routes
-			convertedRoute.reverseRoute += hashPattern.substring(0, hashPattern.length);
-			newPattern += hashPattern.substring(0, hashPattern.length);
-
-			// Replace regex reserved chars on the match pattern
-			newPattern = newPattern
-				.replace(/\./g, '\\.')
-				.replace(/\+/g, '\\+')
-				.replace(/\*/g, '\\*')
-				.replace(/\$/g, '\\$')
-				.replace(/\/$/, '/?'); // Optional last slash
-
-			// Replace every meta name by its regex on the match pattern
-			for (j in Router.META_RULES)
-			{
-				newPattern = newPattern.replace(new RegExp("(\{\{" + j + "\}\})", "g"), Router.META_RULES[j]);
-			}
-
-			// Convert it in regex and
-			convertedRoute.pattern = new RegExp("^" + newPattern + "$");
-
-			// Add to the list
-			processedRoutes.push(convertedRoute);
-		}
-
-		// Return the converted routes list
-		return processedRoutes;
-	}
-
-	/**
-	 * Add routes to an handling context.
-	 * Available param types are in statics
-	 * @param pHandlingName Name of the context. For ex : "main" or "popup"
-	 * @param pRoutes Listing routes, a route have to be like ["Controller.action", "route/pattern/{paramName:string}.html"]
-	 * @param pInsideHandler Called when a route of this context is corresponding. Following IInsideHandler for parameters : (controllerName, actionName, parameters)
-	 * @param pOutsideHandler Called when no route for this context is found
-	 */
-	addRoutes (pHandlingName:string, pRoutes:string[][], pInsideHandler:IInsideHandler, pOutsideHandler:IOutsideHandler):void
-	{
-		// Store the route context
-		this._handlers[pHandlingName] = {
-			routes			: this.processRoutes(pRoutes),
-			insideHandler	: pInsideHandler,
-			outsideHandler	: pOutsideHandler
-		};
-	}
-
-	/**
-	 * Get the route from a specific URL.
-	 * Will return an IRouteOutput if a corresponding route is found.
-	 */
-	getRouteFromURL (pURL:string):IRouteOutput
-	{
-		var currentRoute:IRoute;
-		var regexResult:any;
-
-		// Browse routing handlers
-		var i, j, k;
-		for (i in this._handlers)
-		{
-			// Browse routes
-			for (j in this._handlers[i].routes)
-			{
-				// Target route
-				currentRoute = this._handlers[i].routes[j];
-
-				// Check the URL on the pre-computed check pattern
-				regexResult = currentRoute.pattern.exec(pURL);
-
-				// If this is corresponding
-				if (regexResult != null)
-				{
-					// Remove url and other stuff from result to get only parameters values
-					regexResult.shift();
-
-					delete regexResult.input;
-					delete regexResult.index;
-
-					// Map params indexed array to named object
-					var outputParams:{[index:string] : any} = {};
-					for (k in regexResult)
-					{
-						outputParams[currentRoute.paramsIndexes[k]] = regexResult[k];
-					}
-
-					// Return the formated route output with handling name, action, controller and parameters values
-					return {
-						name: i,
-						controller: currentRoute.controllerName,
-						action: currentRoute.actionName,
-						params: outputParams
-					};
-				}
-			}
-		}
-
-		// No corresponding route found
-		return null;
-	}
-
-	/**
-	 * Start the routing system.
-	 * Routing can't be stopped but you can pause it for while if you want to avoid route triggers.
-	 * Default watched links are with this selector a[internal-link]
-	 * @param pPushStateBase If provided, will enable the HTML5 pushstate URL managing with this base.
-	 * @param pWatchLinkSelector If provided with pPushStateBase, will enable click listening on every elements having this selector. Push state will be then fully activated.
-	 */
-	start (pPushStateBase:string = null, pWatchLinkSelector:string = 'a[internal-link]'):void
-	{
-		// If it's not already started
-		if (!this._started)
-		{
-			// Router is now started
-			this._started = true;
-
-			// Enable push state if needed
-			if (pPushStateBase != null)
-			{
-				$['address'].state(pPushStateBase);
-			}
-
-			// Dispatch first route change if no pushstate base declared
-			// Or if we have no pushstate because IE9
-			if (pPushStateBase == null || EnvUtils.getIEVersion() <= 9)
-			{
-				this.routeChangedHandler();
-			}
-
-			// Initialise link watcher if needed
-			if (pWatchLinkSelector != null)
-			{
-				$(pWatchLinkSelector).on('click', this.watchedLinkClickedHandler);
-			}
-
-			// Start address bar listening
-			$['address'].change((pEvent:any) =>
-			{
-				this.routeChangedHandler();
-			});
-		}
-	}
-
-	/**
-	 * When a watched link is clicked
-	 */
-	private watchedLinkClickedHandler = (pEvent:JQueryEventObject):void =>
-	{
-		// Disable native browser click behavior
-		pEvent.preventDefault();
-
-		// Get the initialised push state base URL
-		var pushStateBase:string = $['address'].state();
-
-		// Get the link URL
-		var href = $(pEvent.currentTarget).attr('href');
-
-		if (href.indexOf(pushStateBase) == 0)
-		{
-			href = href.split(pushStateBase)[1];
-		}
-
-		this.currentURL = href;
-	};
-
-	/**
-	 * Open a route for specific controller, action name and parameters.
-	 * For exemple ("main", "Gallery", "all", {page: 2}) can give "/gallery/page/2.html" on the URL bar
-	 * @param pHandlingName The name of the route configuration handling (maybe "main" or "popup" ?)
-	 * @param pController The name of the required controller
-	 * @param pAction The name of the required action
-	 * @param pParams Key are names and real values for required parameters
-	 */
-	open (pHandlingName:string, pController:string, pAction:string = "index", pParams:{[index:string] : any} = {}):void
-	{
-		// Get the corresponding URL
-		var url:string = this.reverseURL(pHandlingName, pController, pAction, pParams);
-
-		// If we don't have a valid URL, throw an error
-		if (url == null)
-		{
-			throw new Error('Router.open // Route not found for handling ' + pHandlingName + ', controller ' + pController + ', action ' + pAction + ' and parameters ' + JSON.stringify(pParams));
-		}
-
-		// Define the new URL on the address bar
-		this.currentURL = url;
-	}
-
-	/**
-	 * Alias for open with compacted controller and action names.
-	 * Give 'ControllerName.actionName' formatted action to pCompactAction
-	 * @param pHandlingName The name of the route configuration handling (maybe "main" or "popup" ?)
-	 * @param pCompactAction Compacted controller and action name, formatted 'like ControllerName.actionName'
-	 * @param pParams Key are names and real values for required parameters
-	 */
-	openCompact (pHandlingName:string, pCompactAction:string, pParams:{[index:string] : any} = {}):void
-	{
-		// Separate controller and action
-		var splittedAction = pCompactAction.split(".");
-
-		// Check developper stupidity
-		if (splittedAction.length != 2)
-		{
-			throw new Error("Router.openCompact // pCompactAction need to be formated like : 'ControllerName.actionName'");
-		}
-
-		// Get the corresponding URL
-		var url:string = this.reverseURL(pHandlingName, splittedAction[0], splittedAction[1], pParams);
-
-		// If we don't have a valid URL, throw an error
-		if (url == null)
-		{
-			throw new Error('Router.open // Route not found for handling ' + pHandlingName + ', controller ' + splittedAction[0] + ', action ' + splittedAction[1] + ' and parameters ' + JSON.stringify(pParams));
-		}
-
-		// Define the new URL on the address bar
-		this.currentURL = url;
-	}
-
-	/**
-	 * Get the URL from controller name, action name, and parameters.
-	 * For exemple ("main", "Gallery", "all", {page: 2}) can return "/gallery/page/2.html"
-	 * @param pHandlingName The name of the route configuration handling (maybe "main" or "popup" ?)
-	 * @param pController The name of the required controller
-	 * @param pAction The name of the required action
-	 * @param pParams Key are names and real values for required parameters
-	 * @returns reversed URL if route found, otherwise null will be returned.
-	 */
-	reverseURL (pHandlingName:string, pController:string, pAction:string = "index", pParams:{[index:string] : any} = {}, pFirstSlash:boolean = true):string
-	{
-		// Check our handling exists
-		if (!(pHandlingName in this._handlers))
-		{
-			throw new Error('Router.reverseURL // ' + pHandlingName + ' not found in routes handling names.');
-		}
-
-		// Target our route handler
-		var currentRouteHandler = this._handlers[pHandlingName];
-
-		// Current route from loop
-		var currentRoute:IRoute;
-
-		// If all params for this loop are ok
-		var paramsAreValid:boolean;
-
-		// Converted params (slugs) for current route
-		var convertedParams:any;
-
-		// Browse routes
-		var i, j;
-		for (i in currentRouteHandler.routes)
-		{
-			// Target current route
-			currentRoute = currentRouteHandler.routes[i];
-
-			// Check if we have the same controller and action names
-			if (
-					currentRoute.controllerName.toLowerCase() == pController.toLowerCase()
-					&&
-					currentRoute.actionName.toLowerCase() == pAction.toLowerCase()
-				)
-			{
-				// By default, all params are good (for exemple if we don't have any)
-				paramsAreValid = true;
-
-				// New converted params object for this route
-				convertedParams = {};
-
-				// Browse given parameters
-				for (j in pParams)
-				{
-					// If this param doesn't exists in route specifications
-					if (!(j in currentRoute.params))
-					{
-						// This is not this route
-						paramsAreValid = false;
-						break;
-					}
-
-					// Get the new param object with converted values
-					convertedParams[j] = (
-						// Convert slugs
-						(Router.META_RULES[currentRoute.params[j]] == Router.META_RULE_STRING)
-						? StringUtils.slugify(pParams[j])
-
-						// Raw param, converted to string
-						: pParams[j] + ''
-					);
-
-					// Check if this param is valid by checking meta
-					if (!(new RegExp(Router.META_RULES[currentRoute.params[j]], "g")).exec(convertedParams[j]))
-					{
-						paramsAreValid = false;
-						break;
-					}
-				}
-
-				// Every params are ok
-				if (paramsAreValid)
-				{
-					// Get the reverse route from template with converted parameters
-					var routeURL = StringUtils.quickMustache(currentRoute.reverseRoute, convertedParams);
-
-					// If we have to remove the leading /
-					if (!pFirstSlash)
-					{
-						routeURL = routeURL.substr(1, routeURL.length);
-					}
-
-					// Return the route URL
-					return routeURL;
-				}
-			}
-		}
-
-		// No corresponding route found
-		return null;
-	}
-
-	/**
-	 * Address bar URL changed
-	 */
-	private routeChangedHandler ():void
-	{
-		// Get the new URL from the address bar
-		var newAddress = $['address'].value();
-
-		// Supprimer les query parameters
-		newAddress = newAddress.split('?')[0];
-
-		// If our URL really changed
-		if (newAddress != this._currentURL)
-		{
-			// Register the new URL
-			this._currentURL = newAddress;
-
-			// Get the corresponding route if available
-			this._currentRoute = this.getRouteFromURL(this._currentURL);
-
-			// Browse route handlers
-			for (var i in this._handlers)
-			{
-				// If the found route is inside this handler
-				if (this._currentRoute != null && this._currentRoute.name == i)
-				{
-					this._handlers[i].insideHandler(this._currentRoute.controller, this._currentRoute.action, this._currentRoute.params);
-				}
-				else
-				{
-					this._handlers[i].outsideHandler();
-				}
-			}
-
-			// Dispatch the change or the not found
-			if (this._currentRoute != null)
-			{
-				this._onRouteChanged.dispatch();
-			}
+			// Route is found
 			else
 			{
-				this._onRouteNotFound.dispatch();
-			}
-
-			// Track current page
-			if ('ga' in window)
-			{
-				console.log("GA Tracking for " + newAddress);
-				window['ga']('send', 'pageview', newAddress);
+				console.log(routeMatch);
+				// TODO : Dispatch onRouteChanged
 			}
 		}
 	}
 
 
-	// todo : dispose
-	dispose ():void
+	// ------------------------------------------------------------------------- URL / ROUTE CONVERTING
+
+	/**
+	 * Prepare URL to be compatible with router from several formats :
+	 * - With or without base
+	 * - With or without leading slash
+	 * - Relative or absolute link
+	 * - With or without protocol
+	 * @param pURL : URL to be prepared for router.
+	 * @returns {string} Prepared URL for router.
+	 */
+	prepareURL (pURL:string):string
 	{
-		super.dispose();
+		// Detect if link is absolute
+		let doubleSlashIndex = pURL.indexOf('//');
+		if (doubleSlashIndex >= 0 && doubleSlashIndex < 7)
+		{
+			// Remove protocol and domain from URL
+			let firstSlashIndex = pURL.indexOf('/', doubleSlashIndex + 2);
+			pURL = pURL.substr(firstSlashIndex, pURL.length);
+		}
+
+		// Force leading slash on URL
+		pURL = StringUtils.leadingSlash(pURL, true);
+
+		// If our URL doesn't include base
+		if (pURL.indexOf(this._base) != 0)
+		{
+			// Add base to URL
+			pURL = this._base + StringUtils.leadingSlash(pURL, false);
+		}
+
+		// Return prepared URL
+		return pURL;
+	}
+
+	/**
+	 * Convert an URL to a route match.
+	 * URL will be prepared to be compatible. @see Router.prepareURL
+	 */
+	URLToRoute (pURL:string):IRouteMatch
+	{
+		// Convert URL
+		pURL = this.prepareURL( pURL );
+
+		// Remove base from path and add leading slash
+		let pathWithoutBase = StringUtils.leadingSlash(pURL.split(this._base, 2)[1], true);
+
+		// The found route to return
+		let foundRoute:IRouteMatch;
+
+		// Browse routes
+		this._routes.every( (route) =>
+		{
+			// Exec route prepared regex with current path
+			let routeExec = route._matchingRegex.exec( pathWithoutBase );
+
+			// If route can be compatible
+			if (routeExec != null)
+			{
+				// Remove url and other stuff from result to get only parameters values
+				routeExec.shift();
+				delete routeExec.input;
+				delete routeExec.index;
+
+				// Map params indexed array to named object
+				let parameters:IActionParameters = {};
+				for (let k in routeExec)
+				{
+					parameters[route._matchingParameter[k]] = routeExec[k];
+				}
+
+				// Create route match object and configure it from route
+				foundRoute = {
+					page: route.page,
+					action: route.action,
+					stack: route.stack,
+					parameters: parameters
+				};
+
+				// We found our route, do not continue
+				return false;
+			}
+
+			// Not the good route, continue...
+			else return true;
+		});
+
+		// Return found route
+		return foundRoute;
+	}
+
+	/**
+	 * Convert a matching route to its triggering URL.
+	 * @param pRouteMatch Matching route to satisfy. Parameters will be slugified.
+	 * @param pPrependBase If we have to prepend base before generated URL. Default is true.
+	 * @returns {any} Can be null if route not found.
+	 */
+	routeToURL (pRouteMatch:IRouteMatch, pPrependBase = true):string
+	{
+		// Default properties for route match
+		// Default action to "index"
+		if (pRouteMatch.action == null || pRouteMatch.action == '')
+		{
+			pRouteMatch.action = 'index';
+		}
+
+		// Default stack to "main"
+		if (pRouteMatch.stack == null || pRouteMatch.stack == '')
+		{
+			pRouteMatch.stack = 'main';
+		}
+
+		// Default parameters to empty object
+		if (pRouteMatch.parameters == null)
+		{
+			pRouteMatch.parameters = {};
+		}
+
+		// Returned found URL
+		let foundURL:string;
+
+		// Browse routes
+		this._routes.every( (route) =>
+		{
+			// Check if this route is ok with this match
+			if (
+					// Check page
+					route.page == pRouteMatch.page
+					&&
+					// Check action
+					route.action == pRouteMatch.action
+					&&
+					// Check stack
+					route.stack == pRouteMatch.stack
+				)
+			{
+				// Check parameters
+				for (let i in pRouteMatch.parameters)
+				{
+					if (!ArrayUtils.inArray(route._matchingParameter, i))
+					{
+						return true;
+					}
+				}
+
+				// FIXME : Slugify ne supprime pas les leading et trailing dashes
+
+				// Replace parameters and slugify them
+				foundURL = route.url.replace(/\{(.*?)\}/g, function(i, pMatch) {
+					return StringUtils.slugify(
+						(pRouteMatch.parameters[pMatch] as string)
+					);
+				});
+
+				// Search is finished
+				return false;
+			}
+
+			// Continue searching
+			else return true;
+		});
+
+		// Not found, return null
+		if (foundURL == null) return null;
+
+		// Return found URL
+		return (
+			pPrependBase
+			? this._base + StringUtils.leadingSlash(foundURL, false)
+			: foundURL
+		);
+	}
+
+
+	// ------------------------------------------------------------------------- CHANGE ROUTE
+
+	/**
+	 * Open an URL with pushState or replaceState methods.
+	 * Will trigger popState event.
+	 * Only for application internal links.
+	 * URL will be prepared to be compatible. @see Router.prepareURL
+	 * @param pURL Link to open, from server base or absolute.
+	 * @param pAddToHistory If we have to add this link to users history (default is yes)
+	 */
+	openURL (pURL:string, pAddToHistory = true)
+	{
+		// Prepare URL to be compatible
+		pURL = this.prepareURL( pURL );
+
+		// Change URL and add to history or replace
+		pAddToHistory
+		? window.history.pushState(null, null, pURL)
+		: window.history.replaceState(null, null, pURL);
+
+		// Update route
+		this.updateCurrentRoute();
+	}
+
+	/**
+	 * Open a page with pushState or replaceState methods.
+	 * Will trigger popState event.
+	 * @param pRouteMatch Route to satisfy
+	 * @param pAddToHistory If we have to add this link to users history (default is yes)
+	 * @throws Error if route not found.
+	 */
+	openPage (pRouteMatch:IRouteMatch, pAddToHistory = true)
+	{
+		// Get URL from this route
+		let url = this.routeToURL( pRouteMatch );
+
+		// Throw error if URL is not found for this route
+		if (url == null)
+		{
+			// TODO : Doit-on déclancher une erreur / balancer un notFound / console.error / ignorer ?
+			throw new Error(`Router.openPage // Route not found.`);
+		}
+
+		// Open URL
+		this.openURL( url, pAddToHistory );
+	}
+
+
+	// ------------------------------------------------------------------------- ENGINE
+
+	// If our router is started and is listening to route changes
+	protected _isStarted = false;
+
+	/**
+	 * Start route changes listening.
+	 */
+	start ()
+	{
+		this._isStarted = true;
+		this.updateCurrentRoute();
+	}
+
+	/**
+	 * Stop router from listening route changes.
+	 */
+	stop ()
+	{
+		this._isStarted = false;
 	}
 }

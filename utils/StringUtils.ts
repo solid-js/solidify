@@ -1,7 +1,7 @@
 export class StringUtils
 {
 	/**
-	 * Add or remove the trailing slash at the end of the path.
+	 * Add or remove the trailing slash at the end of a path.
 	 * For ex:
 	 * - "/lib/test" becomes "/lib/test/" if pAdd is true
 	 * - "/lib/test/" becomes "/lib/test" if pAdd is false
@@ -12,7 +12,7 @@ export class StringUtils
 	static trailingSlash (pPath:string, pAdd = true):string
 	{
 		// If we currently have a trailing slash
-		const hasTrailingSlash = ( pPath.lastIndexOf("/") == pPath.length - 1 );
+		const hasTrailingSlash = ( pPath.lastIndexOf('/') == pPath.length - 1 );
 
 		// If we have to add trailing slash
 		if (pAdd && !hasTrailingSlash)
@@ -24,6 +24,36 @@ export class StringUtils
 		else if (!pAdd && hasTrailingSlash)
 		{
 			return pPath.substr(0, pPath.length - 1);
+		}
+
+		// Do nothing
+		else return pPath;
+	}
+
+	/**
+	 * Add or remove the leading slash at the start of a path.
+	 * For ex:
+	 * - "lib/test/" becomes "/lib/test/" if pAdd is true
+	 * - "/lib/test/" becomes "lib/test/" if pAdd is false
+	 * @param pPath String path with or without leading slash
+	 * @param pAdd Will add slash or remove slash.
+	 * @returns patched path with or without leading slash
+	 */
+	static leadingSlash (pPath:string, pAdd = true):string
+	{
+		// If we currently have a leading slash
+		const hasLeadingSlash = ( pPath.indexOf('/') == 0 );
+
+		// If we have to add leading slash
+		if (pAdd && !hasLeadingSlash)
+		{
+			return '/' + pPath;
+		}
+
+		// If we have to remove leading slash
+		else if (!pAdd && hasLeadingSlash)
+		{
+			return pPath.substr(1, pPath.length);
 		}
 
 		// Do nothing
