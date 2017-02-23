@@ -242,9 +242,10 @@ export class Router
 
 	/**
 	 * Listen links to fire internal router.
+	 * Default signature is a[data-internal-link]
 	 * @param pLinkSignature Signature to listen.
 	 */
-	listenLinks (pLinkSignature = 'a[internal-link]')
+	listenLinks (pLinkSignature = 'a[data-internal-link]')
 	{
 		$(document).on( 'click', pLinkSignature, this.linkClickedHandler );
 	}

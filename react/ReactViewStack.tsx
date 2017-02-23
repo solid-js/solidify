@@ -59,12 +59,17 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	render ()
 	{
 		// Page type from state
-		// Replace by span if not found
-		let CurrentPageType = this.state.currentPage || 'span';
+		// Use alias with CapitalCase so react detects it
+		let CurrentPageType = this.state.currentPage;
 
 		// Return DOM with current page
 		return (
-			<CurrentPageType
+			// Replace by span if not found
+			(CurrentPageType == null)
+			? <span />
+
+			// Page with action and params
+			: <CurrentPageType
 				ref={ (r) => this._currentPage = r }
 				action={this.state.action}
 				params={this.state.params}
