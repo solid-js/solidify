@@ -1,5 +1,10 @@
 import {StringUtils} from "../utils/StringUtils";
 import {ArrayUtils} from "../utils/ArrayUtils";
+import {Signal} from "../helpers/Signal";
+import {IPageStack} from "./IPageStack";
+
+// ----------------------------------------------------------------------------- STRUCT
+
 /**
  * Interface for action parameters.
  * This is an associative array.
@@ -11,7 +16,9 @@ export interface IActionParameters
 }
 
 /**
- * TODO DOC
+ * Interface for route matching with URLs.
+ * This is created by the router.
+ * It contains every info to run an action on a page with parameters.
  */
 export interface IRouteMatch
 {
@@ -40,7 +47,9 @@ export interface IRouteMatch
 }
 
 /**
- * Interface for a declared route
+ * Interface for a declared route listening.
+ * This is created by dev using the router.
+ * It contains every info to link a dynamic URL with a page / action.
  */
 export interface IRoute
 {
@@ -120,14 +129,32 @@ export class Router
 
 	// ------------------------------------------------------------------------- STATICS
 
-	// TODO : doc
-	static LEFT_PARAMETERS_DELIMITER = '{';
-	static RIGHT_PARAMETER_DELIMITER = '}';
+	/**
+	 * Left delimiter for URL parameters templating
+	 */
+	static LEFT_PARAMETERS_DELIMITER 		= '{';
 
-	static PARAMETER_RULE = '([0-9a-zA-Z\_\%\+\-]+)';
+	/**
+	 * Right delimiter for URL parameters templating
+	 */
+	static RIGHT_PARAMETER_DELIMITER 		= '}';
+
+	/**
+	 * Regex rule to detect slugified parameters.
+	 * As string because we'll create one dynamic regex by route.
+	 */
+	static PARAMETER_RULE 					= '([0-9a-zA-Z\_\%\+\-]+)';
+
+	/**
+	 * Regex to replace parameters in URLs.
+	 */
+	static PARAMETER_REPLACE_RULE 			= /\{(.*?)\}/g;
 
 
 	// ------------------------------------------------------------------------- LOCALS
+
+	// If our router is started and is listening to route changes
+	protected _isStarted = false;
 
 
 	// ------------------------------------------------------------------------- PROPERTIES
@@ -135,7 +162,7 @@ export class Router
 	/**
 	 * The base is the HTTP path between your server and your app.
 	 *
-	 * For example, if your app is here :
+	 * For example, if your app is installed here :
 	 * http://www.my-server.com/any-folder/to/my-app/
 	 *
 	 * then your base is :
@@ -143,7 +170,7 @@ export class Router
 	 *
 	 * Leading and trailing slash will be added if not present.
 	 */
-	protected _base				:string;
+	protected _base					:string;
 	get base ():string { return this._base }
 	set base (value:string)
 	{
@@ -158,14 +185,33 @@ export class Router
 	/**
 	 * List of declared routes
 	 */
-	protected _routes			:IRoute[] 			= [];
+	protected _routes				:IRoute[] 			= [];
 	get routes ():IRoute[] { return this._routes; }
 
 	/**
 	 * Current path, including base.
 	 */
-	protected _currentPath		:string;
+	protected _currentPath			:string;
 	get currentPath ():string { return this._currentPath; }
+
+	/**
+	 * Current route matching with current URL
+	 */
+	protected _currentRouteMatch	:IRouteMatch;
+	get currentRouteMatch ():IRouteMatch { return this._currentRouteMatch; }
+
+	/**
+	 * When current route is changing
+	 */
+	protected _onRouteChanged		:Signal				= new Signal();
+	get onRouteChanged ():Signal { return this._onRouteChanged; }
+
+	/**
+	 * When route is not found
+	 */
+	protected _onNotFound			:Signal				= new Signal();
+	get_onNotFound ():Signal { return this._onNotFound; }
+
 
 
 	// ------------------------------------------------------------------------- INIT
@@ -191,6 +237,71 @@ export class Router
 		window.addEventListener('popstate', this.popStateHandler );
 	}
 
+
+	// ------------------------------------------------------------------------- LINKS LISTENING
+
+	/**
+	 * Listen links to fire internal router.
+	 * @param pLinkSignature Signature to listen.
+	 */
+	listenLinks (pLinkSignature = 'a[internal-link]')
+	{
+		$(document).on( 'click', pLinkSignature, this.linkClickedHandler );
+	}
+
+	/**
+	 * When an internal link is clicked.
+	 * @param pEvent
+	 */
+	protected linkClickedHandler = (pEvent:JQueryEventObject) =>
+	{
+		// Do not follow link
+		pEvent.preventDefault();
+
+		// Cibler le lien dans la DOM
+		let $target = $( pEvent.currentTarget );
+
+		// Get href
+		let fullPath = $target.attr('href');
+
+		// FIXME : Faire une fonction pour faire un replaceState ? Utile ?
+
+		// Follow link
+		this.openURL( fullPath );
+	};
+
+
+	// ------------------------------------------------------------------------- ANALYTICS
+
+	// If this is our first track, because we have to ignore it
+	protected _firstPageView = true;
+
+	/**
+	 * Track current page for google analytics
+	 */
+	protected trackCurrentPage ()
+	{
+		// Do not track first page view because we already fired it from DOM
+		if (this._firstPageView)
+		{
+			this._firstPageView = false;
+			return;
+		}
+
+		console[('ga' in window ? 'info' : 'warn')]('Router.trackingPage // ' + this._currentPath);
+
+		// FIXME : Vérifier que c'est bien _currentPath qu'il faut envoyer ou alors le path sans base ?
+
+		// Si la librairie est chargée
+		if ('ga' in window)
+		{
+			// Signaler à google analytics
+			window['ga']('send', 'pageview', this._currentPath);
+		}
+	}
+
+
+	// ------------------------------------------------------------------------- ROUTE INIT
 
 	/**
 	 * Register new set of routes.
@@ -287,17 +398,57 @@ export class Router
 		pRoute._matchingRegex = new RegExp(`^${pattern}$`);
 	}
 
+	// ------------------------------------------------------------------------- STACK MANAGEMENT
+
+	// Stacks by names
+	protected _stacks		:{ [index:string] : IPageStack } 	= {};
+
+	/**
+	 * Register a pageStack by name to manage pages with declared routes.
+	 * @param pStackName Name of the stack.
+	 * @param pStack Instance of the stack.
+	 */
+	registerStack (pStackName:string, pStack:IPageStack)
+	{
+		// Check errors
+		if (pStackName in this._stacks)
+		{
+			throw new Error(`Router.registerStack // Stack ${pStackName} already registered`);
+		}
+		if (pStack == null)
+		{
+			throw new Error(`Router.registerStack // Can't register a null stack.`);
+
+		}
+
+		// Record instance by name
+		this._stacks[ pStackName ] = pStack;
+	}
+
+	/**
+	 * Return stack instance by its name.
+	 * Will not throw anything but can return null
+	 * @param pStackName Name of the stack we need
+	 * @returns {IPageStack} Can return null if pageStack not found
+	 */
+	getStackByName (pStackName:string):IPageStack
+	{
+		return (
+			(pStackName in this._stacks)
+			? this._stacks[ pStackName ]
+			: null
+		);
+	}
 
 	// ------------------------------------------------------------------------- ROUTE IS CHANGING
 
 	/**
-	 * When state is poped
+	 * When state is popped.
 	 * @param pEvent
 	 */
 	popStateHandler = (pEvent:Event) =>
 	{
-		//console.log('POP STATE', pEvent, this);
-
+		// Update route
 		this.updateCurrentRoute();
 	};
 
@@ -312,23 +463,51 @@ export class Router
 			// Record path
 			this._currentPath = location.pathname;
 
+			// Track analytics
+			this.trackCurrentPage();
+
 			console.info('Router.updateCurrentRoute // Route', this._currentPath);
 
-			// Convert URL to route
-			let routeMatch = this.URLToRoute( this._currentPath );
+			// Convert URL to route and store it
+			this._currentRouteMatch = this.URLToRoute( this._currentPath );
 
 			// If our route is not found
-			if (routeMatch == null)
+			if (this._currentRouteMatch == null)
 			{
-				console.warn('Not found');
-				// TODO : Dispatch onNotFound
+				// Dispatch not found
+				this._onNotFound.dispatch();
+
+				// If we have a main stack
+				let mainStack = this.getStackByName('main');
+
+				// Show notFound page
+				if (mainStack != null)
+				{
+					mainStack.showPage('NotFoundPage', 'index', {});
+				}
 			}
 
 			// Route is found
 			else
 			{
-				console.log(routeMatch);
-				// TODO : Dispatch onRouteChanged
+				// Dispatch and give route
+				this._onRouteChanged.dispatch( this._currentRouteMatch );
+
+				// Get stack from route match
+				let stack = this.getStackByName( this._currentRouteMatch.stack );
+
+				// Check if stack exists
+				if (stack == null)
+				{
+					throw new Error(`Router.updateCurrentRoute // Stack ${this._currentRouteMatch.stack} is not registered.`);
+				}
+
+				// Show page on stack
+				stack.showPage(
+					this._currentRouteMatch.page,
+					this._currentRouteMatch.action,
+					this._currentRouteMatch.parameters
+				)
 			}
 		}
 	}
@@ -483,7 +662,7 @@ export class Router
 				// FIXME : Slugify ne supprime pas les leading et trailing dashes
 
 				// Replace parameters and slugify them
-				foundURL = route.url.replace(/\{(.*?)\}/g, function(i, pMatch) {
+				foundURL = route.url.replace(Router.PARAMETER_REPLACE_RULE, function(i, pMatch) {
 					return StringUtils.slugify(
 						(pRouteMatch.parameters[pMatch] as string)
 					);
@@ -558,9 +737,6 @@ export class Router
 
 
 	// ------------------------------------------------------------------------- ENGINE
-
-	// If our router is started and is listening to route changes
-	protected _isStarted = false;
 
 	/**
 	 * Start route changes listening.

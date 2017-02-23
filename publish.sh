@@ -28,7 +28,7 @@ git commit -m "${message}"
 echo "> Done";
 echo ""
 
-echo "> Creating tag..."
+echo "> Creating tag ${version}..."
 git tag -a "v${version}" -m "${message}"
 echo "> Done";
 echo ""
