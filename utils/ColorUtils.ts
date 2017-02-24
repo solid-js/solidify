@@ -3,6 +3,33 @@
  */
 export class Color
 {
+	// ------------------------------------------------------------------------- STATIC
+
+	/**
+	 * Create color object from hexadecimal string
+	 * @param pHex Hexadecimal string as #FFFFFF or FFFFFF
+	 */
+	static fromHexString (pHex:string):Color
+	{
+		let c = new Color();
+		c.fromHexString( pHex );
+		return c;
+	}
+
+	/**
+	 * Create color object from hexadecimal number
+	 * @param pHex Hexadecimal number as 0xFFFFFF
+	 */
+	static fromHexNumber (pHex:number):Color
+	{
+		let c = new Color();
+		c.fromHexNumber( pHex );
+		return c;
+	}
+
+
+	// ------------------------------------------------------------------------- PROPERTIES
+
 	/**
 	 * Red component from 0 to 1
 	 */
@@ -31,11 +58,14 @@ export class Color
 		this.b = pB;
 	}
 
+
+	// ------------------------------------------------------------------------- FROM
+
 	/**
 	 * Feed values from hexadecimal string
 	 * @param pHex Hexadecimal string as #FFFFFF or FFFFFF
 	 */
-	fromHex (pHex:string)
+	fromHexString (pHex:string)
 	{
 		// Parse hexadecimal with or without hash
 		let match = pHex.replace(/#/,'').match(/.{1,2}/g);
@@ -47,12 +77,24 @@ export class Color
 	}
 
 	/**
+	 * Feed values from hexadecimal number
+	 * @param pHex Hexadecimal number as 0xFFFFFF
+	 */
+	fromHexNumber (pHex:number)
+	{
+		this.fromHexString( pHex.toString(16) );
+	}
+
+
+	// ------------------------------------------------------------------------- TO / AS
+
+	/**
 	 * Convert as hexadecimal value, with or without hash :
 	 * #FFFFFF
 	 * @param pWithHash Prepend with # or not
 	 * @returns {string}
 	 */
-	asHex (pWithHash = true)
+	asHex (pWithHash = true):string
 	{
 		return (
 			pWithHash ? '#' : ''
@@ -66,7 +108,7 @@ export class Color
 	 * Convert as css color : rgb(255, 255, 255)
 	 * @returns {string}
 	 */
-	asCss ()
+	asCss ():string
 	{
 		return `rgb(${this.r}, ${this.g}, ${this.b})`;
 	}
