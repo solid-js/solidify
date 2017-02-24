@@ -80,7 +80,7 @@ export class ReactView<Props, States> extends __React.Component<Props, States>
 
 	/**
 	 * Ref object in a array of components and as a jquery collection.
-	 * Have to be called with ref JSX parameter, like this : ref={this.refNodes.bind(this, 'name', key}
+	 * Have to be called with ref JSX parameter, like this : ref={this.refNodes.bind(this, 'name', key)}
 	 * Will store an array of component called _name
 	 * Will store a jquery collection called $name
 	 * @param pRefName Name of the array and to collection. Will be prefixed by _ for component array and by $ for jquery collection.
