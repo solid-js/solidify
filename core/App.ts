@@ -67,17 +67,11 @@ export class App<AppParamsType> extends Disposable
 		// Start modules preparation
 		this.dependencyManager.updateModuleCache((pLoadedModules) =>
 		{
-			// Listen to app resize
-			this.initAppResizeListening();
+			// Init routes
+			this.initRoutes();
 
 			// Init app view before routes
 			this.initAppView();
-
-			// Init boostrap managment
-			this.initBootstrap();
-
-			// Init routes
-			this.initRoutes();
 
 			// Our app is ready
 			this.ready();
@@ -105,11 +99,12 @@ export class App<AppParamsType> extends Disposable
 	}
 
 	/**
-	 * Init configuration
+	 * Init configuration.
+	 * Can be overridden.
 	 */
 	protected initConfig ()
 	{
-		// Can be override
+		// Can be overridden
 	}
 
 	/**
@@ -131,7 +126,7 @@ export class App<AppParamsType> extends Disposable
 	/**
 	 * Init env dependent stuff.
 	 * Will add env detection classes helpers to the body.
-	 * Can be overrided.
+	 * Can be overridden.
 	 */
 	protected initEnv ():void
 	{
@@ -180,41 +175,11 @@ export class App<AppParamsType> extends Disposable
 	// ------------------------------------------------------------------------- ROUTING
 
 	/**
-	 * Init bootstrap
-	 */
-	protected initBootstrap ():void
-	{
-		// TODO : Mapper le bootstrap sur l'appView pour automatiser le truc
-		//this._mainBootstrap = new Bootstrap(this.appNamespace);
-	}
-
-	protected routeNotFoundHandler ():void { }
-
-	protected routeChangedHandler ():void { }
-
-	/**
 	 * Init routes
 	 */
 	protected initRoutes ():void
 	{
-		// TODO : Initialiser les routes via la classe Router, qui elle même compose Bootstrap et utilise Grapnel
 		throw new Error(`App.initRoutes // Please override App.initRoutes to map app routes.`);
-	}
-
-	// ------------------------------------------------------------------------- APP RESIZE
-
-	/**
-	 * Init app resizing listening
-	 */
-	protected initAppResizeListening ():void
-	{
-		// TODO : Maper ça sur le nouveau Central
-		/*
-		 $(window).resize(() =>
-		 {
-		 Central.getInstance("app").dispatch("resize");
-		 });
-		 */
 	}
 
 

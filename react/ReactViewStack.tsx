@@ -38,7 +38,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	/**
 	 * If we need to play in, only for new pages
 	 */
-	protected _needPlayIn			:boolean						= true;
+	protected _needPlayIn			:boolean						= false;
 
 
 	// ------------------------------------------------------------------------- INIT
@@ -46,11 +46,11 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	prepare ()
 	{
 		// Init state
-		this.state = {
+		this.initState({
 			currentPage		:null,
 			action			:null,
 			params			:null
-		};
+		});
 	}
 
 
