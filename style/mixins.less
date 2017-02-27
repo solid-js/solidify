@@ -28,7 +28,7 @@
 .videoBackground ()
 {
 	// Center
-	.topLeft(50%, 50%);;
+	.topLeft(50%, 50%);
 	transform: translate(-50%,-50%);
 
 	// Set size to always get in screen
@@ -130,19 +130,17 @@
 
 /**
  * Set bigger hitzone with :after.
- * Will set position: relative to current selector.
  */
-.hitZone (@size: 10, @color: transparent)
+.hitZone (@horizontalSize: 10, @verticalSize: 10, @color: transparent)
 {
-	position: relative;
-
 	&:after
 	{
 		content: '';
 		background-color: @color;
-		.place(-@size, -@size, -@size, -@size);
+		.place(-@verticalSize, -@horizontalSize, -@verticalSize, -@horizontalSize);
 	}
 }
+
 
 // ----------------------------------------------------------------------------- SELECTION
 
