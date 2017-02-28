@@ -337,7 +337,7 @@ export class TouchDispatcher extends Disposable
 						{
 							this._currentDirection = InputDirection.HORIZONTAL;
 						}
-						else if (Math.abs(currentPoint.deltaY) >= Math.abs(currentPoint.deltaX))
+						else if (Math.abs(currentPoint.deltaY) > Math.abs(currentPoint.deltaX))
 						{
 							this._currentDirection = InputDirection.VERTICAL;
 						}
