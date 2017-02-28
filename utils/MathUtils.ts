@@ -89,4 +89,13 @@ export class MathUtils
 	{
 		return Math.random() > .5;
 	}
+
+	/**
+	 * Returns positive modulo, even when 'n' is negative.
+	 * From http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
+	 */
+	static positiveModulo (n, m):void
+	{
+		return ((n % m) + m) % m;
+	}
 }
