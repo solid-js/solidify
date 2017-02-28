@@ -94,7 +94,7 @@ export class MathUtils
 	 * Returns positive modulo, even when 'n' is negative.
 	 * From http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
 	 */
-	static positiveModulo (n, m):void
+	static positiveModulo (n:number, m:number):number
 	{
 		return ((n % m) + m) % m;
 	}
