@@ -210,7 +210,7 @@ export class Router
 	 * When route is not found
 	 */
 	protected _onNotFound			:Signal				= new Signal();
-	get_onNotFound ():Signal { return this._onNotFound; }
+	get onNotFound ():Signal { return this._onNotFound; }
 
 
 
@@ -264,6 +264,9 @@ export class Router
 
 		// Get href
 		let fullPath = $target.attr('href');
+
+		// Do not go further if link does exists
+		if (fullPath == null) return;
 
 		// FIXME : Faire une fonction pour faire un replaceState ? Utile ?
 
