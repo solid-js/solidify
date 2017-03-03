@@ -66,14 +66,14 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		return (
 			// Replace by span if not found
 			(CurrentPageType == null)
-			? <span />
+				? <span />
 
-			// Page with action and params
-			: <CurrentPageType
-				ref={ (r) => this._currentPage = r }
-				action={this.state.action}
-				params={this.state.params}
-			/>
+				// Page with action and params
+				: <CurrentPageType
+					ref={ (r) => this._currentPage = r }
+					action={this.state.action}
+					params={this.state.params}
+				/>
 		);
 	}
 
@@ -90,6 +90,9 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// Call animation intro if this is a new page
 		this._needPlayIn && Q(this._currentPage.playIn()).done(() =>
 		{
+			// We need to play in next page
+			this._needPlayIn = false;
+
 			// We are not in transition state anymore
 			this._isInTransition = false;
 		});
@@ -126,15 +129,15 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			return true;
 		}
 
-		// Now we are in transition state
-		this._isInTransition = true;
-
-		// We need to play in next page
-		this._needPlayIn = true;
-
 		// Load new page and do intro
 		let playInNewPage = () =>
 		{
+			// Now we are in transition state
+			this._isInTransition = true;
+
+			// We need to play in next page
+			this._needPlayIn = true;
+
 			// Load page from dependency manager
 			// FIXME : Warning, we do not check errors here !
 			let pageClass = DependencyManager.getInstance().requireModule(pPageName, 'page', null);
@@ -154,8 +157,8 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// Outro animation on current page
 		// Or going straight to the new page
 		(this.state.currentPage == null)
-		? playInNewPage()
-		: Q(this._currentPage.playOut()).done(playInNewPage);
+			? playInNewPage()
+			: Q(this._currentPage.playOut()).done(playInNewPage);
 
 		// Everything is ok
 		return true;
