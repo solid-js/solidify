@@ -183,9 +183,11 @@ export class DependencyManager
         // Preload those modules and get beck via the handler
         ModuleUtils.preloadModules(modulesPath, (pLoadedModules:string[]):void =>
         {
+        	/*
         	console.group(`DependencyManager.updateModuleCache // ${pLoadedModules.length} loaded`);
 			console.log(pLoadedModules);
             console.groupEnd();
+            */
 
             // Relay
             pHandler(pLoadedModules);
