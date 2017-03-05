@@ -44,6 +44,12 @@ export interface IRouteMatch
 	 * Parameters matching with this route.
 	 */
 	parameters			?:IActionParameters;
+
+	/**
+	 * Original route triggering this route match.
+	 * Will be created by router when matchin. Do not touch :)
+	 */
+	_fromRoute			?:IRoute;
 }
 
 /**
@@ -72,10 +78,9 @@ export interface IRoute
 
 	/**
 	 * Optional, called when route is triggered.
-	 * @param pActionName Running action
-	 * @param pParams Params extracted from route URL
+	 * @param pRouteMatch Matching route with action and parameters
 	 */
-	handler				?:(pActionName:string, pParams:IActionParameters) => void;
+	handler				?:( pRouteMatch:IRouteMatch ) => void;
 
 	/**
 	 * Stack name which have to show page.
@@ -497,21 +502,32 @@ export class Router
 				// Dispatch and give route
 				this._onRouteChanged.dispatch( this._currentRouteMatch );
 
+				// Check if we have original route hidden
+				if (this._currentRouteMatch._fromRoute != null)
+				{
+					// Check if we have an handler
+					if (this._currentRouteMatch._fromRoute.handler != null)
+					{
+						// Call handler with route match
+						this._currentRouteMatch._fromRoute.handler( this._currentRouteMatch );
+					}
+				}
+
 				// Get stack from route match
 				let stack = this.getStackByName( this._currentRouteMatch.stack );
 
-				// Check if stack exists
-				if (stack == null)
+				// Check if stack exists if this is not the main stack
+				if (this._currentRouteMatch.stack != 'main' && stack == null)
 				{
 					throw new Error(`Router.updateCurrentRoute // Stack ${this._currentRouteMatch.stack} is not registered.`);
 				}
 
 				// Show page on stack
-				stack.showPage(
+				(stack != null) && stack.showPage(
 					this._currentRouteMatch.page,
 					this._currentRouteMatch.action,
 					this._currentRouteMatch.parameters
-				)
+				);
 			}
 		}
 	}
@@ -591,11 +607,14 @@ export class Router
 
 				// Create route match object and configure it from route
 				foundRoute = {
-					page: route.page,
-					action: route.action,
-					stack: route.stack,
-					parameters: parameters
+					page		: route.page,
+					action		: route.action,
+					stack		: route.stack,
+					parameters	: parameters
 				};
+
+				// Hide from route to have access to handler
+				foundRoute._fromRoute = route;
 
 				// We found our route, do not continue
 				return false;
