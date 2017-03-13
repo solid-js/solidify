@@ -5,6 +5,9 @@ import {IPageStack} from "./IPageStack";
 
 // ----------------------------------------------------------------------------- STRUCT
 
+// TODO : Tout passer en static
+// TODO : Créer Router.create plutôt que le new
+
 /**
  * Interface for action parameters.
  * This is an associative array.
