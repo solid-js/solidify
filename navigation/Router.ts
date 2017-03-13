@@ -695,7 +695,7 @@ export class Router
 						// Slugify it if this is a string only
 						return (
 							(typeof(matchedParam) == 'number')
-							? matchedParam as string
+							? matchedParam.toString(10)
 							: StringUtils.slugify( matchedParam as string )
 						);
 					}
