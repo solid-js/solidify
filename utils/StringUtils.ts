@@ -304,17 +304,20 @@ export class StringUtils
 	 */
 	static slugify (pInput:string):string
 	{
+		// Replace all non URL compatible chars
 		const total = this.SLUG_REGEX.length;
 		for (let i = 0; i < total; i ++)
 		{
 			pInput = pInput.replace(this.SLUG_REGEX[i].regex, this.SLUG_REGEX[i].char);
 		}
 
+		// Patch quircks
 		return (
 			pInput.toLowerCase()
 			.replace(/\s+/g, '-')           // Replacing spaces by dashes
 			.replace(/[^a-z0-9-]/g, '')     // Deleting non alphanumeric chars
-			.replace(/\-{2,}/g,'-')         // Deleting multiple dashes
+			.replace(/\-{2,}/g, '-')        // Deleting multiple dashes
+			.replace(/^\-+|\-+$/g, '')		// Remove leading and trailing slashes
 		);
 	}
 

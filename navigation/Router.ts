@@ -685,14 +685,23 @@ export class Router
 					}
 				}
 
-				// FIXME : Slugify ne supprime pas les leading et trailing dashes
-
 				// Replace parameters and slugify them
-				foundURL = route.url.replace(Router.PARAMETER_REPLACE_RULE, function(i, pMatch) {
-					return StringUtils.slugify(
-						(pRouteMatch.parameters[pMatch] as string)
-					);
-				});
+				foundURL = route.url.replace(
+					Router.PARAMETER_REPLACE_RULE, function (i, pMatch)
+					{
+						// Target matched param
+						let matchedParam = pRouteMatch.parameters[pMatch];
+
+						// Slugify it if this is a string only
+						return (
+							(typeof(matchedParam) == 'number')
+							? matchedParam
+							: StringUtils.slugify(
+								(pRouteMatch.parameters[pMatch] as string)
+							)
+						);
+					}
+				);
 
 				// Search is finished
 				return false;
