@@ -35,11 +35,6 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	protected _isInTransition		:boolean;
 	get isInTransition():boolean { return this._isInTransition; }
 
-	/**
-	 * If we need to play in, only for new pages
-	 */
-	protected _needPlayIn			:boolean						= false;
-
 
 	// ------------------------------------------------------------------------- INIT
 
@@ -85,17 +80,18 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	/**
 	 * Component is updated
 	 */
-	componentDidUpdate ()
+	componentDidUpdate (pOldProps:Props, pOldStates:States)
 	{
-		// Call animation intro if this is a new page
-		this._needPlayIn && Q(this._currentPage.playIn()).done(() =>
+		// If current page changed only, we need a playIn
+		if (pOldStates.currentPage != this.state.currentPage)
 		{
-			// We need to play in next page
-			this._needPlayIn = false;
-
-			// We are not in transition state anymore
-			this._isInTransition = false;
-		});
+			// Call animation intro if this is a new page
+			Q(this._currentPage.playIn()).done(() =>
+			{
+				// We are not in transition state anymore
+				this._isInTransition = false;
+			});
+		}
 	}
 
 
@@ -116,9 +112,6 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// If this is the same page
 		if (pPageName == this._currentPageName)
 		{
-			// No need to playIn
-			this._needPlayIn = false;
-
 			// Just change action and params, not page
 			this.setState({
 				action		: pActionName,
@@ -134,9 +127,6 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		{
 			// Now we are in transition state
 			this._isInTransition = true;
-
-			// We need to play in next page
-			this._needPlayIn = true;
 
 			// Load page from dependency manager
 			// FIXME : Warning, we do not check errors here !
