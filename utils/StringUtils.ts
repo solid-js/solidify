@@ -370,4 +370,16 @@ export class StringUtils
 		// Return params bag
 		return params;
 	}
+
+	/**
+	 * Good old nl2br from PHP...
+	 * http://stackoverflow.com/questions/7467840/nl2br-equivalent-in-javascript
+	 * @param str String in which we replace line breaks by <br> tags
+	 * @param breakTag <br> tag can be changed
+	 * @returns {string}
+	 */
+	static nl2br (str:string, breakTag = '<br>')
+	{
+		return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
+	}
 }
