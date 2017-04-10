@@ -106,4 +106,62 @@ export class ArrayUtils
 
 		return pArray;
 	}
+
+	/**
+	 * Will count from a number to another by adding one at each loop.
+	 * Makes a 'for' loop with a function call.
+	 * Usefull with JSX
+	 * @see ArrayUtils.countWith
+	 * @param pFrom From which number to start counting
+	 * @param pTo To which number to end counting
+	 * @param pHandler Called at each iteration. Index is passed as first argument.
+	 * @returns {any[]}
+	 */
+	static countFrom (pFrom:number = 0, pTo:number, pHandler:(pIndex:number) => void):any[]
+	{
+		return this.countWith(pFrom, pTo, 1, pHandler);
+	}
+
+	/**
+	 * Will count from 0 to a number.
+	 * Makes a 'for' loop with a function call.
+	 * Usefull with JSX
+	 * @see ArrayUtils.countWith
+	 * @param pTo To which number to end counting
+	 * @param pHandler Called at each iteration. Index is passed as first argument.
+	 * @returns {any[]}
+	 */
+	static countTo (pTo:number, pHandler:(pIndex:number) => void):any[]
+	{
+		return this.countWith(0, pTo, 1, pHandler);
+	}
+
+	/**
+	 * Makes a 'for' loop with a function call.
+	 * Usefull with JSX
+	 *
+	 * This is like doing :
+	 * for (let i = pFrom; i < pTo; i += pWith) pHandler( i );
+	 *
+	 * Will return an array with all executed handler results.
+	 *
+	 * @param pFrom From which number to start counting
+	 * @param pTo To which number to end counting
+	 * @param pWith With which number are we counting ? Increment
+	 * @param pHandler Called at each iteration. Index is passed as first argument.
+	 * @returns {any[]}
+	 */
+	static countWith (pFrom:number, pTo:number, pWith:number, pHandler:(pIndex:number) => void):any[]
+	{
+		// Make the loop
+		let results:any[] = [];
+		for (let i = pFrom; i < pTo; i += pWith)
+		{
+			// Call handler and store result
+			results.push( pHandler( i ) );
+		}
+
+		// Return results
+		return results;
+	}
 }
