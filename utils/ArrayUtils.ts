@@ -117,7 +117,7 @@ export class ArrayUtils
 	 * @param pHandler Called at each iteration. Index is passed as first argument.
 	 * @returns {any[]}
 	 */
-	static countFrom (pFrom:number = 0, pTo:number, pHandler:(pIndex:number) => void):any[]
+	static countFrom (pFrom:number = 0, pTo:number, pHandler:(pIndex:number) => any):any[]
 	{
 		return this.countWith(pFrom, pTo, 1, pHandler);
 	}
@@ -131,7 +131,7 @@ export class ArrayUtils
 	 * @param pHandler Called at each iteration. Index is passed as first argument.
 	 * @returns {any[]}
 	 */
-	static countTo (pTo:number, pHandler:(pIndex:number) => void):any[]
+	static countTo (pTo:number, pHandler:(pIndex:number) => any):any[]
 	{
 		return this.countWith(0, pTo, 1, pHandler);
 	}
@@ -151,7 +151,7 @@ export class ArrayUtils
 	 * @param pHandler Called at each iteration. Index is passed as first argument.
 	 * @returns {any[]}
 	 */
-	static countWith (pFrom:number, pTo:number, pWith:number, pHandler:(pIndex:number) => void):any[]
+	static countWith (pFrom:number, pTo:number, pWith:number, pHandler:(pIndex:number) => any):any[]
 	{
 		// Make the loop
 		let results:any[] = [];
