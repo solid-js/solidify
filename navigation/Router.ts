@@ -397,11 +397,11 @@ export class Router
 		// Replace regex reserved chars on pattern
 		// We do it before parameter flag this is important, to avoid doubling escaping
 		pattern = pattern
-			.replace(/\./g, '\\.')
-			.replace(/\+/g, '\\+')
-			.replace(/\*/g, '\\*')
-			.replace(/\$/g, '\\$')
-			.replace(/\/$/, '/?'); // Optional last slash
+		.replace(/\./g, '\\.')
+		.replace(/\+/g, '\\+')
+		.replace(/\*/g, '\\*')
+		.replace(/\$/g, '\\$')
+		.replace(/\/$/, '/?'); // Optional last slash
 
 		// Remplace all parameter flag to corresponding regex for parameter detection
 		pattern = pattern.replace(new RegExp("(\%\%PARAMETER\%\%)", 'g'), Router.PARAMETER_RULE);
@@ -447,8 +447,8 @@ export class Router
 	{
 		return (
 			(pStackName in this._stacks)
-			? this._stacks[ pStackName ]
-			: null
+				? this._stacks[ pStackName ]
+				: null
 		);
 	}
 
@@ -581,8 +581,11 @@ export class Router
 		// Convert URL
 		pURL = this.prepareURL( pURL );
 
-		// Remove base from path and add leading slash
-		let pathWithoutBase = StringUtils.leadingSlash(pURL.split(this._base, 2)[1], true);
+		// Remove base and add leading slash
+		let pathWithoutBase = StringUtils.leadingSlash(
+			StringUtils.extractPathFromBase(pURL, this._base),
+			true
+		);
 
 		// The found route to return
 		let foundRoute:IRouteMatch;
@@ -666,15 +669,15 @@ export class Router
 		{
 			// Check if this route is ok with this match
 			if (
-					// Check page
-					route.page == pRouteMatch.page
-					&&
-					// Check action
-					route.action == pRouteMatch.action
-					&&
-					// Check stack
-					route.stack == pRouteMatch.stack
-				)
+				// Check page
+			route.page == pRouteMatch.page
+			&&
+			// Check action
+			route.action == pRouteMatch.action
+			&&
+			// Check stack
+			route.stack == pRouteMatch.stack
+			)
 			{
 				// Check parameters
 				for (let i in pRouteMatch.parameters)
@@ -695,8 +698,8 @@ export class Router
 						// Slugify it if this is a string only
 						return (
 							(typeof(matchedParam) == 'number')
-							? matchedParam.toString(10)
-							: StringUtils.slugify( matchedParam as string )
+								? matchedParam.toString(10)
+								: StringUtils.slugify( matchedParam as string )
 						);
 					}
 				);
@@ -715,8 +718,8 @@ export class Router
 		// Return found URL
 		return (
 			pPrependBase
-			? this._base + StringUtils.leadingSlash(foundURL, false)
-			: foundURL
+				? this._base + StringUtils.leadingSlash(foundURL, false)
+				: foundURL
 		);
 	}
 
@@ -738,8 +741,8 @@ export class Router
 
 		// Change URL and add to history or replace
 		pAddToHistory
-		? window.history.pushState(null, null, pURL)
-		: window.history.replaceState(null, null, pURL);
+			? window.history.pushState(null, null, pURL)
+			: window.history.replaceState(null, null, pURL);
 
 		// Update route
 		this.updateCurrentRoute();
