@@ -140,4 +140,25 @@ export class DOMUtils
 			pElement.getBoundingClientRect().height / pElement['offsetHeight']
 		];
 	}
+
+	/**
+	 * Will check if a target is corresponding to a selector, or if a parent of
+	 * this target is also corresponding to this selector.
+	 * Really handy to know if a global handler is on a specific objet,
+	 * or any of its children.
+	 * Will return jQuery selector and not boolean if you want to do
+	 * operation on targeted parent.
+	 * Check length to know if any parent is found.
+	 * @param pTarget The jQuery element to check or its parents.
+	 * @param pSelector Selector on which target or parent we have to check.
+	 * @returns {JQuery} target or any of its parents correspond to the selector
+	 */
+	static isTargetThisOrAParent (pTarget:JQuery, pSelector:string):JQuery
+	{
+		return (
+			pTarget.is(pSelector)
+			? pTarget
+			: pTarget.parents(pSelector)
+		);
+	}
 }
