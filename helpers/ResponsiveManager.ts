@@ -325,6 +325,11 @@ export class ResponsiveManager
 	 */
 	public setBreakpoints (pBreakpoints:IBreakpoint[])
 	{
+		// Register breakpoints
 		this._breakpoints = pBreakpoints;
+
+		// Dispatch first resize to have breakpoints
+		// without dispatching signals to avoid breakpoint the app
+		this.windowResizeHandler( null );
 	}
 }
