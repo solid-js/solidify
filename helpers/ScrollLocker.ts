@@ -94,6 +94,16 @@ export class ScrollLocker
 		this.updateLockState();
 	}
 
+	/**
+	 * Add one scroll lock if true.
+	 * Remove one scroll lock if false.
+	 * @param pToggle Adding or removing a scroll lock.
+	 */
+	toggleLock (pToggle:boolean)
+	{
+		pToggle ? this.addLock() : this.removeLock();
+	}
+
 
 	// ------------------------------------------------------------------------- STATE
 
