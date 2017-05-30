@@ -147,7 +147,7 @@ export class ResponsiveManager
 	// ------------------------------------------------------------------------- INIT
 
 	/**
-	 * Responsive constructor.
+	 * Responsive Manager constructor.
 	 */
 	constructor ()
 	{
