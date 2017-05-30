@@ -65,6 +65,7 @@ export class ScrollLocker
 	/**
 	 * Add a scroll lock.
 	 * Lock level will increase.
+	 * If you add 2 lock, you'll need to remove 2 lock to be able to scroll again.
 	 */
 	addLock ()
 	{
@@ -78,6 +79,9 @@ export class ScrollLocker
 	/**
 	 * Remove a scroll lock.
 	 * Lock level will decrease.
+	 * If you remove more lock than added, will throw an error.
+	 * If you want to cancel all locks without errors, @use unlock()
+	 * @throws Can throw if lock level is less than 0 after remove.
 	 */
 	removeLock ()
 	{
@@ -104,6 +108,32 @@ export class ScrollLocker
 		pToggle ? this.addLock() : this.removeLock();
 	}
 
+	/**
+	 * Will set the lock level to 1.
+	 * Override addLock and removeLock usage, use with care.
+	 */
+	lock ()
+	{
+		// Set lock level
+		this._lockLevel = 1;
+
+		// Update lock state with new lock level
+		this.updateLockState();
+	}
+
+	/**
+	 * Will set the lock level to 0.
+	 * Override addLock and removeLock usage, use with care.
+	 */
+	unlock ()
+	{
+		// Set lock level
+		this._lockLevel = 0;
+
+		// Update lock state with new lock level
+		this.updateLockState();
+	}
+
 
 	// ------------------------------------------------------------------------- STATE
 
@@ -112,9 +142,6 @@ export class ScrollLocker
 	 */
 	updateLockState ()
 	{
-		console.log('UPDATE LOCK STATE', this._lockLevel > 0, this.$containerToLock);
-
-
 		this.$containerToLock.css({
 			overflow : (this._lockLevel > 0) ? 'hidden' : ''
 		});
