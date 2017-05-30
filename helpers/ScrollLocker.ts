@@ -81,17 +81,23 @@ export class ScrollLocker
 	 * Lock level will decrease.
 	 * If you remove more lock than added, will throw an error.
 	 * If you want to cancel all locks without errors, @use unlock()
+	 * If you want to remove one lock without error, set pThrow argument.
 	 * @throws Can throw if lock level is less than 0 after remove.
 	 */
-	removeLock ()
+	removeLock (pThrow = true)
 	{
 		// Remove lock level
 		this._lockLevel --;
 
 		// Check if our lock level is correct
-		if (this._lockLevel < 0)
+		if (this._lockLevel < 0 && pThrow)
 		{
 			throw new Error('ScrollLocker.removeLock // Too many lock removed. Please check your implementation. Ex : Do not remove on click handler with an animation because the user can click several times since the animation ;)');
+		}
+		else
+		{
+			// Patch without error
+			this._lockLevel = 0;
 		}
 
 		// Update lock state with new lock level
