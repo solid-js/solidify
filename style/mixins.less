@@ -281,7 +281,7 @@
  */
 .responsiveMinWidth (@minWidth; @rules)
 {
-	@media only screen and (min-width: @minWidth)
+	@media only screen and (min-width: (@minWidth - 1px))
 	{
 		@rules();
 	}

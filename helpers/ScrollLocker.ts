@@ -83,6 +83,7 @@ export class ScrollLocker
 	 * If you want to cancel all locks without errors, @use unlock()
 	 * If you want to remove one lock without error, set pThrow argument.
 	 * @throws Can throw if lock level is less than 0 after remove.
+	 * @param pThrow Can throw errors if true
 	 */
 	removeLock (pThrow = true)
 	{
@@ -107,11 +108,14 @@ export class ScrollLocker
 	/**
 	 * Add one scroll lock if true.
 	 * Remove one scroll lock if false.
+	 * If you want to remove one lock without error, set pThrow argument.
 	 * @param pToggle Adding or removing a scroll lock.
+	 * @throws Can throw if lock level is less than 0 after remove.
+	 * @param pThrow Can throw errors if true
 	 */
-	toggleLock (pToggle:boolean)
+	toggleLock (pToggle:boolean, pThrow = true)
 	{
-		pToggle ? this.addLock() : this.removeLock();
+		pToggle ? this.addLock() : this.removeLock(pThrow);
 	}
 
 	/**
