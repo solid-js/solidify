@@ -153,7 +153,7 @@ export class DOMUtils
 	 * @param pSelector Selector on which target or parent we have to check.
 	 * @returns {JQuery} target or any of its parents correspond to the selector
 	 */
-	static isTargetOrParent (pTarget:JQuery, pSelector:string):JQuery
+	static targetOrParent (pTarget:JQuery, pSelector:string):JQuery
 	{
 		return (
 			pTarget.is(pSelector)
