@@ -5,15 +5,6 @@ import {Disposable} from "./Disposable";
  */
 export class JView extends Disposable
 {
-	/**
-	 * Can prevent init at construction
-	 * Useful when overriding with custom constructor parameters
-	 * @type {boolean}
-	 * @private
-	 */
-	protected __initAtConstruction = true;
-
-
 	// ------------------------------------------------------------------------- DOM
 
 	// Starting node of our component
@@ -21,7 +12,13 @@ export class JView extends Disposable
 
 	// ------------------------------------------------------------------------- INIT
 
-	constructor ($pRoot:JQuery = null)
+	/**
+	 * JView constructor.
+	 * Set component's root. If not defined, can still be targeted trough targetRoot middleWare.
+	 * @param $pRoot Component's root. If not defined, can still be targeted trough targetRoot middleWare.
+	 * @param pAutoInit Will launch init phase if true. Else, child component have to init manually.
+	 */
+	constructor ($pRoot:JQuery = null, pAutoInit = true)
 	{
 		// Relay
 		super();
@@ -32,8 +29,8 @@ export class JView extends Disposable
 			this.$root = $pRoot;
 		}
 
-		// Initialise
-		this.__initAtConstruction && this.init();
+		// Initialise if needed
+		pAutoInit && this.init();
 	}
 
 	/**
