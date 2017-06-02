@@ -5,6 +5,15 @@ import {Disposable} from "./Disposable";
  */
 export class JView extends Disposable
 {
+	/**
+	 * Can prevent init at construction
+	 * Useful when overriding with custom constructor parameters
+	 * @type {boolean}
+	 * @private
+	 */
+	protected __initAtConstruction = true;
+
+
 	// ------------------------------------------------------------------------- DOM
 
 	// Starting node of our component
@@ -24,7 +33,7 @@ export class JView extends Disposable
 		}
 
 		// Initialise
-		this.init();
+		this.__initAtConstruction && this.init();
 	}
 
 	/**
@@ -36,9 +45,9 @@ export class JView extends Disposable
 		this.beforeInit();
 		this.targetRoot();
 		this.prepareNodes();
+		this.initComponents();
 		this.prepareEvents();
 		this.afterInit();
-		this.initComponents();
 	}
 
 	/**
@@ -62,6 +71,11 @@ export class JView extends Disposable
 	protected prepareNodes () { }
 
 	/**
+	 * Init components
+	 */
+	protected initComponents () {}
+
+	/**
 	 * Prepare events
 	 */
 	protected prepareEvents () { }
@@ -70,9 +84,4 @@ export class JView extends Disposable
 	 * Middleware called just after init sequence
 	 */
 	protected afterInit () { }
-
-	/**
-	 * Init components after init
-	 */
-	protected initComponents () {}
 }
