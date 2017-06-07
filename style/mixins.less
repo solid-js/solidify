@@ -28,13 +28,11 @@
 .videoBackground ()
 {
 	// Center
-	.topLeft(50%, 50%);
-	transform: translate(-50%,-50%);
+	.absoluteCenter();
 
 	// Set size to always get in screen
-	.size(auto, auto);
-	min-width: 100%;
-	min-height: 100%;
+	.square();
+	.minSize(100%, 100%);
 }
 
 
@@ -57,6 +55,16 @@
 
 
 // ----------------------------------------------------------------------------- POSITION AND SIZE
+
+/**
+ * Center with absolute and translate.
+ * Use with caution, preferable to avoid and use flex most of time.
+ */
+.absoluteCenter ()
+{
+	.topLeft(50%, 50%);
+	transform: translate(-50%,-50%);
+}
 
 /**
  * Place an element absolute
@@ -120,12 +128,39 @@
 }
 
 /**
+ * Set same width and height
+ */
+.square (@size: auto)
+{
+	width: @size;
+	height: @size;
+}
+
+/**
  * Set width and height on an element and apply ratio
  */
-.ratio (@width:1; @height:1; @ratio:1)
+.ratio (@width: 1; @height: 1; @ratio: 1)
 {
 	width: @width * @ratio;
 	height: @height * @ratio;
+}
+
+/**
+ * Set min-width and min-height
+ */
+.minSize (@width: none, @height: none)
+{
+	min-width: @width;
+	min-height: @height;
+}
+
+/**
+ * Set max-width and max-height
+ */
+.maxSize (@width: none, @height: none)
+{
+	max-width: @width;
+	max-height: @height;
 }
 
 /**
@@ -220,10 +255,11 @@
  */
 .verticalScroll
 {
-	// Scroll
+	// Enabled overflow on Y
 	overflow: hidden;
 	overflow-y: scroll;
 
+	// Activate scroll patch and hide scrollbars
 	.scrollPatch();
 }
 
@@ -233,9 +269,11 @@
  */
 .horizontalScroll
 {
+	// Enabled overflow on X
 	overflow: hidden;
 	overflow-x: scroll;
 
+	// Activate scroll patch and hide scrollbars
 	.scrollPatch();
 }
 
@@ -271,40 +309,4 @@
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
-}
-
-
-// ----------------------------------------------------------------------------- RWD
-
-/**
- * Apply rules for width greater than value
- */
-.responsiveMinWidth (@minWidth; @rules)
-{
-	@media only screen and (min-width: (@minWidth - 1px))
-	{
-		@rules();
-	}
-}
-
-/**
- * Apply rules for width less than value
- */
-.responsiveMaxWidth (@maxWidth; @rules)
-{
-	@media only screen and (max-width: @maxWidth)
-	{
-		@rules();
-	}
-}
-
-/**
- * Apply rules for width between value
- */
-.responsiveMinMaxWidth (@minWidth; @maxWidth; @rules)
-{
-	@media only screen and (min-width: @minWidth) and (max-width: @maxWidth)
-	{
-		@rules();
-	}
 }

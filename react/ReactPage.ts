@@ -6,8 +6,8 @@ import {IPage} from "../navigation/IPage";
  */
 export interface ReactPageProps extends __React.Props<any>
 {
-	action	:string;
-	params	:{ [index:string]:any };
+	action		:string;
+	parameters	:{ [index:string]:any };
 }
 
 export class ReactPage<Props, States> extends ReactView<Props, States> implements IPage

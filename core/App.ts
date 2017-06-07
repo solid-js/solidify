@@ -8,7 +8,7 @@ import {EnvUtils} from "../utils/EnvUtils";
  * Basic app parameters.
  * Can be extended to allow more parameters.
  */
-export interface IAppParams
+export interface IAppParameters
 {
 	// Root node where the app will be append
 	root				:JQuery;
@@ -18,7 +18,7 @@ export interface IAppParams
 }
 
 
-export class App<AppParamsType> extends Disposable
+export class App<AppParameters> extends Disposable
 {
 	// ------------------------------------------------------------------------- STATICS
 
@@ -28,12 +28,12 @@ export class App<AppParamsType> extends Disposable
 	/**
 	 * App parameters. Shorthand for Config.param as reference.
 	 */
-	protected _params			:AppParamsType;
+	protected _parameters				  		:AppParameters;
 
 	/**
 	 * Dependency manager to bind elements between them without hard coding dependencies.
 	 */
-	protected _dependencyManager              :DependencyManager;
+	protected _dependencyManager              	:DependencyManager;
 	get dependencyManager ():DependencyManager { return this._dependencyManager; }
 
 
@@ -44,7 +44,7 @@ export class App<AppParamsType> extends Disposable
 	 * No need to override if there is no specific AppParams to add.
 	 * @param pAppParams specify params at app construction. See IAppParams.
 	 */
-	constructor (pAppParams:AppParamsType)
+	constructor (pAppParams:AppParameters)
 	{
 		// Relay
 		super();
@@ -82,7 +82,7 @@ export class App<AppParamsType> extends Disposable
 	 * Patch the base parameter from app params.
 	 * Will check the base meta if base is not provided from constructor.
 	 */
-	protected patchAppBase (pAppParams:AppParamsType):void
+	protected patchAppBase (pAppParams:AppParameters):void
 	{
 		// If we don't have base param
 		if (pAppParams == null || !('base' in pAppParams))
@@ -111,13 +111,13 @@ export class App<AppParamsType> extends Disposable
 	 * Inject app params into Config
 	 * @param pAppParams specify params at app construction. See IAppParams.
 	 */
-	protected injectConfig (pAppParams:AppParamsType)
+	protected injectConfig (pAppParams:AppParameters)
 	{
 		// Store in config
 		Config.instance.inject(pAppParams);
 
 		// Get reference
-		this._params = Config.getAll<AppParamsType>();
+		this._parameters = Config.getAll<AppParameters>();
 	}
 
 

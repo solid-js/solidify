@@ -11,7 +11,7 @@ interface States
 {
 	currentPage		?:any;
 	action			?:string;
-	params			?:{ [index:string]:any };
+	parameters		?:{ [index:string]:any };
 }
 
 
@@ -44,7 +44,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		this.initState({
 			currentPage		:null,
 			action			:null,
-			params			:null
+			parameters  	:null
 		});
 	}
 
@@ -63,11 +63,11 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			(CurrentPageType == null)
 				? <span />
 
-				// Page with action and params
+				// Page with action and parameters
 				: <CurrentPageType
 					ref={ (r) => this._currentPage = r }
 					action={this.state.action}
-					params={this.state.params}
+					parameters={this.state.parameters}
 				/>
 		);
 	}
@@ -101,10 +101,10 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	 * Show a new page in this stack.
 	 * @param pPageName Page name which will be required from "page" module type with DependencyManager
 	 * @param pActionName Action name to execute on page
-	 * @param pParams Action parameters to pass
+	 * @param pParameters Action parameters to pass
 	 * @returns false if page is not loaded
 	 */
-	public showPage (pPageName:string, pActionName:string, pParams:{[index:string]:any}):boolean
+	public showPage (pPageName:string, pActionName:string, pParameters:{[index:string]:any}):boolean
 	{
 		// TODO : Faire le système d'annulation de changement de page
 		// TODO : Avec shouldPlayIn et shouldPlayOut, voir ce que cela implique sur le routeur
@@ -112,10 +112,10 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// If this is the same page
 		if (pPageName == this._currentPageName)
 		{
-			// Just change action and params, not page
+			// Just change action and parameters, not page
 			this.setState({
 				action		: pActionName,
-				params		: pParams
+				parameters  : pParameters
 			});
 
 			// Do not go further
@@ -140,7 +140,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			this.setState({
 				currentPage	: pageClass,
 				action		: pActionName,
-				params		: pParams
+				parameters  : pParameters
 			});
 		};
 
