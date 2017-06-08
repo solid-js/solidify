@@ -191,7 +191,7 @@ export class ResponsiveManager
 		this._breakpoints = pBreakpoints;
 
 		// Dispatch first resize to have breakpoints
-		// without dispatching signals to avoid breakpoint the app
+		// without dispatching signals to avoid breaking the app
 		this.windowResizeHandler( null );
 	}
 
@@ -265,6 +265,10 @@ export class ResponsiveManager
 				}
 			}
 		}
+
+		// Dispatch first resize to have breakpoints
+		// without dispatching signals to avoid breaking the app
+		this.windowResizeHandler( null );
 	}
 
 	// ------------------------------------------------------------------------- HANDLERS
