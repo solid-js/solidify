@@ -176,6 +176,32 @@
 	}
 }
 
+/**
+ * Set a property size to em from px size
+ */
+.toEm(@selector, @emValue)
+{
+		@{selector}: unit((@emValue / @emRatio), em);
+}
+.toEm(@selector, @emValue1, @emValue2)
+{
+		@{selector}:  unit((@emValue1 / @emRatio), em)
+									unit((@emValue2 / @emRatio), em);
+}
+.toEm(@selector, @emValue1, @emValue2, @emValue3)
+{
+		@{selector}:  unit((@emValue1 / @emRatio), em)
+									unit((@emValue2 / @emRatio), em)
+									unit((@emValue3 / @emRatio), em);
+}
+.toEm(@selector, @emValue1, @emValue2, @emValue3, @emValue4)
+{
+		@{selector}:  unit((@emValue1 / @emRatio), em)
+									unit((@emValue2 / @emRatio), em)
+									unit((@emValue3 / @emRatio), em)
+									unit((@emValue4 / @emRatio), em);
+}
+
 
 // ----------------------------------------------------------------------------- SELECTION
 
@@ -310,3 +336,4 @@
 	-moz-osx-font-smoothing: grayscale;
 	text-rendering: optimizeLegibility;
 }
+
