@@ -102,4 +102,88 @@ export class BitmapUtils
 		// Retourner le canvas
 		return canvas;
 	}
+
+	/**
+	 * Create canvas from multiline text.
+	 * Height will be auto from fixed width.
+	 * Width and height will be defined on canvas object.
+	 * @param pText text to print on canvas
+	 * @param pMaxWidth max-width in pixel of the text. If the text overlaps this width, it warps.
+	 * @param pLineHeight distance between the lines, in pixel.
+	 * @param pFont size and font name of the text
+	 * @param pColor color of the text
+	 * @param pAlign alignement of the text left/center/right
+	 * @param pPadding Padding arround text to avoid bleeding
+	 * @returns {HTMLCanvasElement}
+	 */
+	static generateMultilineText (pText:string, pMaxWidth:number, pLineHeight:number, pFont:string = "12px Arial", pColor:string = "black", pAlign:string = "left", pPadding = 2):HTMLCanvasElement
+	{
+		// Create canvas and get 2D context
+		let canvas = document.createElement('canvas');
+		let context = canvas.getContext('2d');
+
+		// Configure text drawing
+		context.font = pFont;
+		context.textBaseline = "top";
+		context.fillStyle = pColor;
+		context.textAlign = pAlign;
+
+		// Split text in words to get auto line breaks
+		let words = pText.split(' ');
+		let currentLine = '';
+		let lines = [];
+
+		// Get final height of the canvas
+		let y = pPadding;
+		for (let n = 0; n < words.length; n++)
+		{
+			// Add a word at end of line
+			let testLine = currentLine + words[n] + ' ';
+			let metrics = context.measureText(testLine);
+			let testWidth = metrics.width;
+
+			// If we get too much width
+			if (testWidth > (pMaxWidth - (pPadding * 2)) && n > 0)
+			{
+				// Register line for drawing
+				lines.push(currentLine);
+
+				// Reset next line and add last word to next line
+				currentLine = words[n] + ' ';
+
+				// Break line
+				y += pLineHeight;
+			}
+
+			// Still not filling all current line
+			else
+			{
+				// Test next word on same line
+				currentLine = testLine;
+			}
+		}
+
+		// Register last line for drawing
+		lines.push(currentLine);
+
+		// Set canvas size before re-setting context options
+		canvas.width = pMaxWidth;
+		canvas.height = y + pPadding + pLineHeight;
+
+		// Configure text drawing options now our canvas is resized
+		context.font = pFont;
+		context.textBaseline = "top";
+		context.fillStyle = pColor;
+		context.textAlign = pAlign;
+
+		// Draw lines on canvas
+		y = pPadding;
+		for (let n = 0; n < lines.length; n++)
+		{
+			context.fillText(lines[n], pPadding, (n * pLineHeight));
+		}
+
+		// Return filled canvas
+		return canvas;
+	}
 }
