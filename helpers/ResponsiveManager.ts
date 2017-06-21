@@ -18,18 +18,27 @@ import {DOMUtils} from "../utils/DOMUtils";
  */
 export interface IBreakpoint
 {
-	orientation		:EOrientation;
+	direction		:EDirection;
 	from			:number;
 	name			:EBreakpointName;
 }
 
 /**
- * Orientation, for breakpoints too ;)
+ * Direction
  */
-export enum EOrientation
+export enum EDirection
 {
 	HORIZONTAL,
 	VERTICAL
+}
+
+/**
+ * Screen aspect ratio
+ */
+export enum EAspectRatio
+{
+	LANDSCAPE,
+	PORTRAIT
 }
 
 /**
@@ -102,15 +111,15 @@ export class ResponsiveManager
 	get onVerticalBreakpointChanged ():Signal { return this._onVerticalBreakpointChanged; }
 
 	/**
-	 * When orientation has changed.
+	 * When screen aspect ratio has changed.
 	 */
-	protected _onOrientationChanged				:Signal 		= new Signal();
-	get onOrientationChanged ():Signal { return this._onOrientationChanged; }
+	protected _onAspectRatioChanged				:Signal = new Signal();
+	get onAspectRatioChanged ():Signal { return this._onAspectRatioChanged; }
 
 	/**
 	 * When window size has changed.
 	 */
-	protected _onWindowSizeChanged					:Signal 		= new Signal();
+	protected _onWindowSizeChanged				:Signal 		= new Signal();
 	get onWindowSizeChanged ():Signal { return this._onWindowSizeChanged; }
 
 	/**
@@ -146,12 +155,12 @@ export class ResponsiveManager
 	get currentVerticalBreakpoint ():IBreakpoint { return this._currentVerticalBreakpoint; }
 
 	/**
-	 * Current orientation.
-	 * Orientation is defined by ratio between screen width and screen height.
-	 * No native orientation API used.
+	 * Current screen aspect ratio.
+	 * Aspect ratio is defined by ratio between screen width and screen height.
+	 * No native rotation API used.
 	 */
-	protected _currentOrientation				:EOrientation;
-	get currentOrientation ():EOrientation { return this._currentOrientation; }
+	protected _currentAspectRatio				:EAspectRatio;
+	get currentAspectRatio ():EAspectRatio { return this._currentAspectRatio; }
 
 
 	// ------------------------------------------------------------------------- INIT
@@ -201,9 +210,9 @@ export class ResponsiveManager
 	 * This JSON file is loaded and parsed.
 	 *
 	 * Note that breakpoints have to be named like so :
-	 * "breakpoints-%orientation%-%breakpointName%"
+	 * "breakpoints-%direction%-%breakpointName%"
 	 *
-	 * %orientation% have to be camelCase version of EOrientation
+	 * %direction% have to be camelCase version of EDirection
 	 * %breakpointName% have to be camelCase version of EBreakpointName.
 	 *
 	 * Values have to be as string in px.
@@ -226,15 +235,15 @@ export class ResponsiveManager
 		// Target breakpoints data
 		let lessBreakpoints = JsonFiles[pJSONPath];
 
-		// Browse orientations
-		let orientationIndex = -1;
-		while (++orientationIndex in EOrientation)
+		// Browse directions
+		let directionIndex = -1;
+		while (++directionIndex in EDirection)
 		{
-			// Get orientation name
-			let orientationEnumName = EOrientation[ orientationIndex ];
-			let orientationCamelName = StringUtils.snakeToCamelCase(orientationEnumName, '_');
+			// Get direction name
+			let directionEnumName = EDirection[ directionIndex ];
+			let directionCamelName = StringUtils.snakeToCamelCase(directionEnumName, '_');
 
-			// Browse breakpoints for each orientation
+			// Browse breakpoints for each direction
 			let breakpointIndex = -1;
 			while (++breakpointIndex in EBreakpointName)
 			{
@@ -242,8 +251,8 @@ export class ResponsiveManager
 				let breakpointEnumName = EBreakpointName[ breakpointIndex ];
 				let breakpointCamelName = StringUtils.snakeToCamelCase(breakpointEnumName, '_');
 
-				// Name of this breakpoint and orientation inside less file
-				let lessVarName = 'breakpoint-' + orientationCamelName + '-' + breakpointCamelName;
+				// Name of this breakpoint and direction inside less file
+				let lessVarName = 'breakpoint-' + directionCamelName + '-' + breakpointCamelName;
 
 				// If this variable exists
 				if ( lessVarName in lessBreakpoints )
@@ -251,8 +260,8 @@ export class ResponsiveManager
 					// Add breakpoint inside registry
 					this._breakpoints.push({
 
-						// Orientation back to enum format
-						orientation: EOrientation[ orientationEnumName ],
+						// Direction back to enum format
+						direction: EDirection[ directionEnumName ],
 
 						// Name back to enum format
 						name : EBreakpointName[ breakpointEnumName ],
@@ -293,36 +302,36 @@ export class ResponsiveManager
 			);
 		}
 
-		// Update current breakpoints and orientation from those sizes
+		// Update current breakpoints and aspect ratio from those sizes
 		// And dispatch signals only if this method is dispatched from an event
 		this.updateCurrentBreakpoints( pEvent != null );
-		this.updateCurrentOrientation( pEvent != null );
+		this.updateCurrentAspectRatio( pEvent != null );
 	}
 
 
-	// ------------------------------------------------------------------------- ORIENTATION DETECTION
+	// ------------------------------------------------------------------------- ASPECT RATIO DETECTION
 
 	/**
-	 * Update current orientation and dispatch signals if needed.
+	 * Update current aspect ratio and dispatch signals if needed.
 	 * @param pDispatchSignal Dispatch signals if true
 	 */
-	protected updateCurrentOrientation ( pDispatchSignal:boolean )
+	protected updateCurrentAspectRatio (pDispatchSignal:boolean )
 	{
-		// Compute new orientation from window sizes
-		let newOrientation = (
+		// Compute new aspect ratio from window sizes
+		let newAspectRatio = (
 			(this._currentWindowWidth > this._currentWindowHeight)
-			? EOrientation.HORIZONTAL
-			: EOrientation.VERTICAL
+			? EAspectRatio.LANDSCAPE
+			: EAspectRatio.PORTRAIT
 		);
 
-		// If orientation changed
-		if (newOrientation != this._currentOrientation)
+		// If aspect ratio changed
+		if (newAspectRatio != this._currentAspectRatio)
 		{
-			// Registrer new orientation
-			this._currentOrientation = newOrientation;
+			// Registrer new aspect ratio
+			this._currentAspectRatio = newAspectRatio;
 
 			// Dispatch if needed
-			pDispatchSignal && this._onOrientationChanged.dispatch( newOrientation );
+			pDispatchSignal && this._onAspectRatioChanged.dispatch( newAspectRatio );
 		}
 	}
 
@@ -344,11 +353,11 @@ export class ResponsiveManager
 		{
 			// Get nearest horizontal breakpoint
 			if (
-					// Check orientation
-					breakpoint.orientation == EOrientation.HORIZONTAL
+					// Check direction
+					breakpoint.direction == EDirection.HORIZONTAL
 
 					// If this breakpoint si near to window size
-					&& this._currentWindowWidth > breakpoint.from
+					&& this._currentWindowWidth >= breakpoint.from
 
 					// And if this breakpoint is bigger than previous nearest one
 					&& (
@@ -364,11 +373,11 @@ export class ResponsiveManager
 
 			// Get nearest vertical breakpoint
 			if (
-					// Check orientation
-					breakpoint.orientation == EOrientation.VERTICAL
+					// Check direction
+					breakpoint.direction == EDirection.VERTICAL
 
 					// If this breakpoint si near to window size
-					&& this._currentWindowHeight > breakpoint.from
+					&& this._currentWindowHeight >= breakpoint.from
 
 					// And if this breakpoint is bigger than previous nearest one
 					&& (
@@ -422,21 +431,21 @@ export class ResponsiveManager
 	// ------------------------------------------------------------------------- BREAKPOINT HELPERS
 
 	/**
-	 * Get a registered breakpoint as IBreakpoint from it's breakpoint name and orientation.
+	 * Get a registered breakpoint as IBreakpoint from it's breakpoint name and direction.
 	 * IBreakpoint instance will be the same reference as the registered one.
 	 * Will returns null if not found.
-	 * @param pOrientation Orientation of the breakpoint we want to get
+	 * @param pDirection Direction of the breakpoint we want to get
 	 * @param pBreakpointName Breakpoint's name
 	 * @returns {IBreakpoint} Reference of registered IBreakpoint. Can be null.
 	 */
-	protected getBreakpointFromNameAndOrientation (pOrientation:EOrientation, pBreakpointName:EBreakpointName):IBreakpoint
+	protected getBreakpointFromNameAndDirection (pDirection:EDirection, pBreakpointName:EBreakpointName):IBreakpoint
 	{
 		// Filter only matching breakpoints
 		let matchingBreakpoints = this._breakpoints.filter( (breakpoint:IBreakpoint) =>
 		{
 			return (
-				// Check orientation
-				breakpoint.orientation == pOrientation
+				// Check direction
+				breakpoint.direction == pDirection
 
 				// Check name
 				&&
@@ -451,8 +460,8 @@ export class ResponsiveManager
 	/**
 	 * Get the nearest breakpoint from a specific IBreakpoint.
 	 * We can search for the next or previous breakpoint (@see parameters)
-	 * Can be null if there is no bigger or smaller breakpoint on this orientation.
-	 * Will check breakpoints only with the same orientation of pBreakpoint.
+	 * Can be null if there is no bigger or smaller breakpoint on this direction.
+	 * Will check breakpoints only with the same direction of pBreakpoint.
 	 * @param pBreakpoint We want its sibling, next or previous
 	 * @param pSearchNext If true, will search for next, otherwise, will search for previous breakpoint.
 	 * @returns {IBreakpoint} The next or previous found breakpoint. Can be null.
@@ -468,8 +477,8 @@ export class ResponsiveManager
 		{
 			// Select breakpoint if :
 			if (
-					// We have the good orientation
-					breakpoint.orientation == pBreakpoint.orientation
+					// We have the good direction
+					breakpoint.direction == pBreakpoint.direction
 
 					// This is not the same breakpoint
 					// We check the name to be compatible with non references IBreakpoints
@@ -508,9 +517,9 @@ export class ResponsiveManager
 
 	/**
 	 * Get the next breakpoint from a specific IBreakpoint.
-	 * @see getBreakpointFromNameAndOrientation to convert breakpoint from name and orientation to IBreakpoint.
-	 * Can be null if there is no bigger or smaller breakpoint on this orientation.
-	 * Will check breakpoints only with the same orientation of pBreakpoint.
+	 * @see getBreakpointFromNameAndDirection to convert breakpoint from name and direction to IBreakpoint.
+	 * Can be null if there is no bigger or smaller breakpoint on this direction.
+	 * Will check breakpoints only with the same direction of pBreakpoint.
 	 * @param pBreakpoint We want its next sibling
 	 * @returns {IBreakpoint} The next found breakpoint. Can be null.
 	 */
@@ -521,9 +530,9 @@ export class ResponsiveManager
 
 	/**
 	 * Get the previous breakpoint from a specific IBreakpoint.
-	 * @see getBreakpointFromNameAndOrientation to convert breakpoint from name and orientation to IBreakpoint.
-	 * Can be null if there is no bigger or smaller breakpoint on this orientation.
-	 * Will check breakpoints only with the same orientation of pBreakpoint.
+	 * @see getBreakpointFromNameAndDirection to convert breakpoint from name and direction to IBreakpoint.
+	 * Can be null if there is no bigger or smaller breakpoint on this direction.
+	 * Will check breakpoints only with the same direction of pBreakpoint.
 	 * @param pBreakpoint We want its previous sibling
 	 * @returns {IBreakpoint} The previous found breakpoint. Can be null.
 	 */
@@ -536,99 +545,96 @@ export class ResponsiveManager
 	// ------------------------------------------------------------------------- BREAKPOINT API
 
 	/**
-	 * Check if the current breakpoint state is less or equal to a specific breakpoint.
-	 * Useful to check if you are in mobile or desktop for example.
-	 * Please use this method along with isMoreOrEqualTo instead of currentHorizontalBreakpoint and currentVerticalBreakpoint.
+	 * Will check if current window size is less than a specific breakpoint.
+	 * Will NOT include the breakpoint very position by default.
+	 * Please use this method along with isMoreThan instead of currentHorizontalBreakpoint and currentVerticalBreakpoint.
 	 * If you add breakpoints when building your application, your code will still work with this approach.
-	 * @param pOrientation Orientation we want to check
 	 * @param pBreakpointName Breakpoint name we want to check.
+	 * @param pDirection Direction we want to check, horizontal by default.
+	 * @param pOrEqualTo Consider the very breakpoint position as less than. Default is false for isLessThan.
 	 * @returns {boolean} True if current breakpoint is less or equal to this breakpoint.
 	 */
-	public isLessOrEqualTo (pOrientation:EOrientation, pBreakpointName:EBreakpointName):boolean
+	public isLessThan (pBreakpointName:EBreakpointName, pDirection:EDirection = EDirection.HORIZONTAL, pOrEqualTo = false):boolean
 	{
-		// Target IBreakpoint from name and orientation
-		let currentBreakpoint = this.getBreakpointFromNameAndOrientation(pOrientation, pBreakpointName);
+		// Target IBreakpoint from name and direction
+		let currentBreakpoint = this.getBreakpointFromNameAndDirection(pDirection, pBreakpointName);
 
 		// Check if we found a registered breakpoint with those parameters
 		if (currentBreakpoint == null)
 		{
-			throw new Error(`ResponsiveManager.isLessOrEqualTo // Invalid breakpoint. ${EOrientation[pOrientation]} breakpoint named ${EBreakpointName[pBreakpointName]} is not registered.`);
-		}
-
-		// Get the next breakpoint
-		let nextBreakpoint = this.getNextBreakpoint(currentBreakpoint);
-
-		// Check if next breakpoint is invalid
-		// This is non-sense to check if a breakpoint is less than the bigger breakpoint
-		// Because every body fits
-		if (nextBreakpoint == null)
-		{
-			throw new Error(`ResponsiveManager.isLessOrEqualTo // This is useless to check if a breakpoint is smaller than the bigger one (will always be true).`);
+			throw new Error(`ResponsiveManager.isLessThan // Invalid breakpoint. ${EDirection[pDirection]} breakpoint named ${EBreakpointName[pBreakpointName]} is not registered.`);
 		}
 
 		// Check if our breakpoint fits
 		return (
 			// Horizontal breakpoint
 			(
-				pOrientation == EOrientation.HORIZONTAL
+				pDirection == EDirection.HORIZONTAL
 				&&
-				this._currentHorizontalBreakpoint.from < nextBreakpoint.from
+				(
+					pOrEqualTo
+					? (this._currentWindowWidth <= currentBreakpoint.from)
+					: (this._currentWindowWidth < currentBreakpoint.from)
+				)
 			)
 
 			// Vertical breakpoint
 			|| (
-				pOrientation == EOrientation.VERTICAL
+				pDirection == EDirection.VERTICAL
 				&&
-				this._currentVerticalBreakpoint.from < nextBreakpoint.from
+				(
+					pOrEqualTo
+					? (this._currentWindowHeight <= currentBreakpoint.from)
+					: (this._currentWindowHeight < currentBreakpoint.from)
+				)
 			)
 		);
 	}
 
 	/**
-	 * Check if the current breakpoint state is more or equal to a specific breakpoint.
-	 * Useful to check if you are in mobile or desktop for example.
-	 * Please use this method along with isLessOrEqualTo instead of currentHorizontalBreakpoint and currentVerticalBreakpoint.
+	 * Will check if current window size is more than a specific breakpoint.
+	 * Will include the breakpoint very position by default.
+	 * Please use this method along with isLessThan instead of currentHorizontalBreakpoint and currentVerticalBreakpoint.
 	 * If you add breakpoints when building your application, your code will still work with this approach.
-	 * @param pOrientation Orientation we want to check
 	 * @param pBreakpointName Breakpoint name we want to check.
-	 * @returns {boolean} True if current breakpoint is more or equal to this breakpoint.
+	 * @param pDirection Direction we want to check, horizontal by default.
+	 * @param pOrEqualTo Consider the very breakpoint position as more than. Default is true for isMoreThan.
+	 * @returns {boolean} True if current window size is more or equal to this breakpoint.
 	 */
-	public isMoreOrEqualTo (pOrientation:EOrientation, pBreakpointName:EBreakpointName):boolean
+	public isMoreThan (pBreakpointName:EBreakpointName, pDirection:EDirection = EDirection.HORIZONTAL, pOrEqualTo = true):boolean
 	{
-		// Target IBreakpoint from name and orientation
-		let currentBreakpoint = this.getBreakpointFromNameAndOrientation(pOrientation, pBreakpointName);
+		// Target IBreakpoint from name and direction
+		let currentBreakpoint = this.getBreakpointFromNameAndDirection(pDirection, pBreakpointName);
 
 		// Check if we found a registered breakpoint with those parameters
 		if (currentBreakpoint == null)
 		{
-			throw new Error(`ResponsiveManager.isMoreOrEqualTo // Invalid breakpoint. ${EOrientation[pOrientation]} breakpoint named ${EBreakpointName[pBreakpointName]} is not registered.`);
-		}
-
-		// Get the previous breakpoint, just to check validity
-		let previousBreakpoint = this.getPreviousBreakpoint(currentBreakpoint);
-
-		// Check if previous breakpoint is invalid
-		// This is non-sense to check if a breakpoint is more than the bigger breakpoint
-		// Because every body fits
-		if (previousBreakpoint == null)
-		{
-			throw new Error(`ResponsiveManager.isMoreOrEqualTo // This is useless to check if a breakpoint is bigger than the smaller one (will always be true).`);
+			throw new Error(`ResponsiveManager.isMoreThan // Invalid breakpoint. ${EDirection[pDirection]} breakpoint named ${EBreakpointName[pBreakpointName]} is not registered.`);
 		}
 
 		// Check if our breakpoint fits
 		return (
 			// Horizontal breakpoint
 			(
-				pOrientation == EOrientation.HORIZONTAL
+				pDirection == EDirection.HORIZONTAL
 				&&
-				this._currentHorizontalBreakpoint.from >= currentBreakpoint.from
+				(
+					pOrEqualTo
+					? (this._currentWindowWidth >= currentBreakpoint.from)
+					: (this._currentWindowWidth > currentBreakpoint.from)
+				)
+
 			)
 
 			// Vertical breakpoint
 			|| (
-				pOrientation == EOrientation.VERTICAL
+				pDirection == EDirection.VERTICAL
 				&&
-				this._currentVerticalBreakpoint.from >= currentBreakpoint.from
+				(
+					pOrEqualTo
+					? (this._currentWindowHeight >= currentBreakpoint.from)
+					: (this._currentWindowHeight > currentBreakpoint.from)
+				)
 			)
 		);
 	}
