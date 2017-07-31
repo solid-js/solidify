@@ -37,16 +37,22 @@ export class MouseInput
 	// ------------------------------------------------------------------------- PROPERTIES
 
 	/**
-	 * Pointer position in pixels
+	 * Pointer position in pixels from viewport top left (excluding scroll)
 	 */
-	protected _pointerPosition:IPoint;
-	get pointerPosition ():IPoint { return this._pointerPosition; }
+	protected _viewportRelativePosition:IPoint;
+	get viewportRelativePosition ():IPoint { return this._viewportRelativePosition; }
 
 	/**
-	 * Pointer position from 0 to 1
+	 * Pointer position from 0 to 1 starting at viewport top left
 	 */
-	protected _topLeftOffset:IPoint;
-	get topLeftOffset ():IPoint { return this._topLeftOffset; }
+	protected _viewportAbsolutePosition:IPoint;
+	get viewportAbsolutePosition ():IPoint { return this._viewportAbsolutePosition; }
+
+	/**
+	 * Pointer position in pixels from page top left (including scroll)
+	 */
+	protected _pageRelativePosition:IPoint;
+	get pageRelativePosition ():IPoint { return this._pageRelativePosition; }
 
 
 	// ------------------------------------------------------------------------- INIT
@@ -65,16 +71,20 @@ export class MouseInput
 	startPointerPositionTracking ()
 	{
 		// Do not track if already tracking ;)
-		if (this._pointerPosition != null) return;
+		if (this._viewportRelativePosition != null) return;
 
 		// By default our mouse is at the center
-		this._pointerPosition = {
+		this._viewportRelativePosition = {
 			x: $(window).width() / 2,
 			y: $(window).height() / 2
 		};
-		this._topLeftOffset = {
+		this._viewportAbsolutePosition = {
 			x: .5,
 			y: .5
+		};
+		this._pageRelativePosition = {
+			x: this._viewportRelativePosition.x,
+			y: this._viewportRelativePosition.y
 		};
 
 		// Set values when pointer move
@@ -83,11 +93,14 @@ export class MouseInput
 			let width = $(window).width();
 			let height = $(window).height();
 
-			this._pointerPosition.x = event.pageX;
-			this._pointerPosition.y = event.pageY;
+			this._viewportRelativePosition.x = event.clientX;
+			this._viewportRelativePosition.y = event.clientY;
 
-			this._topLeftOffset.x = event.pageX / width;
-			this._topLeftOffset.y = event.pageY / height;
+			this._viewportAbsolutePosition.x = event.clientX / width;
+			this._viewportAbsolutePosition.y = event.clientY / height;
+
+			this._pageRelativePosition.x = event.pageX;
+			this._pageRelativePosition.y = event.pageY;
 		});
 	}
 }
