@@ -1,6 +1,9 @@
 
 
 
+import {IDisposable} from "../core/Disposable";
+import {Signal} from "../helpers/Signal";
+
 export interface IPoint
 {
 	x	:number;
@@ -102,5 +105,81 @@ export class MouseInput
 			this._pageRelativePosition.x = event.pageX;
 			this._pageRelativePosition.y = event.pageY;
 		});
+	}
+}
+
+
+
+
+
+export class MouseWheelInput implements IDisposable
+{
+	isDisposed:boolean;
+
+	protected _accelerationThreshold:number;
+	protected _overrideInterval:number;
+
+	protected _onMouseWheel:Signal = new Signal();
+	get onMouseWheel ():Signal { return this._onMouseWheel; }
+
+	protected _onAcceleration:Signal = new Signal();
+	get onAcceleration ():Signal { return this._onAcceleration; }
+
+	constructor (pAccelerationThreshold = 2, pOverrideInterval = .6)
+	{
+		this._accelerationThreshold = pAccelerationThreshold;
+		this._overrideInterval = pOverrideInterval;
+
+		this.init();
+	}
+
+	protected init ()
+	{
+		$(document).on('mousewheel', this.mouseWheelHandler);
+	}
+
+
+	protected _previousDelta:number = 0;
+	protected _allowAccelerationOverride:boolean = true;
+
+	protected _accelerationInterval:number;
+
+	protected mouseWheelHandler = (pEvent:JQueryEventObject) =>
+	{
+		let delta = pEvent['deltaY'];
+
+		this._onMouseWheel.dispatch(delta);
+
+
+		if (Math.abs(delta) > Math.abs(this._previousDelta) * this._accelerationThreshold && this._allowAccelerationOverride)
+		{
+			this._allowAccelerationOverride = false;
+
+			clearInterval(this._accelerationInterval);
+
+			this._accelerationInterval = setInterval( () =>
+			{
+				this._allowAccelerationOverride = true;
+
+				// FIXME : Utile ?
+				/*
+				if (Utils.isIe())
+				{
+					self.previousDelta = 0;
+				}
+				*/
+
+			}, this._overrideInterval * 1000);
+
+			this._onAcceleration.dispatch( delta < 0 ? -1 : 1 );
+		}
+	};
+
+
+	dispose (): void
+	{
+		$(document).off('mousewheel', this.mouseWheelHandler);
+
+		this.isDisposed = true;
 	}
 }
