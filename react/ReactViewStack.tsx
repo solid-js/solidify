@@ -2,16 +2,95 @@ import {React, ReactDom, ReactView} from "./ReactView";
 import {IPage} from "../navigation/IPage";
 import {IPageStack} from "../navigation/IPageStack";
 import {DependencyManager} from "../helpers/DependencyManager";
+import {IActionParameters} from "../navigation/Router";
+import ComponentClass = __React.ComponentClass;
 
 // ----------------------------------------------------------------------------- STRUCT
 
-interface Props extends __React.Props<any> { }
+/**
+ * Transition between pages.
+ */
+export enum ETransitionType
+{
+	/**
+	 * [default]
+	 * New page will be added and played in after current page is played out.
+	 */
+	PAGE_SEQUENTIAL,
+
+		/**
+		 * New page will be added on top of current page.
+		 * Current page will live until new page is played in and current page is played out.
+		 */
+		PAGE_CROSSED,
+
+		/**
+		 * Transition control is delegated to props.transitionController handler.
+		 */
+		CONTROLLED
+}
+
+/**
+ * A page state, to show a page from Class / action / parameters
+ */
+interface IPageState
+{
+	// Page class to instanciate with react
+	pageClass		?: any;
+
+	// Associated action and parameters
+	action			?: string;
+	parameters		?: IActionParameters;
+}
+
+/**
+ * Transition control delegate API.
+ */
+interface ITransitionControl
+{
+	/**
+	 * Custom transition delegate.
+	 * Set props.transitionType to ETransitionType.CONTROLLER to enable custom transition control.
+	 * Please return promise and resolve it when old page can be removed.
+	 * @param $oldPage Old page DOM element
+	 * @param $newPage New page DOM element
+	 * @param pOldPage Old page instance
+	 * @param pNewPage New page instance
+	 */
+	($oldPage:Element, $newPage:Element, pOldPage:IPage, pNewPage:IPage) : Q.Promise<any>;
+}
+
+interface Props extends __React.Props<any>
+{
+	/**
+	 * Type of transition between pages. @see ETransitionType
+	 */
+	transitionType 		?: ETransitionType;
+
+	/**
+	 * Custom transition delegate.
+	 * Set props.transitionType to ETransitionType.CONTROLLER to enable custom transition control.
+	 * Please return promise and resolve it when old page can be removed.
+	 */
+	transitionControl	?: ITransitionControl;
+
+	/**
+	 * When page is not found. ReactViewStack.showPage Will throw errors if page is not found and this props is defined.
+	 * @param pPageName
+	 */
+	onNotFound			?: (pPageName:string) => void
+}
 
 interface States
 {
-	currentPage		?:any;
-	action			?:string;
-	parameters		?:{ [index:string]:any };
+	// Current page index so react is not lost between old and new pages
+	currentPageIndex	?: number;
+
+	// Old page state
+	oldPage				?: IPageState;
+
+	// New page state
+	currentPage			?: IPageState;
 }
 
 
@@ -24,6 +103,11 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	get currentPageName():string { return this._currentPageName; }
 
 	/**
+	 * Old page, currently playing out
+	 */
+	protected _oldPage				:IPage;
+
+	/**
 	 * Current page component in stack
 	 */
 	protected _currentPage			:IPage;
@@ -32,19 +116,26 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	/**
 	 * If we are in transition
 	 */
-	protected _isInTransition		:boolean;
-	get isInTransition():boolean { return this._isInTransition; }
+	protected _playedIn = true;
+	protected _playedOut = true;
+	get isInTransition():boolean { return !this._playedIn || !this._playedOut; }
 
 
 	// ------------------------------------------------------------------------- INIT
 
 	prepare ()
 	{
+		// Default transition type
+		if (!('transitionType' in this.props))
+		{
+			this.props.transitionType = ETransitionType.PAGE_SEQUENTIAL;
+		}
+
 		// Init state
 		this.initState({
-			currentPage		:null,
-			action			:null,
-			parameters  	:null
+			currentPageIndex	:0,
+			oldPage				:null,
+			currentPage			:null
 		});
 	}
 
@@ -53,23 +144,38 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 	render ()
 	{
-		// Page type from state
+		// Page types from state
 		// Use alias with CapitalCase so react detects it
-		let CurrentPageType = this.state.currentPage;
+		const CurrentPageType = this.state.currentPage == null ? null : this.state.currentPage.pageClass;
+		const OldPageType = this.state.oldPage == null ? null : this.state.oldPage.pageClass;
 
 		// Return DOM with current page
-		return (
-			// Replace by span if not found
-			(CurrentPageType == null)
-				? <span />
+		return <div className="ReactViewStack">
 
-				// Page with action and parameters
-				: <CurrentPageType
-					ref={ (r) => this._currentPage = r }
-					action={this.state.action}
-					parameters={this.state.parameters}
+			{/* Show the old page in cas of crossed transition */}
+			{
+				OldPageType != null
+				&&
+				<OldPageType
+					key={ this.state.currentPageIndex - 1 }
+					ref={ (r) => this._oldPage = r }
+					action={this.state.oldPage.action}
+					parameters={this.state.oldPage.parameters}
 				/>
-		);
+			}
+
+			{/* Show the new page */}
+			{
+				CurrentPageType != null
+				&&
+				<CurrentPageType
+					key={ this.state.currentPageIndex }
+					ref={ (r) => this._currentPage = r }
+					action={this.state.currentPage.action}
+					parameters={this.state.currentPage.parameters}
+				/>
+			}
+		</div>
 	}
 
 	/**
@@ -85,11 +191,94 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// If current page changed only, we need a playIn
 		if (pOldStates.currentPage != this.state.currentPage)
 		{
-			// Call animation intro if this is a new page
-			Q(this._currentPage.playIn()).done(() =>
+			// If we are in controlled transition type mode
+			if (this.props.transitionType == ETransitionType.CONTROLLED)
 			{
-				// We are not in transition state anymore
-				this._isInTransition = false;
+				// We need the control handler, check if.
+				if (this.props.transitionControl == null)
+				{
+					throw new Error('ReactViewStack.transitionControl // Please set transitionControl handler.');
+				}
+
+				// Set transition state as started
+				this._playedIn = false;
+				this._playedOut = false;
+
+				// Call transition control handler with old and new pages instances
+				// Listen when finished through promise
+				Q(
+					this.props.transitionControl(
+						ReactDom.findDOMNode( this._oldPage as any ),
+						ReactDom.findDOMNode( this._currentPage as any ),
+						this._oldPage,
+						this._currentPage
+					)
+				).done( () =>
+				{
+					console.log('DONE');
+
+					// Set transition state as ended
+					this._playedIn = true;
+					this._playedOut = true;
+
+					// Remove old page from state
+					this.setState({
+						oldPage: null
+					});
+				});
+			}
+			else
+			{
+				// If we have an old page (crossed transition only)
+				if (this._oldPage != null)
+				{
+					// Play it out
+					Q( this._oldPage.playOut() ).done(() =>
+					{
+						// Update transition state and check if we still need the old page
+						this._playedOut = true;
+						this.checkOldPage();
+					});
+				}
+
+				// If we have a new page
+				if (this._currentPage != null)
+				{
+					// Play it in
+					Q( this._currentPage.playIn() ).done(() =>
+					{
+						// Update transition state and check if we still need the old page
+						this._playedIn = true;
+						this.checkOldPage();
+					});
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if old page is still usefull.
+	 * Will remove oldPage if transition type is crossed
+	 * and if old and new pages are played.
+	 */
+	protected checkOldPage ()
+	{
+		if (
+			// Only for crossed transition type
+		this.props.transitionType == ETransitionType.PAGE_CROSSED
+
+		// Only when new page is played in and old page is played out
+		&&
+		this._playedIn && this._playedOut
+
+		// Only if we have an old page (do we ?)
+		&&
+		this._oldPage != null
+		)
+		{
+			// Remove old page from state
+			this.setState({
+				oldPage: null
 			});
 		}
 	}
@@ -104,7 +293,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	 * @param pParameters Action parameters to pass
 	 * @returns false if page is not loaded
 	 */
-	public showPage (pPageName:string, pActionName:string, pParameters:{[index:string]:any}):boolean
+	public showPage (pPageName:string, pActionName:string, pParameters:IActionParameters):boolean
 	{
 		// TODO : Faire le système d'annulation de changement de page
 		// TODO : Avec shouldPlayIn et shouldPlayOut, voir ce que cela implique sur le routeur
@@ -114,43 +303,110 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		{
 			// Just change action and parameters, not page
 			this.setState({
-				action		: pActionName,
-				parameters  : pParameters
+				currentPage : {
+					pageClass	: this.state.currentPage.pageClass,
+					action		: pActionName,
+					parameters  : pParameters
+				}
 			});
 
 			// Do not go further
 			return true;
 		}
 
-		// Load new page and do intro
-		let playInNewPage = () =>
+		// Bind play in method to the good scope and with new action parameters
+		const boundAddNewPage = this.addNewPage.bind(this, pPageName, pActionName, pParameters);
+
+		// If we are in crossed transition mode or if this is the first page
+		if (
+			this.state.currentPage == null
+			||
+			this.props.transitionType == ETransitionType.PAGE_CROSSED
+			||
+			this.props.transitionType == ETransitionType.CONTROLLED
+		)
 		{
-			// Now we are in transition state
-			this._isInTransition = true;
+			// Start new page directly
+			boundAddNewPage();
+		}
+		else
+		{
+			// We haven't played out yet
+			this._playedOut = false;
 
-			// Load page from dependency manager
-			// FIXME : Warning, we do not check errors here !
-			let pageClass = DependencyManager.getInstance().requireModule(pPageName, 'page', null);
-
-			// Record page name
-			this._currentPageName = pPageName;
-
-			// Set state with new page class, action and parameters
-			// React will do its magic !
-			this.setState({
-				currentPage	: pageClass,
-				action		: pActionName,
-				parameters  : pParameters
-			});
-		};
-
-		// Outro animation on current page
-		// Or going straight to the new page
-		(this.state.currentPage == null)
-			? playInNewPage()
-			: Q(this._currentPage.playOut()).done(playInNewPage);
+			// Else we have to play out the current page first
+			Q( this._currentPage.playOut() ).done( boundAddNewPage );
+		}
 
 		// Everything is ok
 		return true;
+	}
+
+	/**
+	 * Add new page to state, by its name.
+	 * Will play in (through componentDidUpdate)
+	 * And also trigger action and parameters.
+	 * @param pPageName Page name to play in
+	 * @param pActionName Action name to trigger
+	 * @param pParameters Associated parameters
+	 */
+	protected addNewPage (pPageName:string, pActionName:string, pParameters:IActionParameters):void
+	{
+		// If we are in sequential transition
+		// We have played out here
+		if (this.props.transitionType == ETransitionType.PAGE_SEQUENTIAL)
+		{
+			this._playedOut = true;
+		}
+
+		// We are playing in new page from here.
+		this._playedIn = false;
+
+		// Record page name
+		this._currentPageName = pPageName;
+
+		// Load page from dependency manager
+		let NewPageClass = DependencyManager.getInstance().requireModule(pPageName, 'page', null);
+
+		// If new page class is not found=
+		if (NewPageClass == null)
+		{
+			// Call not found handler
+			if (this.props.onNotFound != null)
+			{
+				this.props.onNotFound( pPageName );
+			}
+			// If we do not have handler, throw error
+			else
+			{
+				throw new Error(`ReactViewStack.showPage // Page ${pPageName}`);
+			}
+		}
+
+		// Set state with new page class, action and parameters
+		// React will do its magic !
+		this.setState({
+
+			// Incrément index for keys so react isn't lost between old and new pages
+			currentPageIndex : this.state.currentPageIndex + 1,
+
+			// Record current page as old page if we are in crossed or controlled transition type
+			oldPage : (
+				(
+					this.props.transitionType == ETransitionType.PAGE_CROSSED
+					||
+					this.props.transitionType == ETransitionType.CONTROLLED
+				)
+					? this.state.currentPage
+					: null
+			),
+
+			// New page and associated action and parameters
+			currentPage	: {
+				pageClass	: NewPageClass,
+				action 		: pActionName,
+				parameters	: pParameters
+			}
+		});
 	}
 }
