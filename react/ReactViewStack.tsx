@@ -18,16 +18,16 @@ export enum ETransitionType
 	 */
 	PAGE_SEQUENTIAL,
 
-		/**
-		 * New page will be added on top of current page.
-		 * Current page will live until new page is played in and current page is played out.
-		 */
-		PAGE_CROSSED,
+	/**
+	 * New page will be added on top of current page.
+	 * Current page will live until new page is played in and current page is played out.
+	 */
+	PAGE_CROSSED,
 
-		/**
-		 * Transition control is delegated to props.transitionController handler.
-		 */
-		CONTROLLED
+	/**
+	 * Transition control is delegated to props.transitionController handler.
+	 */
+	CONTROLLED
 }
 
 /**
@@ -215,8 +215,6 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					)
 				).done( () =>
 				{
-					console.log('DONE');
-
 					// Set transition state as ended
 					this._playedIn = true;
 					this._playedOut = true;
@@ -265,15 +263,15 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	{
 		if (
 			// Only for crossed transition type
-		this.props.transitionType == ETransitionType.PAGE_CROSSED
+			this.props.transitionType == ETransitionType.PAGE_CROSSED
 
-		// Only when new page is played in and old page is played out
-		&&
-		this._playedIn && this._playedOut
+			// Only when new page is played in and old page is played out
+			&&
+			this._playedIn && this._playedOut
 
-		// Only if we have an old page (do we ?)
-		&&
-		this._oldPage != null
+			// Only if we have an old page (do we ?)
+			&&
+			this._oldPage != null
 		)
 		{
 			// Remove old page from state
@@ -319,12 +317,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 		// If we are in crossed transition mode or if this is the first page
 		if (
-			this.state.currentPage == null
-			||
-			this.props.transitionType == ETransitionType.PAGE_CROSSED
-			||
-			this.props.transitionType == ETransitionType.CONTROLLED
-		)
+				this.state.currentPage == null
+				||
+				this.props.transitionType == ETransitionType.PAGE_CROSSED
+				||
+				this.props.transitionType == ETransitionType.CONTROLLED
+			)
 		{
 			// Start new page directly
 			boundAddNewPage();
@@ -397,8 +395,8 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					||
 					this.props.transitionType == ETransitionType.CONTROLLED
 				)
-					? this.state.currentPage
-					: null
+				? this.state.currentPage
+				: null
 			),
 
 			// New page and associated action and parameters
