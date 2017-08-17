@@ -39,11 +39,12 @@ export class LoadUtils
 
 	/**
 	 * Preload images from URL's. Will call handler when images are loaded.
-	 * TODO : Test from new refactoring
 	 * @param pURLs URL's of images to load
 	 * @param pHandler Called when all images are loaded. First argument is list of loaded images elements.
+	 * @param pAppendToBody Will append image to body if true, false by default. Keep image in memory for ever.
+	 * @param pRemove Will remove image after pre-loaded. false by default. For legacy purpose.
 	 */
-	static preloadImages (pURLs:string[], pHandler:(pImages:Element[]) => void):void
+	static preloadImages (pURLs:string[], pHandler:(pImages:Element[]) => void, pAppendToBody = false, pRemove = false):JQuery[]
 	{
 		// Count images
 		let total = pURLs.length;
@@ -59,7 +60,7 @@ export class LoadUtils
 			images.push($pElement[0] as HTMLImageElement);
 
 			// Remove element to avoid memory leaks
-			$pElement.remove();
+			pRemove && $pElement.remove();
 
 			// Count loaded image
 			// If all are loaded, call handler
@@ -69,19 +70,39 @@ export class LoadUtils
 			}
 		};
 
+		// Return list of created images
+		let outputImages = [];
+
 		// Browse URL's to load
 		for (let i in pURLs)
 		{
+			// Create void image tag, attach loader THEN set src attribute to start loading
+			let $img = $('<img />', {
+				src: pURLs[i]
+			});
+
+			// Add to return
+			outputImages.push( $img );
+
+			// Append to body to keep in memory
+			if (pAppendToBody)
+			{
+				// Hide image
+				$img.css({
+					position: 'absolute',
+					left: -100000
+				}).appendTo( $('body '));
+			}
+
 			// Load image
 			LoadUtils.patchedImageLoad(
-				// Create void image tag, attach loader THEN set src attribute to start loading
-				$('<img />', {
-					src: pURLs[i]
-				}),
+				$img,
 				// When loaded
 				handler
 			);
 		}
+
+		return outputImages;
 	}
 
 	/**
