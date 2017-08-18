@@ -82,6 +82,17 @@ export class MathUtils
 	}
 
 	/**
+	 * Return a random integer number between 0 and pTo, excluded.
+	 * Usefull to get a random element from an array.
+	 * @param pTo Maximum number, excluded.
+	 * @returns {number} int from 0 to pTo, excluded
+	 */
+	static randomTo (pTo:number):number
+	{
+		return Math.floor(Math.random() * pTo);
+	}
+
+	/**
 	 * Return true or false, you don't know.
 	 * @returns {boolean}
 	 */
