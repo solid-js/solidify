@@ -34,17 +34,17 @@ export enum ScrollInputEventType
 	 */
 	ENTER = 1,
 
-	/**
-	 * When range or element leaves trigger point
-	 */
-	LEAVE = 2,
+		/**
+		 * When range or element leaves trigger point
+		 */
+		LEAVE = 2,
 
-	/**
-	 * When range or element is scrolling through trigger point
-	 */
-	SCROLLING = 4,
+		/**
+		 * When range or element is scrolling through trigger point
+		 */
+		SCROLLING = 4,
 
-	AFTER = 8
+		AFTER = 8
 }
 
 /**
@@ -57,10 +57,10 @@ enum TriggerStates
 	 */
 	IN,
 
-	/**
-	 * We are outside trigger zone
-	 */
-	OUT
+		/**
+		 * We are outside trigger zone
+		 */
+		OUT
 }
 
 /**
@@ -149,6 +149,9 @@ export class ScrollDispatcher extends Disposable
 	// Parent container of target
 	$parent									:JQuery;
 
+	// DOM Element for scroll position and event listening
+	$listener								:JQuery;
+
 	// ------------------------------------------------------------------------- INIT
 
 
@@ -167,14 +170,23 @@ export class ScrollDispatcher extends Disposable
 		this._delegate = pDelegate;
 		this.$target = $pTarget;
 
-		// Target parent
-		this.$parent = (
-			$pTarget.is(document)
-				? $(window)
-				: $pTarget.parent()
-		);
+		// Special case if we have to listen document
+		if ( $pTarget.is(document) )
+		{
+			// Parent is window
+			this.$parent = $(window);
 
-		// Init scroll listening
+			// But event listening and scroll position are on document
+			this.$listener = $pTarget;
+		}
+		else
+		{
+			// With deep DOM Elements, the parent holds the scroll position and event listening.
+			this.$parent = $pTarget.parent();
+			this.$listener = this.$parent;
+		}
+
+		// Init listening now we have
 		this.initListening();
 	}
 
@@ -184,7 +196,7 @@ export class ScrollDispatcher extends Disposable
 	protected initListening ():void
 	{
 		// Listen scroll
-		this.$target.bind('scroll', this.scrolledHandler);
+		this.$listener.bind('scroll', this.scrolledHandler);
 
 		// And resize !
 		$(window).bind('resize', this.scrolledHandler);
@@ -213,7 +225,7 @@ export class ScrollDispatcher extends Disposable
 	protected updateCurrentScrollPosition ():void
 	{
 		// Get top scroll value
-		this._currentTopScrollPosition = this.$target.scrollTop();
+		this._currentTopScrollPosition = this.$listener.scrollTop();
 
 		// Get heights
 		var contentHeight = this.$target.height();
@@ -268,13 +280,13 @@ export class ScrollDispatcher extends Disposable
 		(
 			isPosition
 				? (
-				triggerPosition >= pTrigger.range[0]
-			)
+					triggerPosition >= pTrigger.range[0]
+				)
 				: (
-				triggerPosition >= pTrigger.range[0]
-				&&
-				triggerPosition <= pTrigger.range[1]
-			)
+					triggerPosition >= pTrigger.range[0]
+					&&
+					triggerPosition <= pTrigger.range[1]
+				)
 		)
 		{
 			// Only changing state
@@ -477,7 +489,7 @@ export class ScrollDispatcher extends Disposable
 					// Ok if we only have one position
 					currentTriggerNode.range.length == 1
 					||
-						// Else check second position
+					// Else check second position
 					currentTriggerNode.range[1] != pRange[1]
 				)
 				)
@@ -547,7 +559,7 @@ export class ScrollDispatcher extends Disposable
 	dispose ()
 	{
 		// Unbind scroll and resize
-		this.$target.unbind('scroll', this.scrolledHandler);
+		this.$listener.unbind('scroll', this.scrolledHandler);
 		$(window).unbind('resize', this.scrolledHandler);
 
 		// Remove references
