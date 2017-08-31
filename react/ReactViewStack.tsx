@@ -36,11 +36,11 @@ export enum ETransitionType
 interface IPageState
 {
 	// Page class to instanciate with react
-	pageClass		?: any;
+	pageClass     ?: any;
 
 	// Associated action and parameters
-	action			?: string;
-	parameters		?: IActionParameters;
+	action       ?: string;
+	parameters    ?: IActionParameters;
 }
 
 /**
@@ -65,32 +65,34 @@ interface Props extends __React.Props<any>
 	/**
 	 * Type of transition between pages. @see ETransitionType
 	 */
-	transitionType 		?: ETransitionType;
+	transitionType        ?: ETransitionType;
 
 	/**
 	 * Custom transition delegate.
 	 * Set props.transitionType to ETransitionType.CONTROLLER to enable custom transition control.
 	 * Please return promise and resolve it when old page can be removed.
 	 */
-	transitionControl	?: ITransitionControl;
+	transitionControl  ?: ITransitionControl;
 
 	/**
-	 * When page is not found. ReactViewStack.showPage Will throw errors if page is not found and this props is defined.
+	 * Called when page is not found by DependencyManager.
+	 * Will not be called if showPage(null...) is called.
+	 * Will throw DependencyManager errors if not defined.
 	 * @param pPageName
 	 */
-	onNotFound			?: (pPageName:string) => void
+	onNotFound       ?: (pPageName:string) => void
 }
 
 interface States
 {
 	// Current page index so react is not lost between old and new pages
-	currentPageIndex	?: number;
+	currentPageIndex   ?: number;
 
 	// Old page state
-	oldPage				?: IPageState;
+	oldPage             ?: IPageState;
 
 	// New page state
-	currentPage			?: IPageState;
+	currentPage          ?: IPageState;
 }
 
 
@@ -99,18 +101,18 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	/**
 	 * Current page name
 	 */
-	protected _currentPageName		:string;
+	protected _currentPageName    :string;
 	get currentPageName():string { return this._currentPageName; }
 
 	/**
 	 * Old page, currently playing out
 	 */
-	protected _oldPage				:IPage;
+	protected _oldPage          :IPage;
 
 	/**
 	 * Current page component in stack
 	 */
-	protected _currentPage			:IPage;
+	protected _currentPage       :IPage;
 	get currentPage():IPage { return this._currentPage; }
 
 	/**
@@ -133,9 +135,9 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 		// Init state
 		this.initState({
-			currentPageIndex	:0,
-			oldPage				:null,
-			currentPage			:null
+			currentPageIndex   :0,
+			oldPage             :null,
+			currentPage          :null
 		});
 	}
 
@@ -286,6 +288,10 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 	/**
 	 * Show a new page in this stack.
+	 *
+	 * Pass every parameter as null if you need to clear the stack.
+	 * Current page will be destroyed and no new page will be required.
+	 *
 	 * @param pPageName Page name which will be required from "page" module type with DependencyManager
 	 * @param pActionName Action name to execute on page
 	 * @param pParameters Action parameters to pass
@@ -302,8 +308,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			// Just change action and parameters, not page
 			this.setState({
 				currentPage : {
-					pageClass	: this.state.currentPage.pageClass,
-					action		: pActionName,
+					pageClass  : (
+						this.state.currentPage == null
+							? null
+							: this.state.currentPage.pageClass
+					),
+					action    : pActionName,
 					parameters  : pParameters
 				}
 			});
@@ -317,12 +327,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 		// If we are in crossed transition mode or if this is the first page
 		if (
-				this.state.currentPage == null
-				||
-				this.props.transitionType == ETransitionType.PAGE_CROSSED
-				||
-				this.props.transitionType == ETransitionType.CONTROLLED
-			)
+			this.state.currentPage == null
+			||
+			this.props.transitionType == ETransitionType.PAGE_CROSSED
+			||
+			this.props.transitionType == ETransitionType.CONTROLLED
+		)
 		{
 			// Start new page directly
 			boundAddNewPage();
@@ -363,23 +373,32 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// Record page name
 		this._currentPageName = pPageName;
 
-		// Load page from dependency manager
-		let NewPageClass = DependencyManager.getInstance().requireModule(pPageName, 'page', null);
+		// Class of the new page, can be null if no new page is required
+		let NewPageClass:any;
 
-		// If new page class is not found=
-		if (NewPageClass == null)
+		// Only require new page if pageName is not null
+		if (pPageName != null)
 		{
-			// Call not found handler
-			if (this.props.onNotFound != null)
+			try
 			{
-				this.props.onNotFound( pPageName );
+				// Load page from dependency manager
+				NewPageClass = DependencyManager.getInstance().requireModule(pPageName, 'page', null);
 			}
-			// If we do not have handler, throw error
-			else
+			catch (error)
 			{
-				throw new Error(`ReactViewStack.showPage // Page ${pPageName}`);
+				// Call not found handler
+				if (this.props.onNotFound != null)
+				{
+					this.props.onNotFound( pPageName );
+				}
+				// If we do not have handler, throw error
+				else
+				{
+					throw error;
+				}
 			}
 		}
+
 
 		// Set state with new page class, action and parameters
 		// React will do its magic !
@@ -395,15 +414,15 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					||
 					this.props.transitionType == ETransitionType.CONTROLLED
 				)
-				? this.state.currentPage
-				: null
+					? this.state.currentPage
+					: null
 			),
 
 			// New page and associated action and parameters
-			currentPage	: {
-				pageClass	: NewPageClass,
-				action 		: pActionName,
-				parameters	: pParameters
+			currentPage    : {
+				pageClass  : NewPageClass,
+				action        : pActionName,
+				parameters : pParameters
 			}
 		});
 	}
