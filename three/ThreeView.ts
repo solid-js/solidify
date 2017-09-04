@@ -141,6 +141,17 @@ export class ThreeView
 	get frame ():number { return this._frame; }
 
 	/**
+	 * Vr display on which show rendering.
+	 * RenderMode need to be WEBVR
+	 */
+	protected _vrDisplay			:VRDisplay;
+	get vrDisplay ():VRDisplay { return this._vrDisplay; }
+	set vrDisplay (pValue:VRDisplay)
+	{
+		this._vrDisplay = pValue;
+	}
+
+	/**
 	 * If the engine is paused, no frame are generated.
 	 */
 	protected _paused				:boolean					= true;
@@ -280,7 +291,7 @@ export class ThreeView
 		let hasWebGL = EnvUtils.getCapabilities().webGL;
 
 		// If WebGL is not available and canvas fallback mode is not allowed
-		if (pRenderMode == ERenderMode.WEBGL && !hasWebGL)
+		if (pRenderMode != ERenderMode.FALLBACK && !hasWebGL)
 		{
 			throw new Error(`ThreeView.initRenderer // WebGL rendering not available.`);
 		}
@@ -310,18 +321,25 @@ export class ThreeView
 		// Register if we are in canvas mode
 		this._canvasMode = !hasWebGL;
 
-		// Stereo rendering mode (no real WebVR API)
-		if (pRenderMode == ERenderMode.STEREO)
+		// Stereo rendering mode
+		if (pRenderMode == ERenderMode.STEREO || pRenderMode == ERenderMode.WEBVR)
 		{
 			// Create stereo effect
 			this._stereoEffect = new StereoEffect( this._renderer );
 		}
 
 		// Real WebVR API
-		else if (pRenderMode == ERenderMode.WEBVR)
+		if (pRenderMode == ERenderMode.WEBVR)
 		{
-			// TODO : WebVR API
-			throw new Error('TODO');
+			let webGLRenderer = (this._renderer as THREE.WebGLRenderer);
+			let vr = webGLRenderer['vr'];
+
+			vr.enabled = true;
+			vr.standing = true;
+
+			(this._vrDisplay as VRDisplay).requestPresent([{
+				source: webGLRenderer.domElement
+			}]);
 		}
 
 		// Create 3D clock and do not start it
