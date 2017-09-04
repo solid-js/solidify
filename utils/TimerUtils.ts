@@ -1,3 +1,4 @@
+import {MathUtils} from "./MathUtils";
 export interface IFrameHandler
 {
 	externalHandler: (pEvent:Event) => void;
@@ -35,6 +36,19 @@ export class TimerUtils
 	 * Current animations framerate (for all TweenLite / TweenMax animations)
 	 */
 	private static __fps								= 60;
+
+	/**
+	 * Change framerate of all TweenLite / TweenMax animations.
+	 */
+	static get fps ():number { return this.__fps; }
+	static set fps (pValue:number)
+	{
+		// Clamp it and store it
+		this.__fps = MathUtils.limitRange(0.1, pValue, 120);
+
+		// Apply on tweenlite
+		TweenLite.ticker['fps'](this.__fps);
+	}
 
 
 	/**
@@ -80,7 +94,7 @@ export class TimerUtils
 			// And don't insert it in the new array
 			if (this.__framesHandlers[i].externalHandler == pHandler)
 			{
-				TweenLite.ticker.removeEventListener("tick", this.__framesHandlers[i].proxyHandler);
+				TweenLite.ticker.removeEventListener('tick', this.__framesHandlers[i].proxyHandler);
 				found = true;
 			}
 
@@ -96,18 +110,5 @@ export class TimerUtils
 
 		// Return if we found it
 		return found;
-	}
-
-	/**
-	 * Change framerate of all TweenLite / TweenMax animations.
-	 */
-	static get fps ():number { return this.__fps; }
-	static set fps (pValue:number)
-	{
-		// Clamp it and store it
-		this.__fps = Math.max(0.1, Math.min(pValue, 75));
-
-		// Apply on tweenlite
-		TweenLite.ticker['fps'](this.__fps);
 	}
 }

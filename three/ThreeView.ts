@@ -163,12 +163,17 @@ export class ThreeView
 		{
 			this._paused = pValue;
 
-			// TODO : Attention sur Vive on est à 90 / 120 FPS
-
-			// Update state
-			(this._paused)
-				? TimerUtils.removeFrameHandler( this.internalEnterFrameHandler )
-				: TimerUtils.addFrameHandler(this, this.internalEnterFrameHandler);
+			if (this._vrDisplay == null)
+			{
+				// Update state
+				(this._paused)
+					? TimerUtils.removeFrameHandler( this.internalEnterFrameHandler )
+					: TimerUtils.addFrameHandler(this, this.internalEnterFrameHandler);
+			}
+			else if (!this._paused)
+			{
+				this._vrDisplay.requestAnimationFrame(this.internalEnterFrameHandler.bind(this));
+			}
 
 			// Update clock stage
 			// NOT SURE : Does stop reset time ?
@@ -322,14 +327,14 @@ export class ThreeView
 		this._canvasMode = !hasWebGL;
 
 		// Stereo rendering mode
-		if (pRenderMode == ERenderMode.STEREO || pRenderMode == ERenderMode.WEBVR)
+		if (pRenderMode == ERenderMode.STEREO)
 		{
 			// Create stereo effect
 			this._stereoEffect = new StereoEffect( this._renderer );
 		}
 
 		// Real WebVR API
-		if (pRenderMode == ERenderMode.WEBVR)
+		else if (pRenderMode == ERenderMode.WEBVR)
 		{
 			let webGLRenderer = (this._renderer as THREE.WebGLRenderer);
 			let vr = webGLRenderer['vr'];
@@ -337,9 +342,14 @@ export class ThreeView
 			vr.enabled = true;
 			vr.standing = true;
 
+			vr.setDevice( this._vrDisplay );
+
+			TimerUtils.fps = 90;
+
 			(this._vrDisplay as VRDisplay).requestPresent([{
 				source: webGLRenderer.domElement
 			}]);
+
 		}
 
 		// Create 3D clock and do not start it
@@ -536,6 +546,11 @@ export class ThreeView
 		this.enterFrameHandler();
 		this._frame ++;
 		this.render();
+
+		if (this._vrDisplay != null && !this._paused)
+		{
+			this._vrDisplay.requestAnimationFrame(this.internalEnterFrameHandler.bind(this));
+		}
 	}
 
 	render ()
