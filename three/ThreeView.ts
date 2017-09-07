@@ -366,11 +366,10 @@ export class ThreeView
 	}
 
 	/**
-	 *
+	 * Init perspective camera
 	 * @param pCameraConfig
 	 */
 	initCamera (
-		// TODO : Orthographic camera support
 		pCameraConfig	:ICameraConfig 		= {near: 1, far: 10000, fov: 85},
 	)
 	{
@@ -380,13 +379,34 @@ export class ThreeView
 
 		// Init camera
 		this._camera = new THREE.PerspectiveCamera(
-			pCameraConfig.fov, 1,
+			pCameraConfig.fov,
+			1,
 			pCameraConfig.near,
 			pCameraConfig.far
 		);
 
-		// TODO : Orthographic camera
 		// BETTER : CombinedCamera ? CinematicCamera ?
+
+		// Call middle ware
+		this.afterCameraInit();
+	}
+
+	/**
+	 * Init orthographic camera
+	 * @param pNear
+	 * @param pFar
+	 */
+	initOrthographicCamera (pNear:number = 1, pFar:number = 10000)
+	{
+		// Check if init order is ok
+		if (this._renderer == null) throw new Error(`ThreeView.initCamera // Please init renderer before camera`);
+		if (this._scene != null) throw new Error(`ThreeView.initCamera // Please init camera before scene`);
+
+		// Init camera
+		this._camera = new THREE.OrthographicCamera(
+			-50, 50, -50, 50,
+			pNear, pFar
+		);
 
 		// Call middle ware
 		this.afterCameraInit();
@@ -423,6 +443,8 @@ export class ThreeView
 
 		// Init scene
 		this._scene = new THREE.Scene();
+
+		// FIXME : LOG FOG SUPPORT
 
 		// Apply fog if needed
 		if (pFog != null)
