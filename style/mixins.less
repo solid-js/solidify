@@ -337,3 +337,62 @@
 	text-rendering: optimizeLegibility;
 }
 
+
+
+// ----------------------------------------------------------------------------- GRID
+
+/**
+ * flex
+ * (à placer sur le parent)
+ */
+
+.flex (@display:flex, @direction:row, @wrap:wrap, @justifyContent:flex-start, @alignItems:flex-start, @firstChildGutter:0)
+{
+	display: @display;                   // flex | inline-flex
+	flex-direction: @direction;          // row | row-reverse | column | column-reverse
+	flex-wrap: @wrap;                    // nowrap | wrap | wrap-reverse
+	justify-content: @justifyContent;    // flex-start | flex-end | center | space-between | space-around
+	align-items: @alignItems;            // flex-start | flex-end | center | baseline | stretch
+
+	// remove gutter of children first-child
+    & when(@firstChildGutter > 0) {
+		margin-left: -@firstChildGutter;  
+    }
+}
+
+
+/**
+ * flexCol 
+ * (à placer sur les enfants)
+ */
+
+.flexCol (@totalGrid:@totalGrid, @number:@number, @gutter:0, @center:false)
+{
+	width: ~'calc(100% / @{totalGrid} * @{number} - @{gutter})';
+	flex: 0 0 auto;
+
+	& when(@center = false) {	
+		margin-left: @gutter;
+    }
+    & when(@center = true) {
+		margin-left:auto;
+		margin-right:auto;
+    }
+}
+
+
+
+// ----------------------------------------------------------------------------- RESET STYLE
+
+.resetButtonStyle 
+{
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    line-height: normal;
+    overflow: visible;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
