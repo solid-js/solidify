@@ -63,18 +63,18 @@
 .absoluteCenter (@axis:yx)
 {
 	& when(@axis = yx) {
-	  	.topLeft(50%, 50%);
+		.topLeft(50%, 50%);
 		transform: translate(-50%,-50%);    
 	}
 
 	& when(@axis = y) {
 		.topLeft(50%, auto);
-	    transform: translateY(-50%);
+		transform: translateY(-50%);
 	}
-  
+
 	& when(@axis = x) {
 		.topLeft(auto, 50%);
-	    transform: translateX(-50%);
+		transform: translateX(-50%);
 	}
 }
 
