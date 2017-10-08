@@ -57,14 +57,27 @@
 // ----------------------------------------------------------------------------- POSITION AND SIZE
 
 /**
- * Center with absolute and translate.
+ * Center with absolute and translate yx, y or x.
  * Use with caution, preferable to avoid and use flex most of time.
  */
-.absoluteCenter ()
+.absoluteCenter (@axis:yx)
 {
-	.topLeft(50%, 50%);
-	transform: translate(-50%,-50%);
+	& when(@axis = yx) {
+	  	.topLeft(50%, 50%);
+		transform: translate(-50%,-50%);    
+	}
+
+	& when(@axis = y) {
+		.topLeft(50%, auto);
+	    transform: translateY(-50%);
+	}
+  
+	& when(@axis = x) {
+		.topLeft(auto, 50%);
+	    transform: translateX(-50%);
+	}
 }
+
 
 /**
  * Place an element absolute
