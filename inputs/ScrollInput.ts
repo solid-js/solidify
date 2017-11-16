@@ -34,17 +34,17 @@ export enum ScrollInputEventType
 	 */
 	ENTER = 1,
 
-		/**
-		 * When range or element leaves trigger point
-		 */
-		LEAVE = 2,
+	/**
+	 * When range or element leaves trigger point
+	 */
+	LEAVE = 2,
 
-		/**
-		 * When range or element is scrolling through trigger point
-		 */
-		SCROLLING = 4,
+	/**
+	 * When range or element is scrolling through trigger point
+	 */
+	SCROLLING = 4,
 
-		AFTER = 8
+	AFTER = 8
 }
 
 /**
@@ -57,10 +57,10 @@ enum TriggerStates
 	 */
 	IN,
 
-		/**
-		 * We are outside trigger zone
-		 */
-		OUT
+	/**
+	 * We are outside trigger zone
+	 */
+	OUT
 }
 
 /**
@@ -218,6 +218,12 @@ export class ScrollDispatcher extends Disposable
 	};
 
 
+	public updateScrollPosition ()
+	{
+		this.scrolledHandler();
+	}
+
+
 	// ------------------------------------------------------------------------- UPDATE
 
 	// TODO : Direction du scroll passé au delegate
@@ -325,10 +331,10 @@ export class ScrollDispatcher extends Disposable
 
 			// If handler is valid and required
 			if (
-				pTrigger.handler != null
-				&&
-				(pTrigger.eventTypes & ScrollInputEventType.LEAVE) > 0
-			)
+					pTrigger.handler != null
+					&&
+					(pTrigger.eventTypes & ScrollInputEventType.LEAVE) > 0
+				)
 			{
 				pTrigger.handler(targetForHandler, ScrollInputEventType.LEAVE);
 			}
