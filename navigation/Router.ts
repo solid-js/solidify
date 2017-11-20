@@ -742,11 +742,15 @@ export class Router
 	 * URL will be prepared to be compatible. @see Router.prepareURL
 	 * @param pURL Link to open, from server base or absolute.
 	 * @param pAddToHistory If we have to add this link to users history (default is yes)
+	 * @param pForce Force update if URL is the same
 	 */
-	openURL (pURL:string, pAddToHistory = true)
+	openURL (pURL:string, pAddToHistory = true, pForce = false)
 	{
 		// Prepare URL to be compatible
 		pURL = this.prepareURL( pURL );
+
+		// Prevent route changing if this is the same URL
+		if (this._currentPath == pURL && !pForce) return;
 
 		// Change URL and add to history or replace
 		pAddToHistory
