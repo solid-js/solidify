@@ -1,5 +1,6 @@
 
-import * as React from 'react';
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export class ReactView<Props, States> extends React.Component<Props, States>
 {
@@ -54,36 +55,36 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	// ------------------------------------------------------------------------- REFS
 
 	/**
-	 * Get jQuery selector for a ref element.
+	 * Get Element Collection for a ref element.
 	 * You can declare ref elements in JSX with the ref attribute as a string.
 	 * Really handy since JSX can change DOM on the fly.
 	 * @param pRefName The ref name as string in the JSX DOM. Can be an array of string
-	 * @returns {HTMLElement[]} Targeted element collection
+	 * @returns {Element[]} Targeted element collection
 	 */
-	protected $ (pRefName:string|string[]):HTMLElement[]
+	protected $ (pRefName:string|string[]):Element[]
 	{
 		// If we have an array of refs
 		if (Array.isArray(pRefName))
 		{
-			// Map each ref DOM node to a jQuery collection
+			// Map each ref DOM node to an element collection
 			return (pRefName as string[] ).map(
-				pSubName => ReactDom.findDOMNode( this.refs[pSubName] )
+				pSubName => ReactDOM.findDOMNode( this.refs[pSubName] )
 			);
 		}
 		else
 		{
-			// Target DOM node and add to a jQuery object
-			return ReactDom.findDOMNode( this.refs[pRefName] );
+			// Target DOM node and add to an Element Collection
+			return [ ReactDOM.findDOMNode( this.refs[pRefName] ) ];
 		}
 	}
 
 
 	/**
-	 * Ref object in a array of components and as a jquery collection.
+	 * Ref object in a array of components and as an Element Collection.
 	 * Have to be called with ref JSX parameter, like this : ref={this.refNodes.bind(this, 'name', key)}
 	 * Will store an array of component called _name
-	 * Will store a jquery collection called $name
-	 * @param pRefName Name of the array and to collection. Will be prefixed by _ for component array and by $ for HTMLElement collection.
+	 * Will store an Element Collection called $name
+	 * @param pRefName Name of the array and to collection. Will be prefixed by _ for component array and by $ for Element collection.
 	 * @param pComponent The component sent by react ref.
 	 * @param pKey Key of the component, as number or string.
 	 */
@@ -113,10 +114,10 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 			this[arrayName][pKey] = pComponent;
 		}
 
-		// Convert the component collection as a jquery collection
+		// Convert the component collection as an element collection
 		this[htmlCollectionName] = [
 			Object.keys( this[arrayName] ).map(
-				( pComponent:any ) => ReactDom.findDOMNode(this[arrayName][pComponent])
+				( pComponent:any ) => ReactDOM.findDOMNode(this[arrayName][pComponent])
 			)
 		];
 	}
