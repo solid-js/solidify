@@ -37,3 +37,8 @@ echo "> Pushing to github..."
 git push origin master
 git push --tags
 echo "> Done !"
+
+echo "> Publishing to NPM..."
+npm publish
+echo "> Done !"
+
