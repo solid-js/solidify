@@ -10,8 +10,8 @@ fi
 # Reading parameters
 message="$1"
 
-# Reading version from bower.json with node
-version=$(node --eval "console.log(require('./bower.json').version)")
+# Reading version from package.json with node
+version=$(node --eval "console.log(require('./package.json').version)")
 
 echo "> Version: $version";
 echo "> Message: $message";
