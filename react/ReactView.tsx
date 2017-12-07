@@ -52,73 +52,89 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		else super.setState(pState, pCallback);
 	}
 
+
 	// ------------------------------------------------------------------------- REFS
 
 	/**
-	 * Get Element Collection for a ref element.
-	 * You can declare ref elements in JSX with the ref attribute as a string.
-	 * Really handy since JSX can change DOM on the fly.
-	 * @param pRefName The ref name as string in the JSX DOM. Can be an array of string
-	 * @returns {Element[]} Targeted element collection
+	 * Get a DOM Node from a ref name
+	 * @param {string} pRefName Ref name declared as string.
+	 * @returns {Element} DOM Node
 	 */
-	protected $ (pRefName:string|string[]):Element[]
+	protected getNode (pRefName:string):Element
 	{
-		// If we have an array of refs
-		if (Array.isArray(pRefName))
+		// Check if this ref exists
+		if ( !(pRefName in this.refs) )
 		{
-			// Map each ref DOM node to an element collection
-			return (pRefName as string[] ).map(
-				pSubName => ReactDOM.findDOMNode( this.refs[pSubName] )
-			);
+			throw new Error(`ReactView.getNode // Ref '${pRefName}' not found.`);
 		}
-		else
-		{
-			// Target DOM node and add to an Element Collection
-			return [ ReactDOM.findDOMNode( this.refs[pRefName] ) ];
-		}
+
+		// Target DOM node
+		return ReactDOM.findDOMNode( this.refs[pRefName] );
 	}
 
+	/**
+	 * Get a React.Component from a ref name.
+	 * @param {string} pRefName Ref name declared as string.
+	 * @returns {ComponentType} React component typed with generics
+	 */
+	protected getComponent <ComponentType extends React.Component> (pRefName:string):ComponentType
+	{
+		// Check if this ref exists
+		if ( !(pRefName in this.refs) )
+		{
+			throw new Error(`ReactView.getComponent // Ref '${pRefName}' not found.`);
+		}
+
+		// Get ref from refs collection
+		let ref = this.refs[ pRefName ];
+
+		// Check if this ref is not a DOM node
+		if ('tagName' in ref)
+		{
+			throw new Error(`ReactView.getComponent // Trying to get a DOM node as a React component from ref '${pRefName}'.`);
+		}
+
+		// Return correctly type component
+		return ref as ComponentType;
+	}
 
 	/**
 	 * Ref object in a array of components and as an Element Collection.
 	 * Have to be called with ref JSX parameter, like this : ref={this.refNodes.bind(this, 'name', key)}
-	 * Will store an array of component called _name
-	 * Will store an Element Collection called $name
+	 * Will store an Component collection called _name in this.
+	 * Will store an Element collection called $name in this.
+	 *
+	 * IMPORTANT : Can break if react behavior changes over time. Read content to know more.
+	 *
 	 * @param pRefName Name of the array and to collection. Will be prefixed by _ for component array and by $ for Element collection.
 	 * @param pComponent The component sent by react ref.
-	 * @param pKey Key of the component, as number or string.
+	 * @param pKey Key of the component, as number only
 	 */
-	protected refNodes (pRefName:string, pKey:number|string, pComponent:ReactView<any, any>):void
+	protected refNodes (pRefName:string, pKey:number, pComponent:React.Component):void
 	{
 		// Get collections names
-		const arrayName = '_' + pRefName;
-		const htmlCollectionName = '$' + pRefName;
+		const componentCollectionName = '_' + pRefName;
+		const elementsCollectionNames = '$' + pRefName;
 
-		// If our collection does not exists
-		// We create it
-		if (!(arrayName in this))
+		// IMPORTANT : This implementation ca change if react behavior changes.
+		// IMPORTANT : Here is the trick, we remove every thing when a component in unmounted
+		// IMPORTANT : It works because for now, react do this on every key, but it can change
+
+		// IMPORTANT : We do this because this is the only way to be sure that array do not contain old references
+		if ( !(componentCollectionName in this) || pComponent == null )
 		{
-			this[arrayName] = [];
+			this[componentCollectionName] = [];
+			this[elementsCollectionNames] = [];
 		}
 
-		// If our new component is null
-		// React maybe removed it from the DOM (not sure)
-		if (pComponent == null)
-		{
-			// Removed unmounted components from the list
-			delete this[arrayName][pKey];
-		}
-		else
+		// If we have a component
+		if (pComponent != null)
 		{
 			// Store mounted component in collection
-			this[arrayName][pKey] = pComponent;
-		}
+			this[componentCollectionName][pKey] = pComponent;
 
-		// Convert the component collection as an element collection
-		this[htmlCollectionName] = [
-			Object.keys( this[arrayName] ).map(
-				( pComponent:any ) => ReactDOM.findDOMNode(this[arrayName][pComponent])
-			)
-		];
+			// Get DOM Node for this component
+			this[elementsCollectionNames][pKey] = ReactDOM.findDOMNode( pComponent );
+		}
 	}
 }

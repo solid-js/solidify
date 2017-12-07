@@ -1,10 +1,10 @@
-import {React, ReactDom, ReactView} from "./ReactView";
+import {ReactView} from "./ReactView";
 import {IPage} from "../navigation/IPage";
 
 /**
  * Default interface for page properties
  */
-export interface ReactPageProps extends __React.Props<any>
+export interface ReactPageProps
 {
 	action		:string;
 	parameters	:{ [index:string]:any };
@@ -68,7 +68,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 * Play intro animation.
 	 * Have to return a promise when animation is ended.
 	 */
-	playIn ():Q.Promise<any>
+	playIn ():Promise
 	{
 		return null;
 	}
@@ -77,7 +77,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 * Play outro animation.
 	 * Have to return a promise when animation is ended.
 	 */
-	playOut ():Q.Promise<any>
+	playOut ():Promise
 	{
 		return null;
 	}
