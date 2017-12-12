@@ -1,4 +1,6 @@
 import {MathUtils} from "./MathUtils";
+import TweenLite = gsap.TweenLite;
+
 export interface IFrameHandler
 {
 	externalHandler: (pEvent:Event) => void;
