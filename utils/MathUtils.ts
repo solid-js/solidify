@@ -1,5 +1,7 @@
 export class MathUtils
 {
+	// ------------------------------------------------------------------------- GEOMETRY
+
 	/**
 	 * Get the angle between 3 points in radians
 	 * @param pPoints An array container 3 points, each point object need to have 'x' and 'y' properties.
@@ -31,6 +33,9 @@ export class MathUtils
 	{
 		return pAngle / 180 * Math.PI;
 	}
+
+
+	// ------------------------------------------------------------------------- RANGE UTILS
 
 	/**
 	 * Return an offset value in a range from 0 to max.
@@ -64,6 +69,21 @@ export class MathUtils
 	{
 		return Math.max(pMin, Math.min(pValue, pMax));
 	}
+
+
+	// ------------------------------------------------------------------------- ARITHMETIC
+
+	/**
+	 * Returns positive modulo, even when 'n' is negative.
+	 * From http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
+	 */
+	static positiveModulo (n:number, m:number):number
+	{
+		return ((n % m) + m) % m;
+	}
+
+
+	// ------------------------------------------------------------------------- RANDOM
 
 	/**
 	 * Return a random number between min and max.
@@ -102,11 +122,36 @@ export class MathUtils
 	}
 
 	/**
-	 * Returns positive modulo, even when 'n' is negative.
-	 * From http://stackoverflow.com/questions/4467539/javascript-modulo-not-behaving
+	 * Pick a random item from an indexed array
+	 * @param Indexed array only.
+	 * @returns {P} Randomly selected value.
 	 */
-	static positiveModulo (n:number, m:number):number
+	static randomPickFromArray <P>( pArray: P[] ):P
 	{
-		return ((n % m) + m) % m;
+		// Return randomly selected object
+		return pArray[
+			MathUtils.randomRange(0, pArray.length, true)
+		];
+	}
+
+	/**
+	 * Pick a random item from an object.
+	 * Will return value.
+	 * @param pObject String indexed object
+	 * @returns {P} Randomly selected value.
+	 */
+	static randomPickFromObject <P>( pObject: {[index:string]:P} ):P
+	{
+		// Get object keys
+		const keys = Object.keys( pObject );
+
+		// Return randomly selected object
+		return pObject[
+			// Not calling randomPickFromArray for performances
+			keys[
+				// Pick random key
+				MathUtils.randomRange(0, keys.length, true)
+			]
+		];
 	}
 }
