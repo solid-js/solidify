@@ -363,7 +363,7 @@ export class EnvUtils
 		EnvUtils.initDetection();
 
 		// Wait DOM
-		$(() =>
+		$( () =>
 		{
 			// Target selector
 			let $domRoot = $(pToSelector);
@@ -371,7 +371,7 @@ export class EnvUtils
 			// Add env properties classes
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowser[EnvUtils.__BROWSER]				, '_'));
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EDeviceType[EnvUtils.__DEVICE_TYPE]			, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EDeviceType[EnvUtils.__DEVICE_TYPE]		, '_'));
 			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EPlatform[EnvUtils.__PLATFORM]				, '_'));
 
 			// Add capabilites

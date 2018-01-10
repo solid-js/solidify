@@ -1,24 +1,25 @@
 import {Disposable} from "./Disposable";
 
 /**
- * This is a simple JQuery based view.
+ * This is a simple zepto based view.
  */
-export class JView extends Disposable
+export class ZeptoView extends Disposable
 {
 	// ------------------------------------------------------------------------- DOM
 
 	// Starting node of our component
-	$root			:JQuery;
+	$root			:ZeptoCollection;
+
 
 	// ------------------------------------------------------------------------- INIT
 
 	/**
-	 * JView constructor.
+	 * ZeptoView constructor.
 	 * Set component's root. If not defined, can still be targeted trough targetRoot middleWare.
 	 * @param $pRoot Component's root. If not defined, can still be targeted trough targetRoot middleWare.
 	 * @param pAutoInit Will launch init phase if true. Else, child component have to init manually.
 	 */
-	constructor ($pRoot:JQuery = null, pAutoInit = true)
+	constructor ($pRoot:ZeptoCollection = null, pAutoInit = true)
 	{
 		// Relay
 		super();

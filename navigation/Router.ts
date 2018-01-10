@@ -5,9 +5,6 @@ import {IPageStack} from "./IPageStack";
 
 // ----------------------------------------------------------------------------- STRUCT
 
-// TODO : Tout passer en static
-// TODO : Créer Router.create plutôt que le new
-
 /**
  * Interface for action parameters.
  * This is an associative array.
@@ -112,29 +109,6 @@ export interface IRoute
  */
 export class Router
 {
-	// ------------------------------------------------------------------------- SINGLETON
-
-	// Our router singleton instance
-	protected static __INSTANCE	:Router;
-
-	/**
-	 * Get router instance.
-	 * Please create and configure it without this getter before.
-	 * @returns {Router}
-	 */
-	static get instance ():Router
-	{
-		// If instance does'n exists
-		if (Router.__INSTANCE == null)
-		{
-			// This is no good.
-			throw new Error('Router.instance // Please create router in app Main file before using it.');
-		}
-
-		// Return instance
-		return Router.__INSTANCE;
-	}
-
 	// ------------------------------------------------------------------------- STATICS
 
 	/**
@@ -162,7 +136,7 @@ export class Router
 	// ------------------------------------------------------------------------- LOCALS
 
 	// If our router is started and is listening to route changes
-	protected _isStarted = false;
+	protected static _isStarted = false;
 
 
 	// ------------------------------------------------------------------------- PROPERTIES
@@ -178,9 +152,9 @@ export class Router
 	 *
 	 * Leading and trailing slash will be added if not present.
 	 */
-	protected _base					:string;
-	get base ():string { return this._base }
-	set base (value:string)
+	protected static _base					:string;
+	static get base ():string { return this._base }
+	static set base (value:string)
 	{
 		// Add leading and trailing slash
 		value = StringUtils.leadingSlash(value, true);
@@ -193,32 +167,32 @@ export class Router
 	/**
 	 * List of declared routes
 	 */
-	protected _routes				:IRoute[] 			= [];
-	get routes ():IRoute[] { return this._routes; }
+	protected static _routes				:IRoute[] 			= [];
+	static get routes ():IRoute[] { return this._routes; }
 
 	/**
 	 * Current path, including base.
 	 */
-	protected _currentPath			:string;
-	get currentPath ():string { return this._currentPath; }
+	protected static _currentPath			:string;
+	static get currentPath ():string { return this._currentPath; }
 
 	/**
 	 * Current route matching with current URL
 	 */
-	protected _currentRouteMatch	:IRouteMatch;
-	get currentRouteMatch ():IRouteMatch { return this._currentRouteMatch; }
+	protected static _currentRouteMatch	:IRouteMatch;
+	static get currentRouteMatch ():IRouteMatch { return this._currentRouteMatch; }
 
 	/**
 	 * When current route is changing
 	 */
-	protected _onRouteChanged		:Signal				= new Signal();
-	get onRouteChanged ():Signal { return this._onRouteChanged; }
+	protected static _onRouteChanged		:Signal				= new Signal();
+	static get onRouteChanged ():Signal { return this._onRouteChanged; }
 
 	/**
 	 * When route is not found
 	 */
-	protected _onNotFound			:Signal				= new Signal();
-	get onNotFound ():Signal { return this._onNotFound; }
+	protected static _onNotFound			:Signal				= new Signal();
+	static get onNotFound ():Signal { return this._onNotFound; }
 
 
 
@@ -230,11 +204,8 @@ export class Router
 	 * @param pBase The base of the app from the server. @see Router.base
 	 * @param pRoutes List of declared routes.
 	 */
-	constructor (pBase:string = '', pRoutes:IRoute[] = null)
+	static init (pBase:string = '', pRoutes:IRoute[] = null)
 	{
-		// Register instance
-		Router.__INSTANCE = this;
-
 		// Set base
 		this.base = pBase;
 
@@ -253,16 +224,16 @@ export class Router
 	 * Default signature is a[data-internal-link]
 	 * @param pLinkSignature Signature to listen.
 	 */
-	listenLinks (pLinkSignature = 'a[data-internal-link]')
+	static listenLinks (pLinkSignature = 'a[data-internal-link]')
 	{
-		$(document).on( 'click', pLinkSignature, this.linkClickedHandler );
+		$( document ).on( 'click', pLinkSignature, this.linkClickedHandler );
 	}
 
 	/**
 	 * When an internal link is clicked.
 	 * @param pEvent
 	 */
-	protected linkClickedHandler = (pEvent:JQueryEventObject) =>
+	protected static linkClickedHandler = (pEvent:Event) =>
 	{
 		// Do not follow link
 		pEvent.preventDefault();
@@ -286,12 +257,12 @@ export class Router
 	// ------------------------------------------------------------------------- ANALYTICS
 
 	// If this is our first track, because we have to ignore it
-	protected _firstPageView = true;
+	protected static _firstPageView = true;
 
 	/**
 	 * Track current page for google analytics
 	 */
-	protected trackCurrentPage ()
+	protected static trackCurrentPage ()
 	{
 		// Do not track first page view because we already fired it from DOM
 		if (this._firstPageView)
@@ -320,7 +291,7 @@ export class Router
 	 * Will be added to previously registered routes.
 	 * @param pRoutes
 	 */
-	addRoutes (pRoutes:IRoute[])
+	static addRoutes (pRoutes:IRoute[])
 	{
 		// Do nothing if no routes
 		if (pRoutes == null) return;
@@ -340,7 +311,7 @@ export class Router
 	 * Prepare route regex to optimise route matching phase.
 	 * @param pRoute Route to prepare.
 	 */
-	protected prepareRoute (pRoute:IRoute)
+	protected static prepareRoute (pRoute:IRoute)
 	{
 		// Check route config
 		if (pRoute.page == null || pRoute.page == '')
@@ -413,14 +384,14 @@ export class Router
 	// ------------------------------------------------------------------------- STACK MANAGEMENT
 
 	// Stacks by names
-	protected _stacks		:{ [index:string] : IPageStack } 	= {};
+	protected static _stacks		:{ [index:string] : IPageStack } 	= {};
 
 	/**
 	 * Register a pageStack by name to manage pages with declared routes.
 	 * @param pStackName Name of the stack.
 	 * @param pStack Instance of the stack.
 	 */
-	registerStack (pStackName:string, pStack:IPageStack)
+	static registerStack (pStackName:string, pStack:IPageStack)
 	{
 		// Check errors
 		if (pStackName in this._stacks)
@@ -443,7 +414,7 @@ export class Router
 	 * @param pStackName Name of the stack we need
 	 * @returns {IPageStack} Can return null if pageStack not found
 	 */
-	getStackByName (pStackName:string):IPageStack
+	static getStackByName (pStackName:string):IPageStack
 	{
 		return (
 			(pStackName in this._stacks)
@@ -458,7 +429,7 @@ export class Router
 	 * When state is popped.
 	 * @param pEvent
 	 */
-	popStateHandler = (pEvent:Event) =>
+	static popStateHandler = (pEvent:Event) =>
 	{
 		// Update route
 		this.updateCurrentRoute();
@@ -467,7 +438,7 @@ export class Router
 	/**
 	 * State is changed, update current route.
 	 */
-	updateCurrentRoute ()
+	static updateCurrentRoute ()
 	{
 		// If router is running
 		if (this._isStarted)
@@ -547,7 +518,7 @@ export class Router
 	 * @param pURL : URL to be prepared for router.
 	 * @returns {string} Prepared URL for router.
 	 */
-	prepareURL (pURL:string):string
+	static prepareURL (pURL:string):string
 	{
 		// Detect if link is absolute
 		let doubleSlashIndex = pURL.indexOf('//');
@@ -576,7 +547,7 @@ export class Router
 	 * Convert an URL to a route match.
 	 * URL will be prepared to be compatible. @see Router.prepareURL
 	 */
-	URLToRoute (pURL:string):IRouteMatch
+	static URLToRoute (pURL:string):IRouteMatch
 	{
 		// Convert URL
 		pURL = this.prepareURL( pURL );
@@ -640,7 +611,7 @@ export class Router
 	 * @param pPrependBase If we have to prepend base before generated URL. Default is true.
 	 * @returns {any} Can be null if route not found.
 	 */
-	routeToURL (pRouteMatch:IRouteMatch, pPrependBase = true):string
+	static generateURL (pRouteMatch:IRouteMatch, pPrependBase = true):string
 	{
 		// Default properties for route match
 		// Default action to "index"
@@ -744,7 +715,7 @@ export class Router
 	 * @param pAddToHistory If we have to add this link to users history (default is yes)
 	 * @param pForce Force update if URL is the same
 	 */
-	openURL (pURL:string, pAddToHistory = true, pForce = false)
+	static openURL (pURL:string, pAddToHistory = true, pForce = false)
 	{
 		// Prepare URL to be compatible
 		pURL = this.prepareURL( pURL );
@@ -768,10 +739,10 @@ export class Router
 	 * @param pAddToHistory If we have to add this link to users history (default is yes)
 	 * @throws Error if route not found.
 	 */
-	openPage (pRouteMatch:IRouteMatch, pAddToHistory = true)
+	static openPage (pRouteMatch:IRouteMatch, pAddToHistory = true)
 	{
 		// Get URL from this route
-		let url = this.routeToURL( pRouteMatch );
+		let url = this.generateURL( pRouteMatch );
 
 		// Throw error if URL is not found for this route
 		if (url == null)
@@ -790,7 +761,7 @@ export class Router
 	/**
 	 * Start route changes listening.
 	 */
-	start ()
+	static start ()
 	{
 		this._isStarted = true;
 		this.updateCurrentRoute();
@@ -799,7 +770,7 @@ export class Router
 	/**
 	 * Stop router from listening route changes.
 	 */
-	stop ()
+	static stop ()
 	{
 		this._isStarted = false;
 	}

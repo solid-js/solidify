@@ -1,6 +1,3 @@
-
-
-
 import {IDisposable} from "../core/Disposable";
 import {Signal} from "../helpers/Signal";
 
