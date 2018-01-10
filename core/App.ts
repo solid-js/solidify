@@ -19,6 +19,9 @@ export class App extends Disposable
 		// Relay
 		super();
 
+		// Prepare app
+		this.prepare();
+
 		// Init app config
 		this.initConfig();
 
@@ -33,6 +36,15 @@ export class App extends Disposable
 
 		// Our app is ready
 		this.ready();
+	}
+
+	/**
+	 * Prepare App.
+	 * Can be overridden.
+	 */
+	protected prepare ()
+	{
+
 	}
 
 	/**
