@@ -16,11 +16,11 @@ export interface IPage
 	 * Play intro animation.
 	 * Have to return a promise when animation is ended.
 	 */
-	playIn ():Promise;
+	playIn ():Promise<any>;
 
 	/**
 	 * Play outro animation.
 	 * Have to return a promise when animation is ended.
 	 */
-	playOut ():Promise;
+	playOut ():Promise<any>;
 }

@@ -250,7 +250,8 @@ export class Router
 		// FIXME : Faire une fonction pour faire un replaceState ? Utile ?
 
 		// Follow link
-		this.openURL( fullPath );
+		Router.openURL( fullPath );
+		return true;
 	};
 
 
@@ -368,11 +369,11 @@ export class Router
 		// Replace regex reserved chars on pattern
 		// We do it before parameter flag this is important, to avoid doubling escaping
 		pattern = pattern
-			.replace(/\./g, '\\.')
-			.replace(/\+/g, '\\+')
-			.replace(/\*/g, '\\*')
-			.replace(/\$/g, '\\$')
-			.replace(/\/$/, '/?'); // Optional last slash
+		.replace(/\./g, '\\.')
+		.replace(/\+/g, '\\+')
+		.replace(/\*/g, '\\*')
+		.replace(/\$/g, '\\$')
+		.replace(/\/$/, '/?'); // Optional last slash
 
 		// Remplace all parameter flag to corresponding regex for parameter detection
 		pattern = pattern.replace(new RegExp("(\%\%PARAMETER\%\%)", 'g'), Router.PARAMETER_RULE);
@@ -401,7 +402,6 @@ export class Router
 		if (pStack == null)
 		{
 			throw new Error(`Router.registerStack // Can't register a null stack.`);
-
 		}
 
 		// Record instance by name
@@ -432,7 +432,7 @@ export class Router
 	static popStateHandler = (pEvent:Event) =>
 	{
 		// Update route
-		this.updateCurrentRoute();
+		Router.updateCurrentRoute();
 	};
 
 	/**
