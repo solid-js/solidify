@@ -171,7 +171,7 @@ export class ScrollDispatcher extends Disposable
 		this.$target = $pTarget;
 
 		// Special case if we have to listen document
-		if ( $pTarget.is(document) )
+		if ( $pTarget.is( $(document) ) )
 		{
 			// Parent is window
 			this.$parent = $(window);
@@ -208,7 +208,7 @@ export class ScrollDispatcher extends Disposable
 
 	// ------------------------------------------------------------------------- HANDLERS
 
-	protected scrolledHandler = (pEvent:JQueryEventObject = null):void =>
+	protected scrolledHandler = (pEvent ?: any):void =>
 	{
 		// Update scroll position for delegate
 		this.updateCurrentScrollPosition();
