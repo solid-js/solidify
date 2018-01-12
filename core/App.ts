@@ -7,27 +7,28 @@ export class App extends Disposable
 
 	/**
 	 * App constructor.
-	 * No need to override if there is no specific AppParams to add.
+	 * @param {boolean} pInitSequence if true, will go through prepare and init method. If false, it will directly go to ready.
 	 */
-	constructor ()
+	constructor ( pInitSequence:boolean )
 	{
 		// Relay
 		super();
 
-		// Prepare app
-		this.prepare();
+		// Launch init sequence
+		if ( pInitSequence )
+		{
+			// Prepare app
+			this.prepare();
 
-		// Init app config
-		this.initConfig();
+			// Init app config
+			this.initConfig();
 
-		// Init env stuff
-		this.initEnv();
+			// Init env stuff
+			this.initEnv();
 
-		// Init routes
-		this.initRoutes();
-
-		// Init app view before routes
-		this.initAppView();
+			// Init routes
+			this.initRoutes();
+		}
 
 		// Our app is ready
 		this.ready();
@@ -73,18 +74,6 @@ export class App extends Disposable
 	protected initRoutes ():void
 	{
 		throw new Error(`App.initRoutes // Please override App.initRoutes to map app routes.`);
-	}
-
-
-	// ------------------------------------------------------------------------- APP VIEW
-
-	/**
-	 * Init app view.
-	 * Called before routes initialisation to have appView instance available in routes delcarations.
-	 */
-	protected initAppView ():void
-	{
-		throw new Error(`App.initAppView // Please override App.initAppView to create application main view.`);
 	}
 
 
