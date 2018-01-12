@@ -66,6 +66,10 @@ export interface IRoute
 {
 	/**
 	 * Link to trigger this route, without base and with leading slash.
+	 * Parameters are delimited with { }
+	 * Prepend parameter with a # to force it as a number
+	 *
+	 * ex : my-route-{#id}-{slug}.html
 	 */
 	url					:string;
 
@@ -136,6 +140,12 @@ export class Router
 	 * As string because we'll create one dynamic regex by route.
 	 */
 	static PARAMETER_RULE 					= '([0-9a-zA-Z\_\%\+\-]+)';
+
+	/**
+	 * Regex rule to detect numeric parameters.
+	 * As string because we'll create one dynamic regex by route.
+	 */
+	static NUMBER_PARAMETER_RULE 			= '([0-9]+)';
 
 	/**
 	 * Regex to replace parameters in URLs.
@@ -282,13 +292,13 @@ export class Router
 			return;
 		}
 
-		console[('ga' in window ? 'info' : 'warn')]('Router.trackingPage // ' + this._currentPath);
-
 		// FIXME : Vérifier que c'est bien _currentPath qu'il faut envoyer ou alors le path sans base ?
 
 		// Si la librairie est chargée
 		if ('ga' in window)
 		{
+			console.info('Router.trackingPage // ' + this._currentPath);
+
 			// Signaler à google analytics
 			window['ga']('send', 'pageview', this._currentPath);
 		}
@@ -362,11 +372,18 @@ export class Router
 			start = url.indexOf( Router.LEFT_PARAMETERS_DELIMITER );
 			end = url.indexOf( Router.RIGHT_PARAMETER_DELIMITER );
 
+			// Check if parameter starts with a #
+			// This is a numeric parameter
+			let isNumeric = ( url.charAt( start + 1) == '#' );
+
 			// Get parameter name and store it inside route for matching
-			pRoute._matchingParameter.push( url.substring(start + 1, end) );
+			pRoute._matchingParameter.push(
+				url.substring(start + (isNumeric ? 2 : 1), end)
+			);
 
 			// Add parameter flag to replace with regex down bellow
-			pattern += url.substring(0, start) + '%%PARAMETER%%';
+			pattern += url.substring(0, start);
+			pattern += '%%' + (isNumeric ? 'NUMBER_PARAMETER' : 'PARAMETER') + '%%';
 
 			// Cut the hash for the next param detection iteration
 			url = url.substring(end + 1, url.length);
@@ -387,6 +404,7 @@ export class Router
 
 		// Remplace all parameter flag to corresponding regex for parameter detection
 		pattern = pattern.replace(new RegExp("(\%\%PARAMETER\%\%)", 'g'), Router.PARAMETER_RULE);
+		pattern = pattern.replace(new RegExp("(\%\%NUMBER_PARAMETER\%\%)", 'g'), Router.NUMBER_PARAMETER_RULE);
 
 		// Convert it to regex and store it inside route
 		pRoute._matchingRegex = new RegExp(`^${pattern}$`);
@@ -676,8 +694,8 @@ export class Router
 
 						// Slugify it if this is a string only
 						return (
-							(typeof(matchedParam) == 'number')
-							? matchedParam.toString(10)
+							( typeof matchedParam === 'number' )
+							? matchedParam.toString( 10 )
 							: StringUtils.slugify( matchedParam as string )
 						);
 					}
