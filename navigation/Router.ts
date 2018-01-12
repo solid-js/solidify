@@ -495,6 +495,7 @@ export class Router
 
 				// Show page on stack
 				(stack != null) && stack.showPage(
+					this._currentRouteMatch.page,
 					this._currentRouteMatch.importer,
 					this._currentRouteMatch.action,
 					this._currentRouteMatch.parameters
@@ -582,6 +583,7 @@ export class Router
 				// Create route match object and configure it from route
 				foundRoute = {
 					page		: route.page,
+					importer	: route.importer,
 					action		: route.action,
 					stack		: route.stack,
 					parameters	: parameters

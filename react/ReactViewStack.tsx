@@ -291,12 +291,13 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	 * Pass every parameter as null if you need to clear the stack.
 	 * Current page will be destroyed and no new page will be required.
 	 *
+	 * @param pPageName page name
 	 * @param pPageImporter import returning a Promise.
 	 * @param pActionName Action name to execute on page
 	 * @param pParameters Action parameters to pass
 	 * @returns false if page is not loaded
 	 */
-	public showPage (pPageImporter:() => Promise<any>, pActionName:string, pParameters:IActionParameters):boolean
+	public showPage (pPageName:string, pPageImporter:() => Promise<any>, pActionName:string, pParameters:IActionParameters):boolean
 	{
 		// TODO : Faire le système d'annulation de changement de page
 		// TODO : Avec shouldPlayIn et shouldPlayOut, voir ce que cela implique sur le routeur
@@ -322,7 +323,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		}
 
 		// Bind play in method to the good scope and with new action parameters
-		const boundAddNewPage = this.addNewPage.bind(this, pPageName, pActionName, pParameters);
+		const boundAddNewPage = this.addNewPage.bind(this, pPageName, pPageImporter, pActionName, pParameters);
 
 		// If we are in crossed transition mode or if this is the first page
 		if (
@@ -353,11 +354,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	 * Add new page to state, by its name.
 	 * Will play in (through componentDidUpdate)
 	 * And also trigger action and parameters.
-	 * @param pPagePath Page path to play in
+	 * @param pPageName
+	 * @param pPageImporter
 	 * @param pActionName Action name to trigger
 	 * @param pParameters Associated parameters
 	 */
-	protected addNewPage (pPagePath:string, pActionName:string, pParameters:IActionParameters):void
+	protected addNewPage (pPageName:string, pPageImporter:() => Promise<any>, pActionName:string, pParameters:IActionParameters):void
 	{
 		// If we are in sequential transition
 		// We have played out here
@@ -370,34 +372,51 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		this._playedIn = false;
 
 		// Record page name
-		this._currentPageName = pPagePath;
+		this._currentPageName = pPageName;
 
 		// Class of the new page, can be null if no new page is required
 		let NewPageClass:any;
 
 		// Only require new page if pageName is not null
-		if (pPagePath != null)
+		if (pPageName != null)
 		{
-			// TODO :
+			// Execute importer
+			pPageImporter()
 
-			import(pPagePath)
-
+			// Catch errors
 			.catch( error =>
 			{
 				// Call not found handler
 				if (this.props.onNotFound != null)
 				{
-					this.props.onNotFound( pPagePath );
-				}
-				// If we do not have handler, throw error
-				else
-				{
-					throw error;
+					this.props.onNotFound( pPageName, pPageImporter );
 				}
 			})
 
-			.then( NewPageClass =>
+			// Import succeed
+			.then( moduleExports =>
 			{
+				// If this is a string
+				// We certainly loaded a 404 ...
+				if (typeof moduleExports === 'string')
+				{
+					// Call not found handler
+					if (this.props.onNotFound != null)
+					{
+						this.props.onNotFound( pPageName, pPageImporter );
+					}
+				}
+
+				// Target export with default or page name
+				NewPageClass = (
+					// Target exports with page name
+					( pPageName in moduleExports )
+					? moduleExports[ pPageName ]
+
+					// Or try default
+					: moduleExports['default']
+				);
+
 				// Set state with new page class, action and parameters
 				// React will do its magic !
 				this.setState({
@@ -419,7 +438,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					// New page and associated action and parameters
 					currentPage    : {
 						pageClass  : NewPageClass,
-						action        : pActionName,
+						action     : pActionName,
 						parameters : pParameters
 					}
 				});

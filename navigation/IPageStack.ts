@@ -19,9 +19,10 @@ export interface IPageStack
 
 	/**
 	 * Show a page.
-	 * @param pPageImporter import returning a Promise.
+	 * @param pPageName Name of the page to identify it and detect changes.
+	 * @param pPageImporter import returning a Promise. Like so : () => import('...')
 	 * @param pActionName Action to call
 	 * @param pParams Action parameters
 	 */
-	showPage (pPageImporter:() => Promise<any>, pActionName:string, pParams:{[index:string]:any});
+	showPage (pPageName:string, pPageImporter:() => Promise<any>, pActionName:string, pParams:{[index:string]:any});
 }
