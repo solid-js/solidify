@@ -2,9 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a701bf77-e59f-4777-bf0c-e90b0f25b865" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/navigation/IPageStack.ts" afterPath="$PROJECT_DIR$/navigation/IPageStack.ts" />
       <change beforePath="$PROJECT_DIR$/navigation/Router.ts" afterPath="$PROJECT_DIR$/navigation/Router.ts" />
       <change beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-      <change beforePath="$PROJECT_DIR$/react/ReactPage.ts" afterPath="$PROJECT_DIR$/react/ReactPage.ts" />
       <change beforePath="$PROJECT_DIR$/react/ReactViewStack.tsx" afterPath="$PROJECT_DIR$/react/ReactViewStack.tsx" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -31,8 +31,18 @@
           <file leaf-file-name="Router.ts" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/navigation/Router.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="5317">
-                  <caret line="403" column="44" lean-forward="true" selection-start-line="403" selection-start-column="44" selection-end-line="403" selection-end-column="44" />
+                <state relative-caret-position="218">
+                  <caret line="499" column="50" lean-forward="false" selection-start-line="499" selection-start-column="50" selection-end-line="499" selection-end-column="50" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="IPageStack.ts" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/navigation/IPageStack.ts">
+              <provider selected="true" editor-type-id="text-editor">
+                <state relative-caret-position="315">
+                  <caret line="21" column="55" lean-forward="true" selection-start-line="21" selection-start-column="14" selection-end-line="21" selection-end-column="55" />
                   <folding />
                 </state>
               </provider>
@@ -41,8 +51,8 @@
           <file leaf-file-name="ReactViewStack.tsx" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/react/ReactViewStack.tsx">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="583">
-                  <caret line="356" column="48" lean-forward="true" selection-start-line="356" selection-start-column="48" selection-end-line="356" selection-end-column="48" />
+                <state relative-caret-position="309">
+                  <caret line="312" column="58" lean-forward="true" selection-start-line="312" selection-start-column="58" selection-end-line="312" selection-end-column="58" />
                   <folding>
                     <element signature="e#0#31#0" expanded="true" />
                   </folding>
@@ -79,6 +89,9 @@
       <find>Q.</find>
       <find>registerst</find>
       <find>Q(</find>
+      <find>NotFound</find>
+      <find>importer</find>
+      <find>showPage</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -93,10 +106,11 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/navigation/IPage.ts" />
         <option value="$PROJECT_DIR$/core/App.ts" />
-        <option value="$PROJECT_DIR$/navigation/Router.ts" />
         <option value="$PROJECT_DIR$/react/ReactPage.ts" />
-        <option value="$PROJECT_DIR$/react/ReactViewStack.tsx" />
+        <option value="$PROJECT_DIR$/navigation/Router.ts" />
+        <option value="$PROJECT_DIR$/navigation/IPageStack.ts" />
         <option value="$PROJECT_DIR$/package.json" />
+        <option value="$PROJECT_DIR$/react/ReactViewStack.tsx" />
       </list>
     </option>
   </component>
@@ -234,12 +248,12 @@
       <option name="presentableId" value="Default" />
       <updated>1515597100958</updated>
       <workItem from="1515597102112" duration="7252000" />
-      <workItem from="1515767304903" duration="1950000" />
+      <workItem from="1515767304903" duration="2792000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9202000" />
+    <option name="totallyTimeSpent" value="10044000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="111" y="1102" width="1680" height="1028" extended-state="6" />
@@ -402,14 +416,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/navigation/IPageStack.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="1" lean-forward="false" selection-start-line="27" selection-start-column="1" selection-end-line="27" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/react/ReactView.tsx">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="270">
@@ -506,26 +512,16 @@
         <state relative-caret-position="210">
           <caret line="14" column="7" lean-forward="true" selection-start-line="14" selection-start-column="7" selection-end-line="14" selection-end-column="7" />
           <folding>
-            <element signature="e#0#38#0" expanded="true" />
+            <element signature="e#0#38#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/navigation/Router.ts">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5317">
-          <caret line="403" column="44" lean-forward="true" selection-start-line="403" selection-start-column="44" selection-end-line="403" selection-end-column="44" />
+        <state relative-caret-position="218">
+          <caret line="499" column="50" lean-forward="false" selection-start-line="499" selection-start-column="50" selection-end-line="499" selection-end-column="50" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/react/ReactViewStack.tsx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="583">
-          <caret line="356" column="48" lean-forward="true" selection-start-line="356" selection-start-column="48" selection-end-line="356" selection-end-column="48" />
-          <folding>
-            <element signature="e#0#31#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -534,6 +530,24 @@
         <state relative-caret-position="30">
           <caret line="2" column="20" lean-forward="false" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/navigation/IPageStack.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="55" lean-forward="true" selection-start-line="21" selection-start-column="14" selection-end-line="21" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/react/ReactViewStack.tsx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="309">
+          <caret line="312" column="58" lean-forward="true" selection-start-line="312" selection-start-column="58" selection-end-line="312" selection-end-column="58" />
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

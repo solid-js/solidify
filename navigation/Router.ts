@@ -29,6 +29,11 @@ export interface IRouteMatch
 	page				:string;
 
 	/**
+	 * Page importer, to get page class.
+	 */
+	importer			:() => Promise<any>;
+
+	/**
 	 * Action to execute on page.
 	 * Default is "index"
 	 */
@@ -69,6 +74,11 @@ export interface IRoute
 	 * Can be a page to show in stack or any name that is fine to you.
 	 */
 	page				:string;
+
+	/**
+	 * Page importer, to get page class.
+	 */
+	importer			:() => Promise<any>;
 
 	/**
 	 * Action to execute on page.
@@ -455,15 +465,6 @@ export class Router
 			{
 				// Dispatch not found
 				this._onNotFound.dispatch();
-
-				// If we have a main stack
-				let mainStack = this.getStackByName('main');
-
-				// Show notFound page
-				if (mainStack != null)
-				{
-					mainStack.showPage('NotFoundPage', 'index', {});
-				}
 			}
 
 			// Route is found
@@ -494,7 +495,7 @@ export class Router
 
 				// Show page on stack
 				(stack != null) && stack.showPage(
-					this._currentRouteMatch.page,
+					this._currentRouteMatch.importer,
 					this._currentRouteMatch.action,
 					this._currentRouteMatch.parameters
 				);

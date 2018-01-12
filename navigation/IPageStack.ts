@@ -18,11 +18,10 @@ export interface IPageStack
 	readonly isInTransition			:boolean;
 
 	/**
-	 * Afficher une page
-	 * @param pPageName Le nom de la page à afficher (nom de classe qui sera chargé dynamiquement avec le type 'page')
-	 * @param pActionName Le nom de l'action à appeler
-	 * @param pParams Les paramètres de l'action à passer
-	 * @returns false si la page ne sera pas chargée
+	 * Show a page.
+	 * @param pPageImporter import returning a Promise.
+	 * @param pActionName Action to call
+	 * @param pParams Action parameters
 	 */
-	showPage (pPageName:string, pActionName:string, pParams:{[index:string]:any}):boolean;
+	showPage (pPageImporter:() => Promise<any>, pActionName:string, pParams:{[index:string]:any});
 }

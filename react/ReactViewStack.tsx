@@ -263,17 +263,17 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	protected checkOldPage ()
 	{
 		if (
-			// Only for crossed transition type
-			this.props.transitionType == ETransitionType.PAGE_CROSSED
+				// Only for crossed transition type
+				this.props.transitionType == ETransitionType.PAGE_CROSSED
 
-			// Only when new page is played in and old page is played out
-			&&
-			this._playedIn && this._playedOut
+				// Only when new page is played in and old page is played out
+				&&
+				this._playedIn && this._playedOut
 
-			// Only if we have an old page (do we ?)
-			&&
-			this._oldPage != null
-		)
+				// Only if we have an old page (do we ?)
+				&&
+				this._oldPage != null
+			)
 		{
 			// Remove old page from state
 			this.setState({
@@ -291,12 +291,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	 * Pass every parameter as null if you need to clear the stack.
 	 * Current page will be destroyed and no new page will be required.
 	 *
-	 * @param pPageName Page name which will be required from "page" module type with DependencyManager
+	 * @param pPageImporter import returning a Promise.
 	 * @param pActionName Action name to execute on page
 	 * @param pParameters Action parameters to pass
 	 * @returns false if page is not loaded
 	 */
-	public showPage (pPageName:string, pActionName:string, pParameters:IActionParameters):boolean
+	public showPage (pPageImporter:() => Promise<any>, pActionName:string, pParameters:IActionParameters):boolean
 	{
 		// TODO : Faire le système d'annulation de changement de page
 		// TODO : Avec shouldPlayIn et shouldPlayOut, voir ce que cela implique sur le routeur
@@ -309,10 +309,10 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 				currentPage : {
 					pageClass  : (
 						this.state.currentPage == null
-							? null
-							: this.state.currentPage.pageClass
+						? null
+						: this.state.currentPage.pageClass
 					),
-					action    : pActionName,
+					action    	: pActionName,
 					parameters  : pParameters
 				}
 			});
@@ -326,12 +326,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 		// If we are in crossed transition mode or if this is the first page
 		if (
-			this.state.currentPage == null
-			||
-			this.props.transitionType == ETransitionType.PAGE_CROSSED
-			||
-			this.props.transitionType == ETransitionType.CONTROLLED
-		)
+				this.state.currentPage == null
+				||
+				this.props.transitionType == ETransitionType.PAGE_CROSSED
+				||
+				this.props.transitionType == ETransitionType.CONTROLLED
+			)
 		{
 			// Start new page directly
 			boundAddNewPage();
