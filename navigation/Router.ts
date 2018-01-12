@@ -31,7 +31,7 @@ export interface IRouteMatch
 	/**
 	 * Page importer, to get page class.
 	 */
-	importer			:() => Promise<any>;
+	importer			?:() => Promise<any>;
 
 	/**
 	 * Action to execute on page.
