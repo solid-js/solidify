@@ -57,7 +57,7 @@ interface ITransitionControl
 	 * @param pOldPage Old page instance
 	 * @param pNewPage New page instance
 	 */
-	($oldPage:Element, $newPage:Element, pOldPage:IPage, pNewPage:IPage) : Promise;
+	($oldPage:Element, $newPage:Element, pOldPage:IPage, pNewPage:IPage) : Promise<any>;
 }
 
 interface Props
@@ -208,14 +208,13 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 				// Call transition control handler with old and new pages instances
 				// Listen when finished through promise
-				Q(
-					this.props.transitionControl(
-						ReactDOM.findDOMNode( this._oldPage as any ),
-						ReactDOM.findDOMNode( this._currentPage as any ),
-						this._oldPage,
-						this._currentPage
-					)
-				).done( () =>
+				this.props.transitionControl(
+					ReactDOM.findDOMNode( this._oldPage as any ),
+					ReactDOM.findDOMNode( this._currentPage as any ),
+					this._oldPage,
+					this._currentPage
+				)
+				.then( () =>
 				{
 					// Set transition state as ended
 					this._playedIn = true;
@@ -343,7 +342,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			this._playedOut = false;
 
 			// Else we have to play out the current page first
-			Q( this._currentPage.playOut() ).done( boundAddNewPage );
+			this._currentPage.playOut().then( boundAddNewPage );
 		}
 
 		// Everything is ok

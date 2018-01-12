@@ -48,17 +48,17 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 * Play intro animation.
 	 * Have to return a promise when animation is ended.
 	 */
-	playIn ():Promise
+	playIn ():Promise<any>
 	{
-		return null;
+		return new Promise( resolve => resolve() );
 	}
 
 	/**
 	 * Play outro animation.
 	 * Have to return a promise when animation is ended.
 	 */
-	playOut ():Promise
+	playOut ():Promise<any>
 	{
-		return null;
+		return new Promise( resolve => resolve() );
 	}
 }

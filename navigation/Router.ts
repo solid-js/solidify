@@ -395,10 +395,6 @@ export class Router
 	static registerStack (pStackName:string, pStack:IPageStack)
 	{
 		// Check errors
-		if (pStackName in this._stacks)
-		{
-			throw new Error(`Router.registerStack // Stack ${pStackName} already registered`);
-		}
 		if (pStack == null)
 		{
 			throw new Error(`Router.registerStack // Can't register a null stack.`);
