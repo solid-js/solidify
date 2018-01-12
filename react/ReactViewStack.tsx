@@ -75,9 +75,8 @@ interface Props
 	transitionControl	?: ITransitionControl;
 
 	/**
-	 * Called when page is not found by DependencyManager.
+	 * Called when page is not found.
 	 * Will not be called if showPage(null...) is called.
-	 * Will throw DependencyManager errors if not defined.
 	 * @param pPageName
 	 */
 	onNotFound       	?: (pPageName:string) => void
@@ -389,7 +388,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 				// Call not found handler
 				if (this.props.onNotFound != null)
 				{
-					this.props.onNotFound( pPageName, pPageImporter );
+					this.props.onNotFound( pPageName );
 				}
 			})
 
@@ -403,7 +402,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					// Call not found handler
 					if (this.props.onNotFound != null)
 					{
-						this.props.onNotFound( pPageName, pPageImporter );
+						this.props.onNotFound( pPageName );
 					}
 				}
 
