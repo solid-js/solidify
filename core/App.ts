@@ -7,19 +7,20 @@ export class App extends Disposable
 
 	/**
 	 * App constructor.
-	 * @param {boolean} pInitSequence if true, will go through prepare and init method. If false, it will directly go to ready.
+	 * Set pInitSequence if this is an Hot Module Reloading trigger.
+	 * @param {boolean} pInitSequence if true, will go through init method. If false, it will directly go to prepare and ready.
 	 */
 	constructor ( pInitSequence:boolean )
 	{
 		// Relay
 		super();
 
+		// Prepare app
+		this.prepare();
+
 		// Launch init sequence
 		if ( pInitSequence )
 		{
-			// Prepare app
-			this.prepare();
-
 			// Init app config
 			this.initConfig();
 
