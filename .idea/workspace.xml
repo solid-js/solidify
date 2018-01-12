@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="a701bf77-e59f-4777-bf0c-e90b0f25b865" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/navigation/Router.ts" afterPath="$PROJECT_DIR$/navigation/Router.ts" />
-      <change beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -29,8 +28,8 @@
           <file leaf-file-name="Router.ts" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/navigation/Router.ts">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="279">
-                  <caret line="71" column="12" lean-forward="true" selection-start-line="71" selection-start-column="12" selection-end-line="71" selection-end-column="12" />
+                <state relative-caret-position="293">
+                  <caret line="706" column="57" lean-forward="false" selection-start-line="706" selection-start-column="57" selection-end-line="707" selection-end-column="75" />
                   <folding>
                     <element signature="e#0#49#0" expanded="true" />
                   </folding>
@@ -94,6 +93,7 @@
       <find>showPage</find>
       <find>onNotFound</find>
       <find>IRouteM</find>
+      <find>replace_rul</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -111,8 +111,8 @@
         <option value="$PROJECT_DIR$/react/ReactPage.ts" />
         <option value="$PROJECT_DIR$/navigation/IPageStack.ts" />
         <option value="$PROJECT_DIR$/react/ReactViewStack.tsx" />
-        <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/navigation/Router.ts" />
+        <option value="$PROJECT_DIR$/package.json" />
       </list>
     </option>
   </component>
@@ -250,12 +250,12 @@
       <option name="presentableId" value="Default" />
       <updated>1515597100958</updated>
       <workItem from="1515597102112" duration="7252000" />
-      <workItem from="1515767304903" duration="5142000" />
+      <workItem from="1515767304903" duration="5784000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12394000" />
+    <option name="totallyTimeSpent" value="13036000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="111" y="1102" width="1680" height="1024" extended-state="6" />
@@ -539,21 +539,21 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/navigation/Router.ts">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="706" column="57" lean-forward="false" selection-start-line="706" selection-start-column="57" selection-end-line="707" selection-end-column="75" />
+          <folding>
+            <element signature="e#0#49#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/package.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
           <caret line="2" column="20" lean-forward="false" selection-start-line="2" selection-start-column="20" selection-end-line="2" selection-end-column="20" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/navigation/Router.ts">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="279">
-          <caret line="71" column="12" lean-forward="true" selection-start-line="71" selection-start-column="12" selection-end-line="71" selection-end-column="12" />
-          <folding>
-            <element signature="e#0#49#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>

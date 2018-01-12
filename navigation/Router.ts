@@ -689,8 +689,17 @@ export class Router
 				foundURL = route.url.replace(
 					Router.PARAMETER_REPLACE_RULE, function (i, pMatch)
 					{
+						// Check if this is a numeric parameter
+						const numericParameter = (pMatch.charAt(0) == '#');
+
+						// Remove starting #
+						if (numericParameter)
+						{
+							pMatch = pMatch.substr(1, pMatch.length);
+						}
+
 						// Target matched param
-						let matchedParam = pRouteMatch.parameters[pMatch];
+						let matchedParam = pRouteMatch.parameters[ pMatch ];
 
 						// Slugify it if this is a string only
 						return (
