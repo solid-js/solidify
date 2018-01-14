@@ -1,3 +1,5 @@
+import {App} from "solidify-lib/core/App";
+
 /**
  * App bundle static require
  */
@@ -19,10 +21,26 @@ export interface IBundleRequire
 export interface IBundleRequireList
 {
 	// FuseBox package manager app bundles paths
-	paths : string[];
+	paths 		: string[];
 
 	// App bundle static requires statements for quantum mode
-	requires : () => IBundleRequire[];
+	requires 	: () => IBundleRequire[];
+}
+
+/**
+ * App Bundle main abstract constructor interface
+ */
+export interface AppMain
+{
+	new ():App;
+}
+
+/**
+ * App Bundle loaded handler interface
+ */
+export interface AppBundleLoadedHandler
+{
+	(pAppMain:any):void;
 }
 
 /**
@@ -31,33 +49,33 @@ export interface IBundleRequireList
  */
 export class SolidBundles
 {
-	// Global variable name for bundles check interval
-	static WINDOW_CHECK_INTERVAL = '__solidCheckInterval';
-
 	// Global variable name for app bundle loading handler
-	static WINDOW_LOADED_HANDLER = 'SolidBundleLoaded';
+	protected static WINDOW_LOADED_HANDLER 		= 'SolidBundleLoaded';
 
 	// Global variable name for FuseBox package manager in dev mode
-	static WINDOW_FUSE_BOX_NAME = 'FuseBox';
+	protected static WINDOW_FUSE_BOX_NAME 		= 'FuseBox';
 
-	// Global variable name for HMR counter
-	static WINDOW_HMR_COUNT = '__solidHmrCount';
-
-	// Bundle loaded check frequency
-	static CHECK_FREQUENCY = 1000 / 30;
+	// Global variable name for this class
+	protected static WINDOW_SOLID_BUNDLES_NAME 	= 'SolidBundles';
 
 	// App bundles require list
-	static __bundlesRequireList:IBundleRequireList;
+	protected static __bundlesRequireList		:IBundleRequireList;
 
 	// Waiting bundle loaded handler
-	static __waitingHandlers = {};
+	protected static __waitingHandlers 			:{[index:string]:AppBundleLoadedHandler}		= {};
+
+	// Register of all loaded app bundle mains
+	protected static __appBundleMains			:{[index:string]:any}							= {};
+
+	// Count of app bundle inits, to catch HMR reloads
+	protected static __appBundleInitCount		:{[index:string]:number}						= {};
 
 
 	/**
-	 * Start Solid Bundle manager.
+	 * Init Solid Bundle manager.
 	 * @param pBundleRequireList Compiled require list from fuse.
 	 */
-	static start ( pBundleRequireList:IBundleRequireList )
+	static init ( pBundleRequireList:IBundleRequireList )
 	{
 		// Check if handler exists
 		if ( !(SolidBundles.WINDOW_LOADED_HANDLER in window) )
@@ -68,54 +86,11 @@ export class SolidBundles
 		// Register require list
 		SolidBundles.__bundlesRequireList = pBundleRequireList;
 
-		// Init HMR count
-		window[ SolidBundles.WINDOW_HMR_COUNT ] = (
-			( SolidBundles.WINDOW_HMR_COUNT in window )
-			? window[ SolidBundles.WINDOW_HMR_COUNT ] + 1
-			: 0
-		);
+		// Expose and override public API
+		window[ SolidBundles.WINDOW_SOLID_BUNDLES_NAME ] = SolidBundles;
 
-		// Expose public API
-		window['SolidBundles'] = SolidBundles;
-
-		// Start checking only if loop isn't started. So HMR will not add loops.
-		if ( !(SolidBundles.WINDOW_CHECK_INTERVAL in window))
-		{
-			// Start loop
-			window[SolidBundles.WINDOW_CHECK_INTERVAL] = window.setInterval(
-				SolidBundles.checkBundles,
-				SolidBundles.CHECK_FREQUENCY
-			);
-
-			// Check bundles directly
-			SolidBundles.checkBundles();
-		}
-	}
-
-	/**
-	 * Load an app bundle.
-	 * @param {string} pBundleName Name of the app bundle to load.
-	 * @param {string} pLoadedHandler Called when app bundle is loaded. First argument is app class.
-	 */
-	static loadBundle (pBundleName:string, pLoadedHandler ?: (pAppMain:any) => void)
-	{
-		// Create script tag
-		let scriptTag = document.createElement('script');
-
-		// Get bundle path from injected env
-		const bundlePath = process.env['BUNDLE_PATH'];
-
-		// Target bundle file
-		scriptTag.setAttribute('src', `${bundlePath}${pBundleName}.js`);
-
-		// Add to head and start loading
-		document.head.appendChild(scriptTag);
-
-		// Register handler
-		if (pLoadedHandler != null)
-		{
-			SolidBundles.__waitingHandlers[ pBundleName ] = pLoadedHandler;
-		}
+		// Check bundles from require list
+		SolidBundles.checkBundles();
 	}
 
 	/**
@@ -161,6 +136,9 @@ export class SolidBundles
 				// Set it as required
 				bundle.required = true;
 
+				// Register this main for this name as a loaded app bundle
+				SolidBundles.__appBundleMains[ bundle.name ] = bundle.main;
+
 				// Expose its name and main bundle
 				window[ SolidBundles.WINDOW_LOADED_HANDLER ]( bundle.name, bundle.main );
 
@@ -175,26 +153,78 @@ export class SolidBundles
 				}
 			}
 		});
+	}
 
-		// Filter required bundles to check if any bundle is still missing
-		let bundlesToRequire = bundles.filter(
-			bundle => ( bundle == null )
-		);
+	/**
+	 * Load an app bundle.
+	 * @param {string} pBundleName Name of the app bundle to load.
+	 * @param {string} pLoadedHandler Called when app bundle is loaded. First argument is app class.
+	 */
+	static loadBundle (pBundleName:string, pLoadedHandler ?: AppBundleLoadedHandler)
+	{
+		// Create script tag
+		let scriptTag = document.createElement('script');
 
-		// If we don't have bundle to require anymore
-		if (bundlesToRequire.length == 0)
+		// Get bundle path from injected env
+		const bundlePath = process.env['BUNDLE_PATH'];
+
+		// Target bundle file
+		scriptTag.setAttribute('src', `${bundlePath}${pBundleName}.js`);
+
+		// Add to head and start loading
+		document.head.appendChild(scriptTag);
+
+		// Register handler
+		if (pLoadedHandler != null)
 		{
-			// Kill the loop and remove interval checker
-			clearInterval( window[SolidBundles.WINDOW_CHECK_INTERVAL] );
-			delete window[SolidBundles.WINDOW_CHECK_INTERVAL];
+			SolidBundles.__waitingHandlers[ pBundleName ] = pLoadedHandler;
 		}
 	}
 
 	/**
-	 * Is true if App is reloaded from Hot Module Reloading.
+	 * Get an app main from it's app bundle name
+	 * @param {string} pAppBundleName
+	 * @returns {any}
 	 */
-	static get isHMRTrigger ()
+	static getAppBundleMainFromName (pAppBundleName:string):any
 	{
-		return ( window[ SolidBundles.WINDOW_HMR_COUNT ] > 0 );
+		// If this app bundle main does not exists
+		if ( !(pAppBundleName in SolidBundles.__appBundleMains) )
+		{
+			throw new Error(`App bundle ${pAppBundleName} does not exists or is not loaded yet.`);
+		}
+
+		// If this app bundle has no main
+		if ( SolidBundles.__appBundleMains[pAppBundleName] === false)
+		{
+			throw new Error(`This app bundle (${pAppBundleName}) does not have Main file.`);
+		}
+
+		// Returns app bundle main
+		return SolidBundles.__appBundleMains[ pAppBundleName ];
+	}
+
+	/**
+	 * Register an app init and get count.
+	 * This is to avoid double init of bundles when Hot Module Reloaded is restarting app.
+	 * @param {string} pAppBundleName App bundle name to count.
+	 * @returns {number} Total init count. If 0, this is not an HMR reloading.
+	 */
+	static registerAppBundleInit (pAppBundleName:string):number
+	{
+		// Init counter
+		if ( !(pAppBundleName in SolidBundles.__appBundleInitCount) )
+		{
+			SolidBundles.__appBundleInitCount[ pAppBundleName ] = 0;
+		}
+
+		// Increment counter
+		else
+		{
+			SolidBundles.__appBundleInitCount[ pAppBundleName ] ++;
+		}
+
+		// Return total
+		return SolidBundles.__appBundleInitCount[ pAppBundleName ];
 	}
 }
