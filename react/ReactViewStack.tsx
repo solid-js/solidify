@@ -379,21 +379,8 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// Only require new page if pageName is not null
 		if (pPageName != null)
 		{
-			// Execute importer
-			pPageImporter()
-
-			// Catch errors
-			.catch( error =>
-			{
-				// Call not found handler
-				if (this.props.onNotFound != null)
-				{
-					this.props.onNotFound( pPageName );
-				}
-			})
-
-			// Import succeed
-			.then( moduleExports =>
+			// When page is imported
+			const pageImortedHandler = (moduleExports) =>
 			{
 				// If this is a string
 				// We certainly loaded a 404 ...
@@ -441,7 +428,33 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 						parameters : pParameters
 					}
 				});
-			});
+			};
+
+			// Execute importer
+			const importResult = pPageImporter();
+
+			// If this is a promise from an async import
+			if (importResult instanceof Promise)
+			{
+				// Catch errors
+				importResult.catch( error =>
+				{
+					// Call not found handler
+					if (this.props.onNotFound != null)
+					{
+						this.props.onNotFound( pPageName );
+					}
+				})
+
+				// Import succeed
+				importResult.then( pageImortedHandler );
+			}
+
+			// Else, this is a sync require call
+			else
+			{
+				pageImortedHandler( importResult );
+			}
 		}
 	}
 }
