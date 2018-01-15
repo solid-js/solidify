@@ -162,20 +162,34 @@ export class Router
 	// ------------------------------------------------------------------------- PROPERTIES
 
 	/**
-	 * The base is the HTTP path between your server and your app.
+	 * Application base.
 	 *
-	 * For example, if your app is installed here :
-	 * http://www.my-server.com/any-folder/to/my-app/
+	 * - Let empty to work in relative mode.
+	 * - No sub folders will be allowed in URLs after base.
+	 * - ex :
+	 * 		If application is installed here : http://domain.com/my-sub-folder/my-app/
+	 * 		Pages with URLs like http://domain.com/my-sub-folder/my-app/another-sub/my-page.html will not work.
 	 *
-	 * then your base is :
-	 * /any-folder/to/my-app/
+	 * OR
 	 *
-	 * Leading and trailing slash will be added if not present.
+	 * - Set path from domain name to application. Starting and ending with slash.
+	 * - ex :
+	 * 		If application is installed here : http://domain.com/my-sub-folder/my-app/
+	 * 		Base should be : "/my-sub-folder/my-app/"
+	 * - ex :
+	 * 		If application is installed here : http://domain.com/
+	 * 		Base should be : "/"
 	 */
 	protected static _base					:string;
 	static get base ():string { return this._base }
 	static set base (value:string)
 	{
+		// Auto base if empty
+		if (value == '')
+		{
+			value = StringUtils.getBaseFromPath( window.location.pathname );
+		}
+
 		// Add leading and trailing slash
 		value = StringUtils.leadingSlash(value, true);
 		value = StringUtils.trailingSlash(value, true);
