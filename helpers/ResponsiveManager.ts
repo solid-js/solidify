@@ -3,9 +3,7 @@ import {StringUtils} from "../utils/StringUtils";
 import {DOMUtils} from "../utils/DOMUtils";
 
 /**
- - !!! Trouver un moyen de mutualiser les valeurs de breakpoint. Depuis CSS vers JS ? Un fichier Properties.js ?
  - Une sorte de ResponsiveManager qui balance des signaux / event ça pourrait être cool car comme ça on peut setState les react
- - ResponsiveManager.configure(...) sinon voir si on peut pas injecter depuis less une div ou autre qui a les props qu'on peut lire en JS
  - S'inspirer de ça : https://github.com/contra/react-responsive
  - Faudrait une sorte de block react if / else pour que ça soit plus pratique
  */
@@ -206,8 +204,6 @@ export class ResponsiveManager
 
 	/**
 	 * Auto set breakpoints from LESS.
-	 * In fact less2js grunt plugin will convert less properties to JSON.
-	 * This JSON file is loaded and parsed.
 	 *
 	 * Note that breakpoints have to be named like so :
 	 * "breakpoints-%direction%-%breakpointName%"
@@ -220,21 +216,10 @@ export class ResponsiveManager
 	 * Ex, a valid breakpoint (in JSON :
 	 * "breakpoint-vertical-extraSmall" : "320px"
 	 *
-	 * Will throw an error if JSON file is not found in JsonFiles registry.
-	 *
-	 * @param pJSONPath You can change JSON path if needed.
+	 * @param pLessBreakpoints Key / value pair of breakpoints
 	 */
-	public autoSetBreakpointsFromLess (pJSONPath = 'src/common/config/Atoms')
+	public autoSetBreakpointsFromLess (pLessBreakpoints:{[index:string]:string})
 	{
-		// Check if this JsonFile exists
-		if (!(pJSONPath in JsonFiles))
-		{
-			throw new Error(`ResponsiveManager.autoSetBreakpointsFromLess // Json ${pJSONPath} not found in JsonFiles registry.`);
-		}
-
-		// Target breakpoints data
-		let lessBreakpoints = JsonFiles[pJSONPath];
-
 		// Browse directions
 		let directionIndex = -1;
 		while (++directionIndex in EDirection)
@@ -255,7 +240,7 @@ export class ResponsiveManager
 				let lessVarName = 'breakpoint-' + directionCamelName + '-' + breakpointCamelName;
 
 				// If this variable exists
-				if ( lessVarName in lessBreakpoints )
+				if ( lessVarName in pLessBreakpoints )
 				{
 					// Add breakpoint inside registry
 					this._breakpoints.push({
@@ -268,7 +253,7 @@ export class ResponsiveManager
 
 						// Parse value and extract pixel value
 						from : DOMUtils.cssToNumber(
-							lessBreakpoints[ lessVarName ]
+							pLessBreakpoints[ lessVarName ]
 						)[0]
 					});
 				}
@@ -287,7 +272,7 @@ export class ResponsiveManager
 	 * Will measure window and then update current breakpoints from those sizes.
 	 * @param pEvent Will dispatch signals if this event is not null
 	 */
-	protected windowResizeHandler (pEvent:JQueryEventObject)
+	protected windowResizeHandler (pEvent:Event)
 	{
 		// Register window size
 		this._currentWindowWidth = $(window).width();
@@ -306,6 +291,9 @@ export class ResponsiveManager
 		// And dispatch signals only if this method is dispatched from an event
 		this.updateCurrentBreakpoints( pEvent != null );
 		this.updateCurrentAspectRatio( pEvent != null );
+
+		// Zepto return
+		return false;
 	}
 
 
@@ -489,8 +477,8 @@ export class ResponsiveManager
 					// depending on pSearchNext parameters
 					&& (
 						pSearchNext
-						? breakpoint.from > pBreakpoint.from
-						: breakpoint.from < pBreakpoint.from
+							? breakpoint.from > pBreakpoint.from
+							: breakpoint.from < pBreakpoint.from
 					)
 
 					&&
@@ -501,8 +489,8 @@ export class ResponsiveManager
 						// Or we search for a breakpoint fitting in between
 						|| (
 							pSearchNext
-							? breakpoint.from < selectedBreakpoint.from
-							: breakpoint.from > selectedBreakpoint.from
+								? breakpoint.from < selectedBreakpoint.from
+								: breakpoint.from > selectedBreakpoint.from
 						)
 					)
 				)
@@ -620,8 +608,8 @@ export class ResponsiveManager
 				&&
 				(
 					pOrEqualTo
-					? (this._currentWindowWidth >= currentBreakpoint.from)
-					: (this._currentWindowWidth > currentBreakpoint.from)
+						? (this._currentWindowWidth >= currentBreakpoint.from)
+						: (this._currentWindowWidth > currentBreakpoint.from)
 				)
 
 			)
@@ -632,8 +620,8 @@ export class ResponsiveManager
 				&&
 				(
 					pOrEqualTo
-					? (this._currentWindowHeight >= currentBreakpoint.from)
-					: (this._currentWindowHeight > currentBreakpoint.from)
+						? (this._currentWindowHeight >= currentBreakpoint.from)
+						: (this._currentWindowHeight > currentBreakpoint.from)
 				)
 			)
 		);

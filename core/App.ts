@@ -1,5 +1,4 @@
 import {Disposable} from "./Disposable";
-import {EnvUtils} from "../utils/EnvUtils";
 
 export class App extends Disposable
 {
@@ -50,7 +49,7 @@ export class App extends Disposable
 	 */
 	protected initConfig ()
 	{
-		// Can be overridden
+
 	}
 
 
@@ -58,12 +57,11 @@ export class App extends Disposable
 
 	/**
 	 * Init env dependent stuff.
-	 * Will add env detection classes helpers to the body.
 	 * Can be overridden.
 	 */
 	protected initEnv ():void
 	{
-		EnvUtils.addClasses();
+
 	}
 
 
