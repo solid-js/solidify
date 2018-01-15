@@ -220,6 +220,9 @@ export class ResponsiveManager
 	 */
 	public autoSetBreakpointsFromLess (pLessBreakpoints:{[index:string]:string})
 	{
+		// Reset breakpoints list
+		this._breakpoints = [];
+
 		// Browse directions
 		let directionIndex = -1;
 		while (++directionIndex in EDirection)
