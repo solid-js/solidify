@@ -1,10 +1,53 @@
 export class StringUtils
 {
+	// ------------------------------------------------------------------------- FORMATTING
+
+	/**
+	 * Prepend a number by a fixed number of zeros.
+	 *
+	 * For ex :
+	 * - 17 can become 00017
+	 *
+	 * Useful to target sprites or some renamed files.
+	 *
+	 * @param {number} pTotalChars Total chars of output string (with added zeros)
+	 * @param {number} pNumber Base number
+	 * @param {number} pPlaceHolder zero char or something else ?
+	 * @returns {string} Zero formatted number.
+	 */
+	static zeroFormat (pTotalChars:number, pNumber:number, pPlaceHolder = '0'):string
+	{
+		// Convert number to string
+		let currentNumberAsString = pNumber.toString();
+
+		// Count chars
+		let totalCharsInCurrentNumber = currentNumberAsString.length;
+
+		// Formatted output
+		let output = '';
+
+		// If we miss some zeros
+		if (totalCharsInCurrentNumber < pTotalChars)
+		{
+			// Add corresponding number of zeros
+			const missingZeros = ( pTotalChars - totalCharsInCurrentNumber );
+			for (let i = 0; i < missingZeros; i ++)
+			{
+				output += pPlaceHolder;
+			}
+		}
+
+		// Return formatted string
+		return output + currentNumberAsString;
+	}
+
 	/**
 	 * Add or remove the trailing slash at the end of a path.
+	 *
 	 * For ex:
 	 * - "/lib/test" becomes "/lib/test/" if pAdd is true
 	 * - "/lib/test/" becomes "/lib/test" if pAdd is false
+	 *
 	 * @param pPath String path with or without trailing slash
 	 * @param pAdd Will add slash or remove slash.
 	 * @returns patched path with or without trailing slash
@@ -32,9 +75,11 @@ export class StringUtils
 
 	/**
 	 * Add or remove the leading slash at the start of a path.
+	 *
 	 * For ex:
 	 * - "lib/test/" becomes "/lib/test/" if pAdd is true
 	 * - "/lib/test/" becomes "lib/test/" if pAdd is false
+	 *
 	 * @param pPath String path with or without leading slash
 	 * @param pAdd Will add slash or remove slash.
 	 * @returns patched path with or without leading slash
@@ -62,6 +107,7 @@ export class StringUtils
 
 	/**
 	 * First letter capital on given string.
+	 *
 	 * For ex: "courgette? Oui!" become "Courgette, Oui!"
 	 */
 	static upperCaseFirstChar (pSource:string):string
@@ -71,6 +117,7 @@ export class StringUtils
 
 	/**
 	 * First letter in low case on given string.
+	 *
 	 * For ex: "Fromage? Oui!" become "fromage? Oui!"
 	 */
 	static lowerCaseFirstChar (pSource:string):string
@@ -80,6 +127,7 @@ export class StringUtils
 
 	/**
 	 * Convert a snake case formated string to a camel case format.
+	 *
 	 * Ex: "my-string" will be converted to "myString"
 	 */
 	static snakeToCamelCase (pSource:string, pSeparator:string = '-'):string
@@ -114,17 +162,14 @@ export class StringUtils
 	{
 		return pSource.replace(
 			/([A-Z])/g,
-			(part) =>
-			{
-				return (
-					pSeparator
-					+ (
-						pUpperCase
-						? part.toUpperCase()
-						: part.toLowerCase()
-					)
-				);
-			}
+			( part:string ) => (
+				pSeparator
+				+ (
+					pUpperCase
+					? part.toUpperCase()
+					: part.toLowerCase()
+				)
+			)
 		);
 	}
 
