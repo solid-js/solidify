@@ -8,14 +8,15 @@ export class App extends Disposable
 	 * App constructor.
 	 * Set pInitSequence if this is an Hot Module Reloading trigger.
 	 * @param {boolean} pInitSequence if true, will go through init method. If false, it will directly go to prepare and ready.
+	 * @param {any} pParams optionnel parameters, passed to prepare method.
 	 */
-	constructor ( pInitSequence:boolean )
+	constructor ( pInitSequence:boolean, pParams:any = null)
 	{
 		// Relay
 		super();
 
 		// Prepare app
-		this.prepare();
+		this.prepare( pParams );
 
 		// Launch init sequence
 		if ( pInitSequence )
@@ -38,7 +39,7 @@ export class App extends Disposable
 	 * Prepare App.
 	 * Can be overridden.
 	 */
-	protected prepare ()
+	protected prepare (pParams:any = null)
 	{
 
 	}
@@ -68,11 +69,12 @@ export class App extends Disposable
 	// ------------------------------------------------------------------------- ROUTING
 
 	/**
-	 * Init routes
+	 * Init routes.
+	 * Can be overridden.
 	 */
 	protected initRoutes ():void
 	{
-		throw new Error(`App.initRoutes // Please override App.initRoutes to map app routes.`);
+
 	}
 
 
