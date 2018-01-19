@@ -369,10 +369,10 @@ export class EnvUtils
 			let $domRoot = $(pToSelector);
 
 			// Add env properties classes
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowser[EnvUtils.__BROWSER]				, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EBrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EDeviceType[EnvUtils.__DEVICE_TYPE]		, '_'));
-			$domRoot.addClass(pPrefix + 'is-' + StringUtils.snakeToCamelCase(EPlatform[EnvUtils.__PLATFORM]				, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.dashToCamelCase(EBrowser[EnvUtils.__BROWSER]				, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.dashToCamelCase(EBrowserEngine[EnvUtils.__BROWSER_ENGINE]	, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.dashToCamelCase(EDeviceType[EnvUtils.__DEVICE_TYPE]		, '_'));
+			$domRoot.addClass(pPrefix + 'is-' + StringUtils.dashToCamelCase(EPlatform[EnvUtils.__PLATFORM]				, '_'));
 
 			// Add capabilites
 			for (let i in EnvUtils.__CAPABILITIES)

@@ -126,17 +126,17 @@ export class StringUtils
 	}
 
 	/**
-	 * Convert a snake case formated string to a camel case format.
+	 * Convert a dash case formated string to a camel case format.
 	 *
 	 * Ex: "my-string" will be converted to "myString"
 	 */
-	static snakeToCamelCase (pSource:string, pSeparator:string = '-'):string
+	static dashToCamelCase (pSource:string, pSeparator:string = '-'):string
 	{
 		// Seperate dashs
 		let splitted = pSource.toLowerCase().split(pSeparator);
 		let total = splitted.length;
 
-		// Return raw if it's not a snake
+		// Return raw if it's not a dash
 		if (total < 2) return pSource.toLowerCase();
 
 		// The first is not uppercase
@@ -152,13 +152,13 @@ export class StringUtils
 	}
 
 	/**
-	 * Convert camelCase to snake_case or snake-case or SNAKE_CASE and event SNAKE-CASE
+	 * Convert camelCase to dash_case or dash-case or DASH_CASE and event DASH-CASE
 	 * @param pSource camelCase string
 	 * @param pSeparator Used separator between words. Default is dash -
 	 * @param pUpperCase If we have to uppercase every words. Default is no thanks.
-	 * @returns {string} snake_case_string
+	 * @returns {string} dash-case-string or dash_case_string
 	 */
-	static camelToSnakeCase (pSource:string, pSeparator = '-', pUpperCase = false):string
+	static camelToDashCase (pSource:string, pSeparator = '-', pUpperCase = false):string
 	{
 		return pSource.replace(
 			/([A-Z])/g,
@@ -174,29 +174,29 @@ export class StringUtils
 	}
 
 	/**
-	 * Convertir un enum en string, camelCase ou snakeCase.
+	 * Convertir un enum en string, camelCase ou dash-case.
 	 * Va convertir un EMonEnum.MA_VALEUR en "maValeur" ou "ma-valeur"
 	 * @param pEnumValue La valeur de l'enum ( EMonEnum.MA_VALEUR )
 	 * @param pEnumClass La classe de l'enum ( EMonEnum )
 	 * @param pCamelCase si true on ressort "maValeur" si false on ressort "ma-valeur"
-	 * @returns {string} Le nom en camelCase ou snake-case
+	 * @returns {string} Le nom en camelCase ou dash-case
 	 */
 	static enumToString (pEnumValue:number, pEnumClass:Object, pCamelCase = true):string
 	{
 		// On récupère le string en underscore depuis notre enum
 		let enumStringValue = pEnumClass[pEnumValue] as string;
 
-		// On converti en snakeCase
-		let enumSnakeValue = enumStringValue.toLowerCase().split('_').join('-');
+		// On converti en dashCase
+		let enumDashValue = enumStringValue.toLowerCase().split('_').join('-');
 
-		// On retourne en camel ou en snake
-		return pCamelCase ? StringUtils.snakeToCamelCase(enumSnakeValue) : enumSnakeValue;
+		// On retourne en camel ou en dash
+		return pCamelCase ? StringUtils.dashToCamelCase(enumDashValue) : enumDashValue;
 	}
 
 	/**
 	 * Trouver un index enum depuis son nom en string.
 	 * Ne prend en charge que le nom exacte de l'enum, par exemple ENum.MY_VALUE sera associé uniquement avec le string "MY_VALUE"
-	 * Cette méthode va convertir automatiquement le snake-case vers FORMAT_ENUM
+	 * Cette méthode va convertir automatiquement le dash-case vers FORMAT_ENUM
 	 * Retourne -1 si la valeur n'a pas été trouvée.
 	 * @param pString Le nom de la valeur à trouver, par ex : "MY_VALUE"
 	 * @param pEnumClass La classe de l'enum, par ex: ENum
@@ -204,7 +204,7 @@ export class StringUtils
 	 */
 	static stringToEnum (pString:string, pEnumClass:Object):number
 	{
-		// Patcher notre snake-case
+		// Patcher notre dash-case
 		let patchedString = pString.toUpperCase().split('-').join('_');
 
 		// Parcourir tous les indexs

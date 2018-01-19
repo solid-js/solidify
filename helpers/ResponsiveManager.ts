@@ -229,7 +229,7 @@ export class ResponsiveManager
 		{
 			// Get direction name
 			let directionEnumName = EDirection[ directionIndex ];
-			let directionCamelName = StringUtils.snakeToCamelCase(directionEnumName, '_');
+			let directionCamelName = StringUtils.dashToCamelCase(directionEnumName, '_');
 
 			// Browse breakpoints for each direction
 			let breakpointIndex = -1;
@@ -237,7 +237,7 @@ export class ResponsiveManager
 			{
 				// Get breakpoint name
 				let breakpointEnumName = EBreakpointName[ breakpointIndex ];
-				let breakpointCamelName = StringUtils.snakeToCamelCase(breakpointEnumName, '_');
+				let breakpointCamelName = StringUtils.dashToCamelCase(breakpointEnumName, '_');
 
 				// Name of this breakpoint and direction inside less file
 				let lessVarName = 'breakpoint-' + directionCamelName + '-' + breakpointCamelName;
