@@ -164,12 +164,13 @@ export class SolidBundles
 	{
 		// Create script tag
 		let scriptTag = document.createElement('script');
-
-		// Get bundle path from injected env
+		
+		// Get base path and bundle path from injected env
+		const basePath = process.env['BASE'];
 		const bundlePath = process.env['BUNDLE_PATH'];
 
 		// Target bundle file
-		scriptTag.setAttribute('src', `${bundlePath}${pBundleName}.js`);
+		scriptTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.js`);
 
 		// Add to head and start loading
 		document.head.appendChild(scriptTag);
