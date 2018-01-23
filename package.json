@@ -1,6 +1,6 @@
 {
   "name": "solidify-lib",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Solidify typescript framework for robust and modular web applications",
   "main": "index.js",
   "scripts": {

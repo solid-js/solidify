@@ -209,9 +209,8 @@ export class SolidBundles
 	 * Register an app init and get count.
 	 * This is to avoid double init of bundles when Hot Module Reloaded is restarting app.
 	 * @param {string} pAppBundleName App bundle name to count.
-	 * @returns {number} Total init count. If 0, this is not an HMR reloading.
 	 */
-	static registerAppBundleInit (pAppBundleName:string):number
+	static registerAppBundleInit (pAppBundleName:string)
 	{
 		// Init counter
 		if ( !(pAppBundleName in SolidBundles.__appBundleInitCount) )
@@ -224,8 +223,15 @@ export class SolidBundles
 		{
 			SolidBundles.__appBundleInitCount[ pAppBundleName ] ++;
 		}
+	}
 
-		// Return total
+	/**
+	 * Get app bundle init count to know if we are in first init or Hot Module Reloading.
+	 * @param {string} pAppBundleName App bundle name to count.
+	 * @returns {number} Total init count. If 0, this is not an Hot Module Reloading.
+	 */
+	static getAppBundleInitCount (pAppBundleName:string):number
+	{
 		return SolidBundles.__appBundleInitCount[ pAppBundleName ];
 	}
 }
