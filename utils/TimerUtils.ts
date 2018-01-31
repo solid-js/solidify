@@ -16,7 +16,9 @@ export class TimerUtils
 	{
 		if (!('requestAnimationFrame' in window))
 		{
-			window.requestAnimationFrame = (
+			// We add a exclamation mark here because typescript is lost somehow ...
+			// https://stackoverflow.com/questions/44147937/property-does-not-exist-on-type-never
+			window!.requestAnimationFrame = (
 				window['webkitRequestAnimationFrame'] ||
 				window['mozRequestAnimationFrame'] ||
 				window['oRequestAnimationFrame'] ||
