@@ -34,6 +34,17 @@ export class MathUtils
 		return pAngle / 180 * Math.PI;
 	}
 
+	/**
+	 * Normalize an angle to be between -Math.PI and +Math.PI
+	 */
+	static normalizeAngle (pAngle:number):number
+	{
+		return MathUtils.positiveModulo(
+			pAngle + Math.PI,
+			Math.PI * 2
+		) - Math.PI;
+	}
+
 
 	// ------------------------------------------------------------------------- RANGE UTILS
 
