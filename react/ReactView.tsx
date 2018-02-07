@@ -65,7 +65,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
 		{
-			throw new Error(`ReactView.getNode // Ref '${pRefName}' not found.`);
+			return null;
 		}
 
 		// Target DOM node
