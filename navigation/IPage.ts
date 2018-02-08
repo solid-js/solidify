@@ -1,11 +1,28 @@
 import {IActionParameters} from "./Router";
 
+
+/**
+ * Allowed playIn / playOut states for IPage
+ */
+export enum EPagePlayState
+{
+	IDLE,
+	PLAYING_IN,
+	PLAYING_OUT
+}
+
+
 /**
  * Interface for page.
  * It can be triggered from route and managed by an IPageStack
  */
 export interface IPage
 {
+	/**
+	 * Current play in / play out state of the page.
+	 */
+	readonly playState:EPagePlayState;
+
 	/**
 	 * Action on this page.
 	 * Have to check props.action and props.params to show proper content.

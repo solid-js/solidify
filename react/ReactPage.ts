@@ -1,5 +1,5 @@
 import {ReactView} from "./ReactView";
-import {IPage} from "../navigation/IPage";
+import {EPagePlayState, IPage} from "../navigation/IPage";
 
 /**
  * Default interface for page properties
@@ -13,11 +13,11 @@ export interface ReactPageProps
 export class ReactPage<Props, States> extends ReactView<Props, States> implements IPage
 {
 	/**
-	 * Animating lock. Is true when animating with playIn or playOut.
-	 * Use this lock to disable features when animating.
+	 * Current play in / play out state of the page.
+	 * Use this state to disable features when animating.
 	 */
-	get animating ():boolean { return this._animating; }
-	protected _animating:boolean;
+	get playState ():EPagePlayState { return this._playState; }
+	protected _playState:EPagePlayState;
 	
 
 	/**
@@ -65,13 +65,13 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 		return new Promise( resolve =>
 		{
 			// Lock animating
-			this._animating = true;
+			this._playState = EPagePlayState.PLAYING_IN;
 
-			// Execute promise
+			// Execute page animation
 			this.playInPromiseHandler( () =>
 			{
 				// Unlock animating
-				this._animating = false;
+				this._playState = EPagePlayState.IDLE;
 
 				// Resolve promise
 				resolve();
@@ -92,12 +92,13 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 		return new Promise( resolve =>
 		{
 			// Lock animating
-			this._animating = true;
+			this._playState = EPagePlayState.PLAYING_OUT;
 
+			// Execute page animation
 			this.playOutPromiseHandler( () =>
 			{
 				// Unlock animating
-				this._animating = false;
+				this._playState = EPagePlayState.IDLE;
 
 				// Resolve promise
 				resolve();
