@@ -63,31 +63,40 @@ export class DOMUtils
 	}
 
 	/**
-	 * Get the height of an element at size 'auto'.
-	 * Will measure height at auto and rollback to previous height in a blink.
-	 * Element have to be in DOM. Preferable to have it visible (with no display:none parents)
-	 * @param pElement The element to measure.
-	 * @returns {number} The height in pixels
+	 * Measure the size pixel value of an element with a dynamic size.
+	 * Width and height only can be measured in px. No background positions.
+	 * Dynamic sizes can be things like 'auto', '50%', '3em', '3vw'
+	 * @param pElement The DOM element to measure.
+	 * @param pPropertyName width or height only
+	 * @param pDynamicSize Dynamic size to measure. 'auto', '50%', '3em', '3vw' ...
+	 * @throws Error if pPropertyName is not valid.
+	 * @returns {number} Measured size in px.
 	 */
-	static getAutoHeight (pElement:Element):number
+	static getPixelSizeFromDynamicSize (pElement:Element, pPropertyName = 'height', pDynamicSize: 'auto'):number
 	{
-		// Wrap element with zepto
-		let $element = $( pElement );
+		// Check property name
+		if (pPropertyName != 'width' && pPropertyName != 'height')
+		{
+			throw new Error(`DOMUtils.getPixelSizeFromDynamicSize // Only width and height are valid size properties.`);
+		}
 
-		// Get the current height value
-		let currentHeightValue = $element.css('height');
+		// Target element as a jquery / zepto collection
+		const $element = $( pElement );
 
-		// Set to auto
-		$element.css({height: 'auto'});
+		// Get current declared css value
+		const currentValue = $element.css( pPropertyName );
 
-		// Measure the auto height
-		let descriptionHeight = $element.height();
+		// Set dynamic value to measure
+		$element.css(pPropertyName, pDynamicSize);
+
+		// Measure size in px
+		const pixelValue = $element[ pPropertyName ]();
 
 		// Roll back to the first measured height value
-		$element.css({height: currentHeightValue});
+		$element.css(pPropertyName, currentValue);
 
-		// Return auto height
-		return descriptionHeight;
+		// Return measured value
+		return pixelValue;
 	}
 
 	/**

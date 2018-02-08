@@ -58,6 +58,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	/**
 	 * Get a DOM Node from a ref name
 	 * @param {string} pRefName Ref name declared as string.
+	 * @throws Error if ref does not exists. To get refs without throws, you can use $ method.
 	 * @returns {Element} DOM Node
 	 */
 	protected getNode (pRefName:string):Element
@@ -65,11 +66,42 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
 		{
-			return null;
+			throw new Error(`ReactView.getComponent // Ref ${pRefName} not found.`);
 		}
 
 		// Target DOM node
 		return ReactDOM.findDOMNode( this.refs[pRefName] );
+	}
+
+	/**
+	 * Get a DOM Node collection from ref names.
+	 * Will not throw anything if ref does not exists.
+	 * @param pRefNames List of all refs to target. Will fail silently if a ref is not found.
+	 * @returns A DOM element collection.
+	 */
+	protected $ (pRefNames:string[]|string):Element[]
+	{
+		// Patch array argument if only a string is given
+		if (typeof pRefNames === 'string')
+		{
+			pRefNames = [pRefNames];
+		}
+
+		// Browse ref list
+		const collection = [];
+		pRefNames.map( refName =>
+		{
+			// Do not throw if ref is not found, ignore
+			if ( !(refName in this.refs) ) return;
+			
+			// Add to collection
+			collection.push(
+				ReactDOM.findDOMNode( this.refs[ refName ] )
+			);
+		});
+
+		// Return clean collection
+		return collection;
 	}
 
 	/**
@@ -82,7 +114,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
 		{
-			throw new Error(`ReactView.getComponent // Ref '${pRefName}' not found.`);
+			throw new Error(`ReactView.getComponent // Ref ${pRefName} not found.`);
 		}
 
 		// Get ref from refs collection
@@ -91,7 +123,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		// Check if this ref is not a DOM node
 		if ('tagName' in ref)
 		{
-			throw new Error(`ReactView.getComponent // Trying to get a DOM node as a React component from ref '${pRefName}'.`);
+			throw new Error(`ReactView.getComponent // Trying to get a DOM node as a React component from ref ${pRefName}.`);
 		}
 
 		// Return correctly type component
