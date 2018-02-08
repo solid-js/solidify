@@ -20,6 +20,7 @@ export interface IPage
 {
 	/**
 	 * Current play in / play out state of the page.
+	 * Use this state to disable features when animating.
 	 */
 	readonly playState:EPagePlayState;
 
