@@ -6,7 +6,7 @@ import {IActionParameters} from "./Router";
  */
 export enum EPagePlayState
 {
-	IDLE,
+	VISIBLE,
 	PLAYING_IN,
 	PLAYING_OUT
 }

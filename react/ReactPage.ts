@@ -71,7 +71,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 			this.playInPromiseHandler( () =>
 			{
 				// Unlock animating
-				this._playState = EPagePlayState.IDLE;
+				this._playState = EPagePlayState.VISIBLE;
 
 				// Resolve promise
 				resolve();
@@ -98,7 +98,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 			this.playOutPromiseHandler( () =>
 			{
 				// Unlock animating
-				this._playState = EPagePlayState.IDLE;
+				this._playState = null;
 
 				// Resolve promise
 				resolve();
