@@ -281,7 +281,12 @@ export class ResponsiveManager
 		this._currentWindowWidth = $(window).width();
 		this._currentWindowHeight = $(window).height();
 
-		// Dispatch new window size if we have an evet
+		// Update current breakpoints and aspect ratio from those sizes
+		// And dispatch signals only if this method is dispatched from an event
+		this.updateCurrentBreakpoints( pEvent != null );
+		this.updateCurrentAspectRatio( pEvent != null );
+
+		// Dispatch new window size if we have an event
 		if (pEvent != null)
 		{
 			this._onWindowSizeChanged.dispatch(
@@ -289,11 +294,6 @@ export class ResponsiveManager
 				this._currentWindowHeight
 			);
 		}
-
-		// Update current breakpoints and aspect ratio from those sizes
-		// And dispatch signals only if this method is dispatched from an event
-		this.updateCurrentBreakpoints( pEvent != null );
-		this.updateCurrentAspectRatio( pEvent != null );
 
 		// Zepto return
 		return false;
