@@ -293,6 +293,9 @@ export class Router
 
 	// If this is our first track, because we have to ignore it
 	protected static _firstPageView = true;
+	
+	// GTAG id from dataLayer
+	protected static _gtagId		:string;
 
 	/**
 	 * Track current page for google analytics
@@ -300,22 +303,80 @@ export class Router
 	protected static trackCurrentPage ()
 	{
 		// Do not track first page view because we already fired it from DOM
-		if (this._firstPageView)
+		if ( this._firstPageView )
 		{
 			this._firstPageView = false;
 			return;
 		}
 
-		// FIXME : Vérifier que c'est bien _currentPath qu'il faut envoyer ou alors le path sans base ?
+		// Page path, starting with a /
+		// @see : https://developers.google.com/analytics/devguides/collection/gtagjs/pages
+		const path = StringUtils.leadingSlash(this._currentPath, true);
 
-		// Si la librairie est chargée
+		// If old GA lib is loaded
 		if ('ga' in window)
 		{
-			console.info('Router.trackingPage // ' + this._currentPath);
-
-			// Signaler à google analytics
-			window['ga']('send', 'pageview', this._currentPath);
+			// Track page view
+			window['ga']('send', 'pageview', path);
 		}
+
+		// If GTAG library is loaded
+		if ( typeof window['gtag'] == 'function' && 'dataLayer' in window )
+		{
+			// Target dataLayer object
+			const dataLayer = (window['dataLayer'] as any[]);
+
+			// If gtag id is not gathered yet
+			if (this._gtagId == null)
+			{
+				// Browse dataLayer infos until we found it
+				for (var i in dataLayer)
+				{
+					if (dataLayer[i][0] == 'config')
+					{
+						// Registrer the gtag id
+						this._gtagId = dataLayer[i][1];
+						break;
+					}
+				}
+			}
+
+			// Track page view
+			window['gtag']('config', this._gtagId, {
+				page_title : document.getElementsByTagName('title')[0].text,
+				page_path: path
+			});
+		}
+	}
+
+	/**
+	 * Track a GTAG event.
+	 * @see : https://developers.google.com/analytics/devguides/collection/gtagjs/events
+	 * @param {string} pAction Action sent with the event. Mandatory.
+	 * @param {string} pCategory Category of event. Default is 'general'.
+	 * @param {string} pLabel Additionnal label. Optionnal.
+	 * @param {number} pValue Non negative integer. Optionnal.
+	 * @param {number} pNonInteraction @see https://support.google.com/analytics/answer/1033068#NonInteractionEvents
+	 */
+	static trackEvent (pAction:string, pCategory?:string, pLabel?:string, pValue?:number, pNonInteraction:boolean = false)
+	{
+		if ( typeof window['gtag'] != 'function' ) return;
+
+		// Data associated with event
+		const eventData = {
+			event_category: pCategory,
+			event_label: pLabel,
+			value: pValue
+		};
+
+		// Only add non interaction data if true
+		if ( pNonInteraction )
+		{
+			eventData['non_interaction'] = true;
+		}
+
+		// Track event
+		window['gtag']('event', pAction, eventData);
 	}
 
 
