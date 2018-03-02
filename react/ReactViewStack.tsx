@@ -80,6 +80,9 @@ interface Props
 	 * @param pPageName
 	 */
 	onNotFound       	?: (pPageName:string) => void
+
+
+	onLoadStateChanged	?: (pLoading?:boolean) => void
 }
 
 interface States
@@ -380,8 +383,14 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		if (pPageName != null)
 		{
 			// When page is imported
-			const pageImortedHandler = (moduleExports) =>
+			const pageImortedHandler = (moduleExports, pDiscardStateChanged = false) =>
 			{
+				// Loading state changed, we are not loading anymore
+				if ( pDiscardStateChanged && this.props.onLoadStateChanged != null )
+				{
+					this.props.onLoadStateChanged( false );
+				}
+
 				// If this is a string
 				// We certainly loaded a 404 ...
 				if (typeof moduleExports === 'string')
@@ -436,6 +445,9 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			// If this is a promise from an async import
 			if (importResult instanceof Promise)
 			{
+				// Loading state changed, we are loading
+				this.props.onLoadStateChanged != null && this.props.onLoadStateChanged( true );
+
 				// Catch errors
 				importResult.catch( error =>
 				{
@@ -453,7 +465,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			// Else, this is a sync require call
 			else
 			{
-				pageImortedHandler( importResult );
+				pageImortedHandler( importResult, true );
 			}
 		}
 	}
