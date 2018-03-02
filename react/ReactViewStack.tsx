@@ -386,7 +386,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			const pageImortedHandler = (moduleExports, pDiscardStateChanged = false) =>
 			{
 				// Loading state changed, we are not loading anymore
-				if ( pDiscardStateChanged && this.props.onLoadStateChanged != null )
+				if ( !pDiscardStateChanged && this.props.onLoadStateChanged != null )
 				{
 					this.props.onLoadStateChanged( false );
 				}
