@@ -57,7 +57,7 @@ interface ITransitionControl
 	 * @param pOldPage Old page instance
 	 * @param pNewPage New page instance
 	 */
-	($oldPage:Element, $newPage:Element, pOldPage:IPage, pNewPage:IPage) : Promise<any>;
+	($oldPage:HTMLElement, $newPage:HTMLElement, pOldPage:IPage, pNewPage:IPage) : Promise<any>;
 }
 
 interface Props

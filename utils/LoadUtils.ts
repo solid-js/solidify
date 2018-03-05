@@ -2,26 +2,26 @@ export class LoadUtils
 {
 	/**
 	 * Will check if an image is loaded.
-	 * Will only check element 0 of the jQuery target.
-	 * @param $pElement JQuery targeting image element. Will only check first one.
+	 * Will only check element 0 of the zepto target.
+	 * @param $pElement Zepto targeting image element. Will only check first one.
 	 * @returns {boolean|any} true if image is loaded.
 	 */
-	static checkCompleteAttribute ($pElement:JQuery):boolean
+	static checkCompleteAttribute ($pElement:Zepto):boolean
 	{
 		return (0 in $pElement && 'complete' in $pElement[0] && $pElement[0]['complete']);
 	}
 
 	/**
-	 * This method is a patch for jQuery.load.
-	 * With jQuery, if you listen image loading, it will fail if images are retrieved from the cache,
+	 * This method is a patch for zepto.load.
+	 * With zepto, if you listen image loading, it will fail if images are retrieved from the cache,
 	 * or if images are loaded before you start the listener.
 	 * This will just check if the image is already loaded on handler attachment. Simple.
-	 * @param $pElement The jQuery element you want to check. Only image, only one element.
+	 * @param $pElement The zepto element you want to check. Only image, only one element.
 	 * @param pHandler Called when image is loaded. Element will be passed on first parameter, and event as second argument if available.
 	 */
-	static patchedImageLoad ($pElement:JQuery, pHandler:($pElement:JQuery, pEvent:JQueryEventObject) => void)
+	static patchedImageLoad ($pElement:Zepto, pHandler:($pElement:Zepto, pEvent:Event) => void)
 	{
-		// Check our jQuery target. Not null and have to target one element. We do not check if it's an image at this point.
+		// Check our zepto target. Not null and have to target one element. We do not check if it's an image at this point.
 		if ($pElement == null || $pElement.length != 1) throw new Error('LoadUtils.patchedOnLoad // $pElement need to target only one DOM element.');
 
 		// Check if the complete property exists and is set to true
@@ -44,7 +44,7 @@ export class LoadUtils
 	 * @param pAppendToBody Will append image to body if true, false by default. Keep image in memory for ever.
 	 * @param pRemove Will remove image after pre-loaded. false by default. For legacy purpose.
 	 */
-	static preloadImages (pURLs:string[], pHandler:(pImages:Element[]) => void, pAppendToBody = false, pRemove = false):JQuery[]
+	static preloadImages (pURLs:string[], pHandler:(pImages:HTMLElement[]) => void, pAppendToBody = false, pRemove = false):Zepto[]
 	{
 		// Count images
 		let total = pURLs.length;
@@ -54,7 +54,7 @@ export class LoadUtils
 		let images:HTMLImageElement[] = [];
 
 		// Called when an image is loaded
-		let handler = function ($pElement:JQuery)
+		let handler = function ($pElement:Zepto)
 		{
 			// Add image element to list
 			images.push($pElement[0] as HTMLImageElement);

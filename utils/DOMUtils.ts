@@ -72,7 +72,7 @@ export class DOMUtils
 	 * @throws Error if pPropertyName is not valid.
 	 * @returns {number} Measured size in px.
 	 */
-	static getPixelSizeFromDynamicSize (pElement:Element, pPropertyName = 'height', pDynamicSize: 'auto'):number
+	static getPixelSizeFromDynamicSize (pElement:HTMLElement, pPropertyName = 'height', pDynamicSize: 'auto'):number
 	{
 		// Check property name
 		if (pPropertyName != 'width' && pPropertyName != 'height')
@@ -143,7 +143,7 @@ export class DOMUtils
 	 * @param pElement The element to check
 	 * @returns {[number,number]} Will return an array with width and height values.
 	 */
-	static getGlobalScale (pElement:Element):number[]
+	static getGlobalScale (pElement:HTMLElement):number[]
 	{
 		return [
 			pElement.getBoundingClientRect().width / pElement['offsetWidth'],

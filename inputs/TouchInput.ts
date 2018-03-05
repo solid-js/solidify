@@ -44,7 +44,7 @@ export interface TouchPoint
 	inputType		:EInputTypes;
 
 	// The target used
-	target			:Element;
+	target			:HTMLElement;
 
 	// Event creating this touch point
 	originalEvent	:UIEvent;
@@ -98,8 +98,8 @@ export class TouchDispatcher extends Disposable
 	/**
 	 * DOM Element target listening events
 	 */
-	protected _target						:Element;
-	get target ():Element { return this._target; }
+	protected _target						:HTMLElement;
+	get target ():HTMLElement { return this._target; }
 
 	/**
 	 * Allowed input types
@@ -157,7 +157,7 @@ export class TouchDispatcher extends Disposable
 	 * @param pTarget DOM Element used to listen events
 	 * @param pEInputTypes Allowed input types (look at the InputType enum). Can be multiple input types with the pipe | operator on enum (EInputTypes.TOUCH | EInputTypes.MOUSE) for example.
 	 */
-	constructor (pDelegate:ITouchInputDelegate, pTarget:Element, pEInputTypes:number = EInputTypes.TOUCH | EInputTypes.MOUSE)
+	constructor (pDelegate:ITouchInputDelegate, pTarget:HTMLElement, pEInputTypes:number = EInputTypes.TOUCH | EInputTypes.MOUSE)
 	{
 		// Relay
 		super();
@@ -300,7 +300,7 @@ export class TouchDispatcher extends Disposable
 					? (pOriginalPoint as FakeTouch).inputType
 					: EInputTypes.TOUCH
 				),
-				target			: (pEvent.target as Element),
+				target			: (pEvent.target as HTMLElement),
 				x				: pOriginalPoint.clientX,
 				y				: pOriginalPoint.clientY,
 				deltaX			: 0,

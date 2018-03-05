@@ -59,9 +59,9 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * Get a DOM Node from a ref name
 	 * @param {string} pRefName Ref name declared as string.
 	 * @throws Error if ref does not exists. To get refs without throws, you can use $ method.
-	 * @returns {Element} DOM Node
+	 * @returns {HTMLElement} DOM Node
 	 */
-	protected getNode (pRefName:string):Element
+	protected getNode (pRefName:string):HTMLElement
 	{
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
@@ -79,7 +79,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @param pRefNames List of all refs to target. Will fail silently if a ref is not found.
 	 * @returns A DOM element collection.
 	 */
-	protected $ (pRefNames:string[]|string):Element[]
+	protected $ (pRefNames:string[]|string):HTMLElement[]
 	{
 		// Patch array argument if only a string is given
 		if (typeof pRefNames === 'string')
@@ -131,8 +131,8 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	}
 
 	/**
+	 * Usage : ref={ r => this.refNodes('refName', index, r) }
 	 * Ref object in a array of components and as an Element Collection.
-	 * Have to be called with ref JSX parameter, like this : ref={this.refNodes.bind(this, 'name', key)}
 	 * Will store an Component collection called _name in this.
 	 * Will store an Element collection called $name in this.
 	 *
@@ -142,7 +142,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @param pComponent The component sent by react ref.
 	 * @param pKey Key of the component, as number only
 	 */
-	protected refNodes (pRefName:string, pKey:number, pComponent:React.Component):void
+	protected refNodes (pRefName:string, pKey:number, pComponent:React.Component|HTMLElement):void
 	{
 		// Get collections names
 		const componentCollectionName = '_' + pRefName;
