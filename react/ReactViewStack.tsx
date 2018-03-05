@@ -211,8 +211,8 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 				// Call transition control handler with old and new pages instances
 				// Listen when finished through promise
 				this.props.transitionControl(
-					ReactDOM.findDOMNode( this._oldPage as any ),
-					ReactDOM.findDOMNode( this._currentPage as any ),
+					ReactDOM.findDOMNode( this._oldPage as any ) as HTMLElement,
+					ReactDOM.findDOMNode( this._currentPage as any ) as HTMLElement,
 					this._oldPage,
 					this._currentPage
 				)

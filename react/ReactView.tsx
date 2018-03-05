@@ -70,7 +70,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		}
 
 		// Target DOM node
-		return ReactDOM.findDOMNode( this.refs[pRefName] );
+		return ReactDOM.findDOMNode( this.refs[pRefName] ) as HTMLElement;
 	}
 
 	/**
