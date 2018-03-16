@@ -205,6 +205,12 @@ export class Router
 	static get routes ():IRoute[] { return this._routes; }
 
 	/**
+	 * With fake mode, Router is working without address bar. Usefull when embedded inside a web view for example.
+	 */
+	protected static _fakeMode				:boolean
+	static get fakeMode ():boolean { return this._fakeMode; }
+
+	/**
 	 * Current path, including base.
 	 */
 	protected static _currentPath			:string;
@@ -237,8 +243,9 @@ export class Router
 	 * Please use before accessing with singleton static methods.
 	 * @param pBase The base of the app from the server. @see Router.base
 	 * @param pRoutes List of declared routes.
+	 * @param pFakeMode With fake mode, Router is working without address bar. Usefull when embedded inside a web view for example.
 	 */
-	static init (pBase:string = '', pRoutes:IRoute[] = null)
+	static init (pBase:string = '', pRoutes:IRoute[] = null, pFakeMode = false)
 	{
 		// Set base
 		this.base = pBase;
@@ -246,8 +253,20 @@ export class Router
 		// Add routes
 		this.addRoutes(pRoutes);
 
+		// Record fakemode
+		this._fakeMode = pFakeMode;
+
+		// In fake mode, init current path
+		if ( this._fakeMode )
+		{
+			this._currentPath = '';
+		}
+
 		// Listen to popstate
-		window.addEventListener('popstate', this.popStateHandler );
+		else
+		{
+			window.addEventListener('popstate', this.popStateHandler );
+		}
 	}
 
 
@@ -293,7 +312,7 @@ export class Router
 
 	// If this is our first track, because we have to ignore it
 	protected static _firstPageView = true;
-	
+
 	// GTAG id from dataLayer
 	protected static _gtagId		:string;
 
@@ -542,8 +561,11 @@ export class Router
 		// If router is running
 		if (this._isStarted)
 		{
-			// Record path
-			this._currentPath = location.pathname;
+			// Record path from address bar if we are not in fake mode
+			if (!this._fakeMode)
+			{
+				this._currentPath = location.pathname;
+			}
 
 			// Track analytics
 			this.trackCurrentPage();
@@ -824,10 +846,19 @@ export class Router
 		// Prevent route changing if this is the same URL
 		if (this._currentPath == pURL && !pForce) return;
 
-		// Change URL and add to history or replace
-		pAddToHistory
-		? window.history.pushState(null, null, pURL)
-		: window.history.replaceState(null, null, pURL);
+		// In fake mode
+		if (this._fakeMode)
+		{
+			// Set fake URL
+			this._currentPath = pURL;
+		}
+		else
+		{
+			// Change URL and add to history or replace
+			pAddToHistory
+			? window.history.pushState(null, null, pURL)
+			: window.history.replaceState(null, null, pURL);
+		}
 
 		// Update route
 		this.updateCurrentRoute();
