@@ -80,7 +80,7 @@ export class UnityGateway
 			else
 			{
 				// Attendre que la promesse soit passé
-				TweenLite.delayedCall(.3, () =>
+				TweenLite.delayedCall(.1, () =>
 				{
 					// Appeler la réponse en spécifiant qu'on est pas Unity
 					resolve({
@@ -101,6 +101,6 @@ export class UnityGateway
 		console.info('UnityGateway.callWebView', rest);
 
 		// Relayer au signal
-		UnityGateway.onMessage.dispatch( rest );
+		UnityGateway.onMessage.dispatch( ...rest );
 	}
 }
