@@ -79,7 +79,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @param pRefNames List of all refs to target. Will fail silently if a ref is not found.
 	 * @returns A DOM element collection.
 	 */
-	protected $ (pRefNames:string[]|string):Element[]|HTMLELement[]
+	protected $ (pRefNames:string[]|string):Element[]|HTMLElement[]
 	{
 		// Patch array argument if only a string is given
 		if (typeof pRefNames === 'string')
