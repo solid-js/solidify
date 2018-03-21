@@ -59,9 +59,9 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * Get a DOM Node from a ref name
 	 * @param {string} pRefName Ref name declared as string.
 	 * @throws Error if ref does not exists. To get refs without throws, you can use $ method.
-	 * @returns {HTMLElement} DOM Node
+	 * @returns DOM Node
 	 */
-	protected getNode (pRefName:string):HTMLElement
+	protected getNode (pRefName:string):Element|HTMLElement
 	{
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
@@ -70,7 +70,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		}
 
 		// Target DOM node
-		return ReactDOM.findDOMNode( this.refs[pRefName] ) as HTMLElement;
+		return ReactDOM.findDOMNode( this.refs[pRefName] );
 	}
 
 	/**
@@ -79,7 +79,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @param pRefNames List of all refs to target. Will fail silently if a ref is not found.
 	 * @returns A DOM element collection.
 	 */
-	protected $ (pRefNames:string[]|string):HTMLElement[]
+	protected $ (pRefNames:string[]|string):Element[]|HTMLELement[]
 	{
 		// Patch array argument if only a string is given
 		if (typeof pRefNames === 'string')
@@ -93,7 +93,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		{
 			// Do not throw if ref is not found, ignore
 			if ( !(refName in this.refs) ) return;
-			
+
 			// Add to collection
 			collection.push(
 				ReactDOM.findDOMNode( this.refs[ refName ] )
