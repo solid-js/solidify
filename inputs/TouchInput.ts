@@ -98,8 +98,8 @@ export class TouchDispatcher extends Disposable
 	/**
 	 * DOM Element target listening events
 	 */
-	protected _target						:HTMLElement;
-	get target ():HTMLElement { return this._target; }
+	protected _target						:HTMLElement|Element;
+	get target ():HTMLElement|Element { return this._target; }
 
 	/**
 	 * Allowed input types
@@ -157,7 +157,7 @@ export class TouchDispatcher extends Disposable
 	 * @param pTarget DOM Element used to listen events
 	 * @param pEInputTypes Allowed input types (look at the InputType enum). Can be multiple input types with the pipe | operator on enum (EInputTypes.TOUCH | EInputTypes.MOUSE) for example.
 	 */
-	constructor (pDelegate:ITouchInputDelegate, pTarget:HTMLElement, pEInputTypes:number = EInputTypes.TOUCH | EInputTypes.MOUSE)
+	constructor (pDelegate:ITouchInputDelegate, pTarget:HTMLElement|Element, pEInputTypes:number = EInputTypes.TOUCH | EInputTypes.MOUSE)
 	{
 		// Relay
 		super();
