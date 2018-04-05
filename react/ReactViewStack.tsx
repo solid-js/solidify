@@ -124,6 +124,17 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	protected _playedOut = true;
 	get isInTransition():boolean { return !this._playedIn || !this._playedOut; }
 
+	/**
+	 * Allow some pages to have transition when the route changes but not the page.
+	 * Set an array of page names as strings.
+	 */
+	protected _allowSamePageTransition:string[]
+	get allowSamePageTransition ():string[] { return this._allowSamePageTransition; }
+	set allowSamePageTransition (value:string[])
+	{
+		this._allowSamePageTransition = value;
+	}
+
 
 	// ------------------------------------------------------------------------- INIT
 
@@ -304,24 +315,28 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		// TODO : Faire le système d'annulation de changement de page
 		// TODO : Avec shouldPlayIn et shouldPlayOut, voir ce que cela implique sur le routeur
 
-		// If this is the same page
-		if (pPageName == this._currentPageName)
+		// If we do not allow transition for this page to itself
+		if (this._allowSamePageTransition == null || this._allowSamePageTransition.indexOf(pPageName) == -1)
 		{
-			// Just change action and parameters, not page
-			this.setState({
-				currentPage : {
-					pageClass  : (
-						this.state.currentPage == null
-						? null
-						: this.state.currentPage.pageClass
-					),
-					action    	: pActionName,
-					parameters  : pParameters
-				}
-			});
+			// And if this is the same page
+			if (pPageName == this._currentPageName)
+			{
+				// Just change action and parameters, not page
+				this.setState({
+					currentPage : {
+						pageClass  : (
+							this.state.currentPage == null
+							? null
+							: this.state.currentPage.pageClass
+						),
+						action    	: pActionName,
+						parameters  : pParameters
+					}
+				});
 
-			// Do not go further
-			return true;
+				// Do not go further
+				return true;
+			}
 		}
 
 		// Bind play in method to the good scope and with new action parameters
