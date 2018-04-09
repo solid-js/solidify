@@ -234,6 +234,15 @@ export class Router
 	protected static _onNotFound			:Signal				= new Signal();
 	static get onNotFound ():Signal { return this._onNotFound; }
 
+	/**
+	 * If this is our first routed page.
+	 * Will be null if first page has not fired yet.
+	 */
+	protected static _isFirstPage = null;
+	static get isFirstPage ():boolean|null
+	{
+		return Router._isFirstPage;
+	}
 
 
 	// ------------------------------------------------------------------------- INIT
@@ -310,9 +319,6 @@ export class Router
 
 	// ------------------------------------------------------------------------- ANALYTICS
 
-	// If this is our first track, because we have to ignore it
-	protected static _firstPageView = true;
-
 	// GTAG id from dataLayer
 	protected static _gtagId		:string;
 
@@ -321,13 +327,6 @@ export class Router
 	 */
 	protected static trackCurrentPage ()
 	{
-		// Do not track first page view because we already fired it from DOM
-		if ( this._firstPageView )
-		{
-			this._firstPageView = false;
-			return;
-		}
-
 		// Page path, starting with a /
 		// @see : https://developers.google.com/analytics/devguides/collection/gtagjs/pages
 		const path = StringUtils.leadingSlash(this._currentPath, true);
@@ -567,8 +566,24 @@ export class Router
 				this._currentPath = location.pathname;
 			}
 
-			// Track analytics
-			this.trackCurrentPage();
+			// If we are on the first page
+			if ( this._isFirstPage === null )
+			{
+				this._isFirstPage = true;
+			}
+
+			// If we are beyond the first page
+			else if ( this._isFirstPage == true )
+			{
+				this._isFirstPage = false;
+			}
+
+			// Do not track first page view because we already fired it from DOM
+			if ( !this._isFirstPage )
+			{
+				// Track analytics
+				this.trackCurrentPage();
+			}
 
 			console.info('Router.updateCurrentRoute // Route', this._currentPath);
 
