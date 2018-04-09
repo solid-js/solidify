@@ -81,8 +81,9 @@ export interface IRoute
 
 	/**
 	 * Page importer, to get page class.
+	 * Will use dynamic page importer if null.
 	 */
-	importer			:() => Promise<any>;
+	importer			?:() => Promise<any>;
 
 	/**
 	 * Action to execute on page.
@@ -115,6 +116,22 @@ export interface IRoute
 	_matchingParameter	?:string[];
 }
 
+/**
+ * Object to allow dynamic page importers.
+ * Will map a page name to an importer.
+ */
+export interface IDynamicPageImporter
+{
+	/**
+	 * Page name to associate with importer
+	 */
+	page		:string;
+
+	/**
+	 * Page importer, to get page class.
+	 */
+	importer	?:() => Promise<any>;
+}
 
 /**
  * This router uses pushState.
@@ -244,6 +261,15 @@ export class Router
 		return Router._isFirstPage;
 	}
 
+	/**
+	 * Get declared dynamic pages importers.
+	 */
+	protected static _dynamicPageImporters:IDynamicPageImporter[] = [];
+	static get dynamicPageImporters ():IDynamicPageImporter[]
+	{
+		return Router._dynamicPageImporters;
+	}
+
 
 	// ------------------------------------------------------------------------- INIT
 
@@ -276,6 +302,18 @@ export class Router
 		{
 			window.addEventListener('popstate', this.popStateHandler );
 		}
+	}
+
+	/**
+	 * Add a set of dynamic page importers to the Router.
+	 * It will help to know which page to import if there is no importer in declared routes.
+	 */
+	static addDynamicPageImporters (pImporters:IDynamicPageImporter[])
+	{
+		pImporters.map( importer =>
+		{
+			Router._dynamicPageImporters.push( importer );
+		});
 	}
 
 
@@ -623,10 +661,26 @@ export class Router
 					throw new Error(`Router.updateCurrentRoute // Stack ${this._currentRouteMatch.stack} is not registered.`);
 				}
 
+				// Get page importer from route declaration
+				let currentRoutePageImporter = this._currentRouteMatch.importer;
+
+				// If there is no page importer
+				if (currentRoutePageImporter == null)
+				{
+					// Check if we have one inside dynamic page importers
+					this._dynamicPageImporters.map( pageImporter =>
+					{
+						if (pageImporter.page == this._currentRouteMatch.page)
+						{
+							currentRoutePageImporter = pageImporter.importer;
+						}
+					});
+				}
+
 				// Show page on stack
 				(stack != null) && stack.showPage(
 					this._currentRouteMatch.page,
-					this._currentRouteMatch.importer,
+					currentRoutePageImporter,
 					this._currentRouteMatch.action,
 					this._currentRouteMatch.parameters
 				);
