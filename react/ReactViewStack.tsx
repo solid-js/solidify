@@ -81,8 +81,19 @@ interface Props
 	 */
 	onNotFound       	?: (pPageName:string) => void
 
+	/**
+	 * Called when loading state is changing.
+	 * Only useful when loading async import pages.
+	 */
+	onLoadStateChanged	?: (pLoading?:boolean) => void;
 
-	onLoadStateChanged	?: (pLoading?:boolean) => void
+	/**
+	 * Allow some pages to have transition when the route changes but not the page.
+	 * Set an array of page names as strings.
+	 * 
+	 * Alias of the class property, cannot be updated after mount.
+	 */
+	allowSamePageTransition ?:string[];
 }
 
 interface States
@@ -128,7 +139,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	 * Allow some pages to have transition when the route changes but not the page.
 	 * Set an array of page names as strings.
 	 */
-	protected _allowSamePageTransition:string[]
+	protected _allowSamePageTransition:string[];
 	get allowSamePageTransition ():string[] { return this._allowSamePageTransition; }
 	set allowSamePageTransition (value:string[])
 	{
@@ -144,6 +155,12 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		if (!('transitionType' in this.props))
 		{
 			this.props.transitionType = ETransitionType.PAGE_SEQUENTIAL;
+		}
+
+		// Set allowSamePageTransition from props if defined
+		if ('allowSamePageTransition' in this.props)
+		{
+			this._allowSamePageTransition = this.props.allowSamePageTransition;
 		}
 
 		// Init state
