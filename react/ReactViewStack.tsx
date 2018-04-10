@@ -1,5 +1,5 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from "nervjs";
+const ReactDOM = React;
 import {ReactView} from "./ReactView";
 import {IPage} from "../navigation/IPage";
 import {IPageStack} from "../navigation/IPageStack";

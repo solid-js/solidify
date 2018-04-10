@@ -1,5 +1,5 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
+import * as React from "nervjs";
+const ReactDOM = React;
 
 export class ReactView<Props, States> extends React.Component<Props, States>
 {
