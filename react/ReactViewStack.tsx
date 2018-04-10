@@ -472,7 +472,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			const oldWindowOnError = window.onerror;
 
 			// Reset global error handler and optionnaly throw a not page found
-			const resetError = (pThrow = false) =>
+			const resetError = (pThrow = false, pRestParameters:any = null) =>
 			{
 				// If we have to throw a page not found error
 				if ( pThrow )
@@ -481,7 +481,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					this.props.onLoadStateChanged != null && this.props.onLoadStateChanged( false );
 
 					// Delegate original global window onerror
-					oldWindowOnError && oldWindowOnError();
+					oldWindowOnError && oldWindowOnError.apply(window, pRestParameters);
 
 					// Throw a not found page
 					(this.props.onNotFound != null) && this.props.onNotFound( pPageName );
@@ -492,7 +492,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			};
 
 			// Set it to detect blocked promises due to XHR errors
-			window.onerror = () => resetError( true );
+			window.onerror = (...rest) => resetError( true, rest );
 
 			// Execute importer
 			const importResult = pPageImporter();
@@ -501,7 +501,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			if ( importResult instanceof Promise )
 			{
 				// Catch and throw errors
-				importResult.catch( () => resetError( true) );
+				importResult.catch( () => resetError( true ) );
 
 				// Import succeed
 				importResult.then( moduleExports =>
