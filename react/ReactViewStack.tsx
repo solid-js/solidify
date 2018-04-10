@@ -424,10 +424,8 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 				if (typeof moduleExports === 'string')
 				{
 					// Call not found handler
-					if (this.props.onNotFound != null)
-					{
-						this.props.onNotFound( pPageName );
-					}
+					if (this.props.onNotFound != null) this.props.onNotFound( pPageName );
+					return;
 				}
 
 				// Target export with default or page name
@@ -470,29 +468,53 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 			// Loading state changed, we are loading
 			this.props.onLoadStateChanged != null && this.props.onLoadStateChanged( true );
 
+			// Remember window.onerror handler if already set
+			const oldWindowOnError = window.onerror;
+
+			// Reset global error handler and optionnaly throw a not page found
+			const resetError = (pThrow = false) =>
+			{
+				// If we have to throw a page not found error
+				if ( pThrow )
+				{
+					// Loading state changed, we are not loading anymore
+					this.props.onLoadStateChanged != null && this.props.onLoadStateChanged( false );
+
+					// Delegate original global window onerror
+					oldWindowOnError && oldWindowOnError();
+
+					// Throw a not found page
+					(this.props.onNotFound != null) && this.props.onNotFound( pPageName );
+				}
+
+				// Reset global on error handler with remembered one
+				window.onerror = oldWindowOnError;
+			};
+
+			// Set it to detect blocked promises due to XHR errors
+			window.onerror = () => resetError( true );
+
 			// Execute importer
 			const importResult = pPageImporter();
 
 			// If this is a promise from an async import
-			if (importResult instanceof Promise)
+			if ( importResult instanceof Promise )
 			{
-				// Catch errors
-				importResult.catch( error =>
-				{
-					// Call not found handler
-					if (this.props.onNotFound != null)
-					{
-						this.props.onNotFound( pPageName );
-					}
-				})
+				// Catch and throw errors
+				importResult.catch( () => resetError( true) );
 
 				// Import succeed
-				importResult.then( pageImortedHandler );
+				importResult.then( moduleExports =>
+				{
+					resetError();
+					pageImortedHandler( moduleExports );
+				});
 			}
 
 			// Else, this is a sync require call
 			else
 			{
+				resetError();
 				pageImortedHandler( importResult );
 			}
 		}
