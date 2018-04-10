@@ -1,5 +1,4 @@
 import * as React from "nervjs";
-const ReactDOM = React;
 
 export class ReactView<Props, States> extends React.Component<Props, States>
 {
@@ -69,7 +68,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		}
 
 		// Target DOM node
-		return ReactDOM.findDOMNode( this.refs[pRefName] );
+		return React.findDOMNode( this.refs[pRefName] );
 	}
 
 	/**
@@ -95,7 +94,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 
 			// Add to collection
 			collection.push(
-				ReactDOM.findDOMNode( this.refs[ refName ] )
+				React.findDOMNode( this.refs[ refName ] )
 			);
 		});
 
@@ -165,7 +164,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 			this[componentCollectionName][pKey] = pComponent;
 
 			// Get DOM Node for this component
-			this[elementsCollectionNames][pKey] = ReactDOM.findDOMNode( pComponent );
+			this[elementsCollectionNames][pKey] = React.findDOMNode( pComponent );
 		}
 	}
 }
