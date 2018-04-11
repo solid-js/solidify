@@ -1,4 +1,5 @@
-import * as React from "nervjs";
+import { Component, createElement } from 'react';
+import { findDOMNode } from 'react-dom';
 import {ReactView} from "./ReactView";
 import {IPage} from "../navigation/IPage";
 import {IPageStack} from "../navigation/IPageStack";
@@ -108,13 +109,20 @@ interface States
 }
 
 
-export class ReactViewStack extends ReactView<Props, States> implements IPageStack
+export class ReactViewStack extends Component<Props, States> implements IPageStack
 {
 	/**
 	 * Current page name
 	 */
 	protected _currentPageName		:string;
 	get currentPageName():string { return this._currentPageName; }
+
+	/**
+	 * Transition type from props.
+	 * Can't be changed after component creation.
+	 */
+	protected _transitionType		:ETransitionType;
+	get transitionType():ETransitionType { return this._transitionType; }
 
 	/**
 	 * Old page, currently playing out
@@ -148,13 +156,17 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 
 	// ------------------------------------------------------------------------- INIT
 
-	prepare ()
+	constructor (props:Props, context:any)
 	{
-		// Default transition type
-		if (!('transitionType' in this.props))
-		{
-			this.props.transitionType = ETransitionType.PAGE_SEQUENTIAL;
-		}
+		// Relay construction
+		super(props, context);
+
+		// Set transition type as a local var with a default value
+		this._transitionType = (
+			('transitionType' in this.props)
+			? this.props.transitionType
+			: ETransitionType.PAGE_SEQUENTIAL
+		);
 
 		// Set allowSamePageTransition from props if defined
 		if ('allowSamePageTransition' in this.props)
@@ -163,11 +175,11 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		}
 
 		// Init state
-		this.initState({
+		this.state = {
 			currentPageIndex	:0,
 			oldPage				:null,
 			currentPage			:null
-		});
+		};
 	}
 
 
@@ -223,7 +235,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		if (pOldStates.currentPage != this.state.currentPage)
 		{
 			// If we are in controlled transition type mode
-			if (this.props.transitionType == ETransitionType.CONTROLLED)
+			if (this._transitionType == ETransitionType.CONTROLLED)
 			{
 				// We need the control handler, check if.
 				if (this.props.transitionControl == null)
@@ -238,8 +250,8 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 				// Call transition control handler with old and new pages instances
 				// Listen when finished through promise
 				this.props.transitionControl(
-					React.findDOMNode( this._oldPage as any ) as HTMLElement,
-					React.findDOMNode( this._currentPage as any ) as HTMLElement,
+					findDOMNode( this._oldPage as any ) as HTMLElement,
+					findDOMNode( this._currentPage as any ) as HTMLElement,
 					this._oldPage,
 					this._currentPage
 				)
@@ -293,7 +305,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	{
 		if (
 				// Only for crossed transition type
-				this.props.transitionType == ETransitionType.PAGE_CROSSED
+				this._transitionType == ETransitionType.PAGE_CROSSED
 
 				// Only when new page is played in and old page is played out
 				&&
@@ -362,9 +374,9 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 		if (
 				this.state.currentPage == null
 				||
-				this.props.transitionType == ETransitionType.PAGE_CROSSED
+				this._transitionType == ETransitionType.PAGE_CROSSED
 				||
-				this.props.transitionType == ETransitionType.CONTROLLED
+				this._transitionType == ETransitionType.CONTROLLED
 			)
 		{
 			// Start new page directly
@@ -396,7 +408,7 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 	{
 		// If we are in sequential transition
 		// We have played out here
-		if (this.props.transitionType == ETransitionType.PAGE_SEQUENTIAL)
+		if (this._transitionType == ETransitionType.PAGE_SEQUENTIAL)
 		{
 			this._playedOut = true;
 		}
@@ -448,9 +460,9 @@ export class ReactViewStack extends ReactView<Props, States> implements IPageSta
 					// Record current page as old page if we are in crossed or controlled transition type
 					oldPage : (
 						(
-							this.props.transitionType == ETransitionType.PAGE_CROSSED
+							this._transitionType == ETransitionType.PAGE_CROSSED
 							||
-							this.props.transitionType == ETransitionType.CONTROLLED
+							this._transitionType == ETransitionType.CONTROLLED
 						)
 						? this.state.currentPage
 						: null

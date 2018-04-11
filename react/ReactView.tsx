@@ -1,6 +1,7 @@
-import * as React from "nervjs";
+import { Component, createElement } from 'react';
+import { findDOMNode } from 'react-dom';
 
-export class ReactView<Props, States> extends React.Component<Props, States>
+export class ReactView<Props, States> extends Component<Props, States>
 {
 	// ------------------------------------------------------------------------- PROPS
 
@@ -59,7 +60,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @throws Error if ref does not exists. To get refs without throws, you can use $ method.
 	 * @returns DOM Node
 	 */
-	protected getNode (pRefName:string):Element|HTMLElement
+	protected getNode (pRefName:string):Element|HTMLElement|Text
 	{
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
@@ -68,7 +69,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 		}
 
 		// Target DOM node
-		return React.findDOMNode( this.refs[pRefName] );
+		return findDOMNode( this.refs[pRefName] );
 	}
 
 	/**
@@ -77,7 +78,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @param pRefNames List of all refs to target. Will fail silently if a ref is not found.
 	 * @returns A DOM element collection.
 	 */
-	protected $ (pRefNames:string[]|string) : (Element|HTMLElement)[]
+	protected $ (pRefNames:string[]|string) : (Element|HTMLElement|Text)[]
 	{
 		// Patch array argument if only a string is given
 		if (typeof pRefNames === 'string')
@@ -94,7 +95,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 
 			// Add to collection
 			collection.push(
-				React.findDOMNode( this.refs[ refName ] )
+				findDOMNode( this.refs[ refName ] )
 			);
 		});
 
@@ -103,11 +104,11 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	}
 
 	/**
-	 * Get a React.Component from a ref name.
+	 * Get a Component from a ref name.
 	 * @param {string} pRefName Ref name declared as string.
 	 * @returns {ComponentType} React component typed with generics
 	 */
-	protected getComponent <ComponentType extends React.Component> (pRefName:string):ComponentType
+	protected getComponent <ComponentType extends Component> (pRefName:string):ComponentType
 	{
 		// Check if this ref exists
 		if ( !(pRefName in this.refs) )
@@ -140,7 +141,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 	 * @param pComponent The component sent by react ref.
 	 * @param pKey Key of the component, as number only
 	 */
-	protected refNodes (pRefName:string, pKey:number, pComponent:React.Component|HTMLElement):void
+	protected refNodes (pRefName:string, pKey:number, pComponent:Component|HTMLElement):void
 	{
 		// Get collections names
 		const componentCollectionName = '_' + pRefName;
@@ -164,7 +165,7 @@ export class ReactView<Props, States> extends React.Component<Props, States>
 			this[componentCollectionName][pKey] = pComponent;
 
 			// Get DOM Node for this component
-			this[elementsCollectionNames][pKey] = React.findDOMNode( pComponent );
+			this[elementsCollectionNames][pKey] = findDOMNode( pComponent );
 		}
 	}
 }
