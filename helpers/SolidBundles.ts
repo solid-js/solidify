@@ -159,8 +159,9 @@ export class SolidBundles
 	 * Load an app bundle.
 	 * @param {string} pBundleName Name of the app bundle to load.
 	 * @param {string} pLoadedHandler Called when app bundle is loaded. First argument is app class.
+	 * @param {boolean} pExtremeCacheBusting Enable extreme cache busting by asking timestamp as a parameter. Otherwise, will use bundle version.
 	 */
-	static loadBundle (pBundleName:string, pLoadedHandler ?: AppBundleLoadedHandler)
+	static loadBundle (pBundleName:string, pLoadedHandler ?: AppBundleLoadedHandler, pExtremeCacheBusting = false)
 	{
 		// Create script tag
 		let scriptTag = document.createElement('script');
@@ -169,8 +170,11 @@ export class SolidBundles
 		const basePath = process.env['BASE'];
 		const bundlePath = process.env['BUNDLE_PATH'];
 
+		// Generate the cache busting extension with date for extreme mode or bundle version for regular mode
+		const cacheExtension = (pExtremeCacheBusting ? Date.now() : process.env['VERSION']);
+
 		// Target bundle file
-		scriptTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.js`);
+		scriptTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.js?${cacheExtension}`);
 
 		// Add to head and start loading
 		document.head.appendChild(scriptTag);
