@@ -1,4 +1,5 @@
 import { Component, createElement } from 'react';
+const React = { createElement };
 import { findDOMNode } from 'react-dom';
 import {ReactView} from "./ReactView";
 import {IPage} from "../navigation/IPage";
