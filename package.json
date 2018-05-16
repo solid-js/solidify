@@ -1,8 +1,7 @@
 {
   "name": "solidify-lib",
-  "version": "1.7.1",
+  "version": "1.7.2",
   "description": "Solidify typescript framework for robust and modular web applications",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
