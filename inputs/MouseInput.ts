@@ -1,5 +1,6 @@
 import {IDisposable} from "../core/Disposable";
 import {Signal} from "../helpers/Signal";
+import Timer = NodeJS.Timer
 
 export interface IPoint
 {
@@ -88,7 +89,7 @@ export class MouseInput
 		};
 
 		// Set values when pointer move
-		$(document).mousemove( (event:JQueryEventObject) =>
+		$(document).mousemove( (event:MouseEvent) =>
 		{
 			let width = $(window).width();
 			let height = $(window).height();
@@ -101,6 +102,8 @@ export class MouseInput
 
 			this._pageRelativePosition.x = event.pageX;
 			this._pageRelativePosition.y = event.pageY;
+
+			return null;
 		});
 	}
 }
@@ -139,9 +142,9 @@ export class MouseWheelInput implements IDisposable
 	protected _previousDelta:number = 0;
 	protected _allowAccelerationOverride:boolean = true;
 
-	protected _accelerationInterval:number;
+	protected _accelerationInterval:any;
 
-	protected mouseWheelHandler = (pEvent:JQueryEventObject) =>
+	protected mouseWheelHandler = (pEvent:MouseEvent) =>
 	{
 		let delta = pEvent['deltaY'];
 
@@ -170,6 +173,7 @@ export class MouseWheelInput implements IDisposable
 
 			this._onAcceleration.dispatch( delta < 0 ? -1 : 1 );
 		}
+		return null;
 	};
 
 
