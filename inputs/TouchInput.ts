@@ -194,8 +194,7 @@ export class TouchDispatcher extends Disposable
 
 		// Listen mouse
 		this._target.addEventListener('mousedown', this.mouseHandler);
-		this._target.addEventListener('mousemove', this.mouseHandler);
-		this._target.addEventListener('mouseup', this.mouseHandler);
+		document.addEventListener('mouseup', this.mouseHandler);
 
 		// Start frame based loop
 		TimerUtils.addFrameHandler(this, this.frameHandler);
@@ -213,8 +212,8 @@ export class TouchDispatcher extends Disposable
 
 		// Remove mouse listening
 		this._target.removeEventListener('mousedown', this.mouseHandler);
-		this._target.removeEventListener('mousemove', this.mouseHandler);
-		this._target.removeEventListener('mouseup', this.mouseHandler);
+		document.removeEventListener('mousemove', this.mouseHandler);
+		document.removeEventListener('mouseup', this.mouseHandler);
 
 		// Stop frame based loop
 		TimerUtils.removeFrameHandler(this.frameHandler);
@@ -228,8 +227,19 @@ export class TouchDispatcher extends Disposable
 		// Check enable and mouse input
 		if (!this._enabled || !(this._inputTypes & EInputTypes.MOUSE)) return;
 
+		// Init mouse move listening on whole document
+		// To be able to track mouse move when cursor is out of target
+		if (pEvent.type == 'mousedown')
+		{
+			document.addEventListener('mousemove', this.mouseHandler)
+		}
+		else if (pEvent.type == 'mouseup')
+		{
+			document.removeEventListener('mousemove', this.mouseHandler)
+		}
+
 		// If this is a move, check if we have the mouse point registered
-		if (pEvent.type == 'mousemove')
+		else if (pEvent.type == 'mousemove')
 		{
 			let hasMouseInput = false;
 
@@ -398,7 +408,7 @@ export class TouchDispatcher extends Disposable
 	/**
 	 * Every frames
 	 */
-	protected frameHandler = () =>
+	protected frameHandler ():void
 	{
 		// If we have only one point and a direction
 		if (this._points.length == 1 && this._currentDirection != EInputDirection.UNKNOWN)
