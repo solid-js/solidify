@@ -31,3 +31,5 @@ _/
 
 # Mac poops
 .DS_Store
+
+.idea/

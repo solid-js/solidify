@@ -134,7 +134,7 @@
 /**
  * Set width and height on en element
  */
-.size (@width:auto; @height:auto)
+.size (@width:auto; @height:@width)
 {
 	width: @width;
 	height: @height;
@@ -161,7 +161,7 @@
 /**
  * Set min-width and min-height
  */
-.minSize (@width: none, @height: none)
+.minSize (@width: none, @height:@width)
 {
 	min-width: @width;
 	min-height: @height;
@@ -170,7 +170,7 @@
 /**
  * Set max-width and max-height
  */
-.maxSize (@width: none, @height: none)
+.maxSize (@width: none, @height:@width)
 {
 	max-width: @width;
 	max-height: @height;
