@@ -32,4 +32,5 @@ _/
 # Mac poops
 .DS_Store
 
+# intellij config
 .idea/
