@@ -133,8 +133,15 @@
 
 /**
  * Set width and height on en element
+ * If only one value parameter is set, width and height will be equal
+ * ex:
+ * 		.size(10px);
+ *
+ * return:
+ *		width: 10px;
+ *		height: 10px;
  */
-.size (@width:auto; @height:auto)
+.size (@width:auto; @height:@width)
 {
 	width: @width;
 	height: @height;
@@ -160,8 +167,15 @@
 
 /**
  * Set min-width and min-height
+ * If only one value parameter is set, min-width and min-height will be equal
+ * ex:
+ * 		.minSize(10px);
+ *
+ * return:
+ *		min-width: 10px;
+ *		min-height: 10px;
  */
-.minSize (@width: none, @height: none)
+.minSize (@width: none, @height:@width)
 {
 	min-width: @width;
 	min-height: @height;
@@ -169,8 +183,15 @@
 
 /**
  * Set max-width and max-height
+ * If only one value parameter is set, max-width and max-height will be equal
+ * ex:
+ * 		.maxSize(10px);
+ *
+ * return:
+ *		max-width: 10px;
+ *		max-height: 10px;
  */
-.maxSize (@width: none, @height: none)
+.maxSize (@width: none, @height:@width)
 {
 	max-width: @width;
 	max-height: @height;
