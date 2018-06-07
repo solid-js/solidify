@@ -80,15 +80,27 @@
 
 
 /**
- * Place an element absolute
+ * place
+ * One-line method for setting an element’s positioning
+ * Parameters are nullable
  */
 .place (@top:auto; @right:auto; @bottom:auto; @left:auto; @position:absolute)
 {
-	position: @position;
-	top: @top;
-	right: @right;
-	bottom: @bottom;
-	left: @left;
+	& when not (@position = null) {
+		position: @position;
+	}
+	& when not (@top = null) {
+		top: @top;
+	}
+	& when not (@right = null) {
+		right: @right;
+	}
+	& when not (@bottom = null) {
+		bottom: @bottom;
+	}
+	& when not (@left = null) {
+		left: @left;
+	}
 }
 
 /**
