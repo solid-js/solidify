@@ -1,6 +1,4 @@
 
-import Ease = gsap.Ease;
-
 
 // ----------------------------------------------------------------------------- STRUCT
 
@@ -12,10 +10,11 @@ export interface CustomEaseType
 	(pRatio:number) : number;
 }
 
-/**
- * An ease type can either be a native GSAP easing or a custom non standard GSAP one
- */
-export type EaseType = (Ease | CustomEaseType);
+export interface GSAPEase
+{
+	getRatio( pValue:number ) : number;
+}
+
 
 // ----------------------------------------------------------------------------- CLASS
 
@@ -26,19 +25,19 @@ export class EaseUtils
 	/**
 	 * Application's main easing
 	 */
-	protected static __mainEase		:EaseType;
+	protected static __mainEase		:CustomEaseType;
 
 	/**
 	 * Application's main easing
 	 * @returns {EaseType}
 	 */
-	static get mainEase ():EaseType { return this.__mainEase; }
+	static get mainEase ():CustomEaseType { return this.__mainEase; }
 
 	/**
 	 * Set Application's main easing
 	 * @param pEase
 	 */
-	public static registerMainEase (pEase:EaseType)
+	public static registerMainEase (pEase:CustomEaseType)
 	{
 		this.__mainEase = pEase;
 	}
@@ -55,7 +54,7 @@ export class EaseUtils
 	 * @param pRatio Ratio when we get from first to second ease. Default is .5
 	 * @returns {(pTweenRatio:number)=>number}
 	 */
-	public static combine (pFirstEase:Ease, pSecondEase:Ease, pRatio = .5):EaseType
+	public static combine (pFirstEase:GSAPEase, pSecondEase:GSAPEase, pRatio = .5) : CustomEaseType
 	{
 		// Compute inverted ratio once
 		const invertRatio = (1 - pRatio);
