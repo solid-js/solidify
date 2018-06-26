@@ -160,12 +160,10 @@ export class SolidBundles
 	 * @param {string} pBundleName Name of the app bundle to load.
 	 * @param {string} pLoadedHandler Called when app bundle is loaded. First argument is app class.
 	 * @param {boolean} pExtremeCacheBusting Enable extreme cache busting by asking timestamp as a parameter. Otherwise, will use bundle version.
+	 * @param {boolean} pLoadCSSToo Also add a link tag for bundle CSS
 	 */
-	static loadBundle (pBundleName:string, pLoadedHandler ?: AppBundleLoadedHandler, pExtremeCacheBusting = false)
+	static loadBundle (pBundleName:string, pLoadedHandler ?: AppBundleLoadedHandler, pExtremeCacheBusting = false, pLoadCSSToo = false)
 	{
-		// Create script tag
-		let scriptTag = document.createElement('script');
-		
 		// Get base path and bundle path from injected env
 		const basePath = process.env['BASE'];
 		const bundlePath = process.env['BUNDLE_PATH'];
@@ -173,11 +171,20 @@ export class SolidBundles
 		// Generate the cache busting extension with date for extreme mode or bundle version for regular mode
 		const cacheExtension = (pExtremeCacheBusting ? Date.now() : process.env['VERSION']);
 
-		// Target bundle file
-		scriptTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.js?${cacheExtension}`);
+		// Load CSS first if asked
+		if ( pLoadCSSToo )
+		{
+			// Create style tag with attributes and append it to the body
+			const styleTag = document.createElement('style');
+			styleTag.setAttribute('rel', "stylesheet");
+			styleTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.css?${cacheExtension}`);
+			document.head.appendChild( styleTag );
+		}
 
-		// Add to head and start loading
-		document.head.appendChild(scriptTag);
+		// Create script tag with attributes and append it to the body
+		const scriptTag = document.createElement('script');
+		scriptTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.js?${cacheExtension}`);
+		document.head.appendChild( scriptTag );
 
 		// Register handler
 		if (pLoadedHandler != null)
@@ -188,21 +195,30 @@ export class SolidBundles
 
 	/**
 	 * Get an app main from it's app bundle name
-	 * @param {string} pAppBundleName
+	 * @param {string} pAppBundleName Bundle name to get, without extension.
+	 * @param {string} pThrow If we throw errors or return null. Default throws.
 	 * @returns {any}
 	 */
-	static getAppBundleMainFromName (pAppBundleName:string):any
+	static getAppBundleMainFromName (pAppBundleName:string, pThrow = true):any
 	{
 		// If this app bundle main does not exists
 		if ( !(pAppBundleName in SolidBundles.__appBundleMains) )
 		{
-			throw new Error(`App bundle ${pAppBundleName} does not exists or is not loaded yet.`);
+			if ( pThrow )
+			{
+				throw new Error(`App bundle ${pAppBundleName} does not exists or is not loaded yet.`)
+			}
+			else return null;
 		}
 
 		// If this app bundle has no main
 		if ( SolidBundles.__appBundleMains[pAppBundleName] === false)
 		{
-			throw new Error(`This app bundle (${pAppBundleName}) does not have Main file.`);
+			if ( pThrow )
+			{
+				throw new Error(`This app bundle (${pAppBundleName}) does not have Main file.`);
+			}
+			else return null;
 		}
 
 		// Returns app bundle main
