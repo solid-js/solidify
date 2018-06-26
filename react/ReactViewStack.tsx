@@ -95,6 +95,13 @@ interface Props
 	 * Alias of the class property, cannot be updated after mount.
 	 */
 	allowSamePageTransition ?:string[];
+
+	/**
+	 * Called when a new page is mounted.
+	 * Usefull event after page is fully ready (styles / sizes / etc)
+	 * Which is not possible from AppView.
+	 */
+	onPageMounted		?: (pPage ?: IPage) => void;
 }
 
 interface States
@@ -294,6 +301,11 @@ export class ReactViewStack extends Component<Props, States> implements IPageSta
 					});
 				}
 			}
+
+			// Call page mounted event on props
+			this.props.onPageMounted != null
+			&&
+			this.props.onPageMounted( this._currentPage );
 		}
 	}
 
