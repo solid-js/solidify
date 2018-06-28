@@ -161,6 +161,9 @@ export class ReactViewStack extends Component<Props, States> implements IPageSta
 		this._allowSamePageTransition = value;
 	}
 
+	// NOTE : New 16.4.4 @types/react forces state as readonly, which is dumb
+	// NOTE : If it changes in the future, it can be removed
+	public state:States;
 
 	// ------------------------------------------------------------------------- INIT
 
