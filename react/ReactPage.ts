@@ -30,6 +30,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 		super(pProps, pContext);
 
 		// Call action
+		// FIXME : Useful ?
 		this.action();
 	}
 
@@ -38,7 +39,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 * Action on this page.
 	 * Have to check props.action and props.params to show proper content.
 	 */
-	action (pActionName:string, pParameters:IActionParameters) { }
+	action (pActionName?:string, pParameters?:IActionParameters) { }
 
 	/**
 	 * Play intro animation.
