@@ -1,5 +1,6 @@
 import {ReactView} from "./ReactView";
 import {EPagePlayState, IPage} from "../navigation/IPage";
+import {IActionParameters} from "../navigation/Router";
 
 /**
  * Default interface for page properties
@@ -7,7 +8,7 @@ import {EPagePlayState, IPage} from "../navigation/IPage";
 export interface ReactPageProps
 {
 	action		:string;
-	parameters	:{ [index:string]:any };
+	parameters	:IActionParameters;
 }
 
 export class ReactPage<Props, States> extends ReactView<Props, States> implements IPage
@@ -33,24 +34,11 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	}
 
 	/**
-	 * When page params changes
-	 * @param pNewProps New params list
-	 */
-	componentWillReceiveProps (pNewProps:any)
-	{
-		// Set new props
-		this.props = pNewProps;
-
-		// Recall action with new props
-		this.action();
-	}
-
-	/**
 	 * Have to be override.
 	 * Action on this page.
 	 * Have to check props.action and props.params to show proper content.
 	 */
-	action () { }
+	action (pActionName:string, pParameters:IActionParameters) { }
 
 	/**
 	 * Play intro animation.

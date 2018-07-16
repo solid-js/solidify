@@ -376,7 +376,7 @@ export class ReactViewStack extends Component<Props, States> implements IPageSta
 						action    	: pActionName,
 						parameters  : pParameters
 					}
-				});
+				}, this.updateActionOnCurrentPage.bind(this));
 
 				// Do not go further
 				return true;
@@ -490,7 +490,8 @@ export class ReactViewStack extends Component<Props, States> implements IPageSta
 						action     : pActionName,
 						parameters : pParameters
 					}
-				});
+
+				}, this.updateActionOnCurrentPage.bind(this));
 			};
 
 			// Loading state changed, we are loading
@@ -546,5 +547,16 @@ export class ReactViewStack extends Component<Props, States> implements IPageSta
 				pageImortedHandler( importResult );
 			}
 		}
+	}
+
+	/**
+	 * We call action on the new page once, and only when it's ready.
+	 */
+	protected updateActionOnCurrentPage ()
+	{
+		// FIXME : Peut-être qu'on doit vérifier si les paramètres de page et action ont changés pour éviter call inutiles ?
+
+		if (this._currentPage == null || this.state.currentPage == null) return;
+		this._currentPage.action(this.state.currentPage.action, this.state.currentPage.parameters);
 	}
 }
