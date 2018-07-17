@@ -140,6 +140,16 @@ export class TouchDispatcher extends Disposable
 	}
 
 	/**
+	 * If the stopPropagation is called on events
+	 */
+	protected _stopPropagation					:boolean				= false;
+	get stopPropagation ():boolean { return this._stopPropagation; }
+	set stopPropagation (pValue:boolean)
+	{
+		this._stopPropagation = pValue;
+	}
+
+	/**
 	 * Velocity Factor.
 	 * Each frame, velocity is going to delta value, divided by this number.
 	 */
@@ -263,9 +273,11 @@ export class TouchDispatcher extends Disposable
 			clientY: pEvent.clientY
 		});
 
-		// Stop propagation and browser behavior
-		//pEvent.preventDefault();
-		pEvent.stopPropagation();
+		// Stop propagation if needed
+		if (this._stopPropagation)
+		{
+			pEvent.stopPropagation();
+		}
 	};
 
 	/**
@@ -295,8 +307,11 @@ export class TouchDispatcher extends Disposable
 		// Current point
 		let currentPoint:TouchPoint;
 
-		// Stop propagation
-		pEvent.stopPropagation();
+		// Stop propagation if needed
+		if (this._stopPropagation)
+		{
+			pEvent.stopPropagation();
+		}
 
 		// -- START
 		if (pEvent.type == 'touchstart' || pEvent.type == 'mousedown')
