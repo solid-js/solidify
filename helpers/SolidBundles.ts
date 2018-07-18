@@ -70,6 +70,14 @@ export class SolidBundles
 	// Count of app bundle inits, to catch HMR reloads
 	protected static __appBundleInitCount		:{[index:string]:number}						= {};
 
+	/**
+	 * Override base to load bundles.
+	 * If null, will use process.env['BASE'] from deployed config.
+	 */
+	static get base ():string { return this.__base; }
+	static set base (value:string) { this.__base = value; }
+	protected static __base:string;
+
 
 	/**
 	 * Init Solid Bundle manager.
@@ -165,7 +173,7 @@ export class SolidBundles
 	static loadBundle (pBundleName:string, pLoadedHandler ?: AppBundleLoadedHandler, pExtremeCacheBusting = false, pLoadCSSToo = false)
 	{
 		// Get base path and bundle path from injected env
-		const basePath = process.env['BASE'];
+		const basePath = this.__base === null ? process.env['BASE'] : this.__base;
 		const bundlePath = process.env['BUNDLE_PATH'];
 
 		// Generate the cache busting extension with date for extreme mode or bundle version for regular mode
