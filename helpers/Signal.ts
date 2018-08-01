@@ -99,28 +99,20 @@ export class Signal extends Disposable
 		let listenersToRemove		:IListener[]	= [];
 		let listenerIndex 							= 0;
 
-		// Browse listeners
-		let total = this._listeners.length;
-		for (listenerIndex = 0; listenerIndex < total; listenerIndex ++)
+		results = this._listeners.filter(currentListener =>
 		{
-			// Target current listener
-			currentListener = this._listeners[listenerIndex];
+            // Call the listener
+            currentResult = currentListener.handler.apply(currentListener.scope, rest);
 
-			// Call the listener
-			currentResult = currentListener.handler.apply(currentListener.scope, rest);
+            // If it's an once listener, mark as remove
+            if (currentListener.once)
+            {
+                listenersToRemove.push(currentListener);
+            }
 
-			// If we have result, add it to the return package
-			if (currentResult != null && currentResult != undefined)
-			{
-				results.push(currentResult);
-			}
-
-			// If it's an once listener, mark as remove
-			if (currentListener.once)
-			{
-				listenersToRemove.push(currentListener);
-			}
-		}
+            // If we have result, add it to the return package
+            return currentResult != null;
+        });
 
 		// Remove all once listeners
 		total = listenersToRemove.length;
