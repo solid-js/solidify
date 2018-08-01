@@ -115,7 +115,7 @@ export class Signal extends Disposable
         });
 
 		// Remove all once listeners
-		total = listenersToRemove.length;
+		let total = listenersToRemove.length;
 		for (listenerIndex = 0; listenerIndex < total; listenerIndex ++)
 		{
 			this.remove(listenersToRemove[listenerIndex].handler);
