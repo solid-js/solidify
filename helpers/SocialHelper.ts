@@ -4,7 +4,8 @@
 export enum ESocialType
 {
 	FACEBOOK,
-	TWITTER
+	TWITTER,
+	LINKEDIN
 }
 
 /**
@@ -16,23 +17,27 @@ export class SocialHelper
 	 * Open social share popup
 	 * @param pSocialType @see ESocialType
 	 * @param pLink page to share. Will share location.origin if null
-	 * @param pTwitterText Pre-filled text for twitter.
+	 * @param pText Pre-filled text for twitter or linkedin.
 	 * @param pPopupSize width and height for opened popup
 	 */
-	static openShare (pSocialType:ESocialType, pLink = window.location.origin, pTwitterText = "", pPopupSize = [600, 500])
+	static openShare (pSocialType:ESocialType, pLink = window.location.origin, pText = "", pPopupSize = [600, 500])
 	{
 		// Create tweet content
-		let tweet = encodeURIComponent(pTwitterText + pLink);
+		let tweet = encodeURIComponent(pText + pLink);
 
 		// Le lien de la popup
 		let popinHref;
 		if (pSocialType == ESocialType.FACEBOOK)
 		{
-			popinHref = 'https://www.facebook.com/sharer/sharer.php?u=' + pLink;
+			popinHref = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent( pLink );
 		}
 		else if (pSocialType == ESocialType.TWITTER)
 		{
-			popinHref = 'https://twitter.com/intent/tweet?text=' + tweet;
+			popinHref = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(pText + ' ' + pLink);
+		}
+		else if (pSocialType == ESocialType.LINKEDIN)
+		{
+			popinHref = 'https://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent( pLink ) + '&summary=' + encodeURIComponent( pText )
 		}
 
 		// Center popup
