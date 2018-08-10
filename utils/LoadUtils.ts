@@ -6,7 +6,7 @@ export class LoadUtils
 	 * @param $pElement Zepto targeting image element. Will only check first one.
 	 * @returns {boolean|any} true if image is loaded.
 	 */
-	static checkCompleteAttribute ($pElement:Zepto):boolean
+	static checkCompleteAttribute ($pElement:ZeptoCollection):boolean
 	{
 		return (0 in $pElement && 'complete' in $pElement[0] && $pElement[0]['complete']);
 	}
@@ -19,7 +19,7 @@ export class LoadUtils
 	 * @param $pElement The zepto element you want to check. Only image, only one element.
 	 * @param pHandler Called when image is loaded. Element will be passed on first parameter, and event as second argument if available.
 	 */
-	static patchedImageLoad ($pElement:Zepto, pHandler:($pElement:Zepto, pEvent:Event) => void)
+	static patchedImageLoad ($pElement:ZeptoCollection, pHandler:($pElement:ZeptoCollection, pEvent:Event) => void)
 	{
 		// Check our zepto target. Not null and have to target one element. We do not check if it's an image at this point.
 		if ($pElement == null || $pElement.length != 1) throw new Error('LoadUtils.patchedOnLoad // $pElement need to target only one DOM element.');
@@ -44,7 +44,7 @@ export class LoadUtils
 	 * @param pAppendToBody Will append image to body if true, false by default. Keep image in memory for ever.
 	 * @param pRemove Will remove image after pre-loaded. false by default. For legacy purpose.
 	 */
-	static preloadImages (pURLs:string[], pHandler:(pImages:HTMLElement[]) => void, pAppendToBody = false, pRemove = false):Zepto[]
+	static preloadImages (pURLs:string[], pHandler:(pImages:HTMLElement[]) => void, pAppendToBody = false, pRemove = false):ZeptoCollection[]
 	{
 		// Count images
 		let total = pURLs.length;
@@ -54,7 +54,7 @@ export class LoadUtils
 		let images:HTMLImageElement[] = [];
 
 		// Called when an image is loaded
-		let handler = function ($pElement:Zepto)
+		let handler = function ($pElement:ZeptoCollection)
 		{
 			// Add image element to list
 			images.push($pElement[0] as HTMLImageElement);
