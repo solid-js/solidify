@@ -1,7 +1,7 @@
-import { Component, createElement } from 'react';
+import { Component, PureComponent, createElement } from 'react';
 import { findDOMNode } from 'react-dom';
 
-export class ReactView<Props, States> extends Component<Props, States>
+export class ReactView<Props, States> extends PureComponent<Props, States>
 {
 	// ------------------------------------------------------------------------- PROPS
 
