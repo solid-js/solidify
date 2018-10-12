@@ -377,7 +377,7 @@ export class StringUtils
 	 * @param pQueryString The query string to parse
 	 * @returns Associative object with parsed values
 	 */
-	static parseQueryString (pQueryString:string):{[key:string]:string}
+	static parseQueryString (pQueryString:string):{[key:string]:string|number|boolean}
 	{
 		// Start parsing after first ? or first # if detected
 		['?', '#'].map( q =>
@@ -387,6 +387,13 @@ export class StringUtils
 			if ( pos !== -1 )
 				pQueryString = pQueryString.substr( pos + 1, pQueryString.length );
 		});
+
+		// Convert number in strings to number
+		const parseNumberValue = pValue => (
+			( StringUtils.isNumber( pValue ) )
+			? parseFloat( pValue )
+			: pValue
+		);
 
 		// Split every & and browse
 		const outputVarBag = {};
@@ -398,12 +405,25 @@ export class StringUtils
 			// If there is an =, this is a key/value
 			outputVarBag[ decodeURIComponent( splitted[0] ) ] = (
 				( splitted.length === 2 )
-				? decodeURIComponent( splitted[1] )
+				// Try to parse number from strings
+				? parseNumberValue( decodeURIComponent( splitted[1] ) )
 				// Otherwise, this is just a flag, we put it to true
 				: true
 			);
 		});
 		return outputVarBag;
+	}
+
+	/**
+	 * Check if a string represent a number, and a number only.
+	 * NaN and Infinity will be false.
+	 * @param pNumberAsString The string representing the number
+	 * @returns True if the string is representing a number.
+	 */
+	static isNumber (pNumberAsString:string):boolean
+	{
+		const f = parseFloat( pNumberAsString );
+		return !isNaN( f ) && isFinite( f );
 	}
 
 	/**
