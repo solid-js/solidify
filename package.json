@@ -1,6 +1,6 @@
 {
   "name": "solidify-lib",
-  "version": "1.9.0",
+  "version": "1.9.1",
   "description": "Solidify typescript framework for robust and modular web applications",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

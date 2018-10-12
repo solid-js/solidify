@@ -377,43 +377,33 @@ export class StringUtils
 	 * @param pQueryString The query string to parse
 	 * @returns Associative object with parsed values
 	 */
-	static parseQueryString (pQueryString:string):{[index:string]:string}
+	static parseQueryString (pQueryString:string):{[key:string]:string}
 	{
-		let varSplitters = ['&', '='];
-		let queryStarters = ['?', '#'];
-
-		// Start parsing after query starters
-		for (let j in queryStarters)
+		// Start parsing after first ? or first # if detected
+		['?', '#'].map( q =>
 		{
-			// Check that query start are before var spliiters
-			if (pQueryString.indexOf(queryStarters[j]) < pQueryString.indexOf(varSplitters[1]))
-			{
-				pQueryString = pQueryString.substring(pQueryString.indexOf(queryStarters[j]) + 1, pQueryString.length);
-			}
-		}
+			// Detect position of starter and split from it if detected
+			const pos = pQueryString.indexOf( q );
+			if ( pos !== -1 )
+				pQueryString = pQueryString.substr( pos + 1, pQueryString.length );
+		});
 
-		// Split every parameters on &
-		let queryParameters = pQueryString.split(varSplitters[0]);
-
-		// Output parameters
-		let params:{[index:string]:string} = {};
-
-		// Parse parameters
-		let pair:string[];
-		for (let i = queryParameters.length - 1; i >= 0; i--)
+		// Split every & and browse
+		const outputVarBag = {};
+		pQueryString.split('&').map( couples =>
 		{
-			// Get var name and value pair
-			pair = queryParameters[i].split(varSplitters[1]);
+			// Split on all =
+			const splitted = couples.split('=', 2);
 
-			// Do not validate void var names
-			if (pair[0].length == 0) continue;
-
-			// Decode var name, value and store them in output bag
-			params[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
-		}
-
-		// Return params bag
-		return params;
+			// If there is an =, this is a key/value
+			outputVarBag[ decodeURIComponent( splitted[0] ) ] = (
+				( splitted.length === 2 )
+				? decodeURIComponent( splitted[1] )
+				// Otherwise, this is just a flag, we put it to true
+				: true
+			);
+		});
+		return outputVarBag;
 	}
 
 	/**
