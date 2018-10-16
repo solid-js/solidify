@@ -395,6 +395,8 @@ export class StringUtils
 			: pValue
 		);
 
+		// TODO : Ajouter le parsing de "true" / "false" ... et étendre ça a des helpers sur StringUtils
+
 		// Split every & and browse
 		const outputVarBag = {};
 		pQueryString.split('&').map( couples =>

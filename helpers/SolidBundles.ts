@@ -183,9 +183,9 @@ export class SolidBundles
 		if ( pLoadCSSToo )
 		{
 			// Create style tag with attributes and append it to the body
-			const styleTag = document.createElement('style');
+			const styleTag = document.createElement('link');
 			styleTag.setAttribute('rel', "stylesheet");
-			styleTag.setAttribute('src', `${basePath}${bundlePath}${pBundleName}.css?${cacheExtension}`);
+			styleTag.setAttribute('href', `${basePath}${bundlePath}${pBundleName}.css?${cacheExtension}`);
 			document.head.appendChild( styleTag );
 		}
 
