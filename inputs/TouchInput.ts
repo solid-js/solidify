@@ -423,7 +423,7 @@ export class TouchDispatcher extends Disposable
 	/**
 	 * Every frames
 	 */
-	protected frameHandler ():void
+	protected frameHandler = ():void =>
 	{
 		// If we have only one point and a direction
 		if (this._points.length == 1 && this._currentDirection != EInputDirection.UNKNOWN)
@@ -453,7 +453,7 @@ export class TouchDispatcher extends Disposable
 			currentPoint.deltaX = 0;
 			currentPoint.deltaY = 0;
 		}
-	}
+	};
 
 	/**
 	 * Destruct
