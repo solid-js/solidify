@@ -176,14 +176,101 @@ export class BitmapUtils
 		context.fillStyle = pColor;
 		context.textAlign = pAlign;
 
+		// Set offset in order to match the alignement rule
+		const offset = (
+			pAlign == "center"
+			? canvas.width / 2
+			: pPadding
+		);
+
 		// Draw lines on canvas
 		y = pPadding;
 		for (let n = 0; n < lines.length; n++)
 		{
-			context.fillText(lines[n], pPadding, (n * pLineHeight));
+			context.fillText(lines[n], offset, (n * pLineHeight));
 		}
 
 		// Return filled canvas
+		return canvas;
+	}
+
+	/**
+	 * Fit une image dans un canvas à la manière d'un background-cover centré.
+	 * Version modifié du code trouvé ici : https://sdqali.in/blog/2013/10/03/fitting-an-image-in-to-a-canvas-object/
+	 * @param pImage L'objet Image à dessiner sur le canvas
+	 * @param pCanvasWidth La largeur du canvas (cadre) généré
+	 * @param pCanvasHeight La hauteur du canvas (cadre) généré
+	 * @param pFitMethod "cover" pour laisser dépasser l'image du cadre, "contain" pour ajouter des bordures
+	 * @param pBackgroundColor La couleur de fond, "transparent" par défaut.
+	 */
+	static generateFitCanvasTexture (pImage:HTMLImageElement|HTMLCanvasElement|HTMLVideoElement|ImageBitmap, pCanvasWidth:number, pCanvasHeight:number, pFitMethod = 'cover', pBackgroundColor = 'transparent')
+	{
+		// On crée un nouveau canvas et on récupère son contexte
+		const canvas = document.createElement('canvas') as HTMLCanvasElement;
+		const context = canvas.getContext('2d');
+
+		// On set le canvas avec la taille donnée en paramètre
+		canvas.width = pCanvasWidth;
+		canvas.height = pCanvasHeight;
+
+		// On détermine les ratios du canvas et de l'image
+		const imageAspectRatio = pImage.width / pImage.height;
+		const canvasAspectRatio = canvas.width / canvas.height;
+
+		// point de départ de la zone a dessiner sur le canvas
+		let xStart = 0;
+		let yStart = 0;
+
+		// dimensions de la zone à dessiner sur le canvas
+		let renderableWidth = canvas.width;
+		let renderableHeight = canvas.height;
+
+		/**
+		 * Deux cas de figure : cover / contain. Dans les deux cas, on compare le ratio de l'image au ratio du canvas.
+		 * cover : si le ratio de l'image est plus grand que le canvas, on fit à la hauteur et on centre en largeur, sinon, l'inverse.
+		 * contain : si le ratio de l'image est moins grand que le canvas, on on fit à la hauteur et on centre en largeur, sinon l'inverse
+		 */
+		if (pFitMethod == "cover")
+		{
+			if (imageAspectRatio > canvasAspectRatio)
+			{
+				renderableHeight = canvas.height;
+				renderableWidth = pImage.width * (renderableHeight / pImage.height);
+				xStart = (canvas.width - renderableWidth) / 2;
+				yStart = 0;
+			}
+			else if (imageAspectRatio < canvasAspectRatio)
+			{
+				renderableWidth = canvas.width;
+				renderableHeight = pImage.height * (renderableWidth / pImage.width);
+				xStart = 0;
+				yStart = (canvas.height - renderableHeight) / 2;
+			}
+		}
+		else if (pFitMethod == "contain")
+		{
+			if (imageAspectRatio < canvasAspectRatio)
+			{
+				renderableHeight = canvas.height;
+				renderableWidth = pImage.width * (renderableHeight / pImage.height);
+				xStart = (canvas.width - renderableWidth) / 2;
+				yStart = 0;
+			}
+			else if (imageAspectRatio > canvasAspectRatio)
+			{
+				renderableWidth = canvas.width
+				renderableHeight = pImage.height * (renderableWidth / pImage.width);
+				xStart = 0;
+				yStart = (canvas.height - renderableHeight) / 2;
+			}
+		}
+
+		// On rempli avec la couleur de fond
+		context.fillStyle = pBackgroundColor;
+		context.fillRect(0, 0, canvas.width, canvas.height);
+
+		// On dessine l'image et on retourne le canvas
+		context.drawImage(pImage, xStart, yStart, renderableWidth, renderableHeight);
 		return canvas;
 	}
 }
