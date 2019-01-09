@@ -3,6 +3,11 @@
 // TODO : Car la mini video embed dans le fichier pèse un minimum
 
 
+// Si on est sur le vrai IE 11, et non pas la détection user agent qui ne marche plus ...
+export const isRealIE11 = (
+	!(window['ActiveXObject']) && "ActiveXObject" in window
+);
+
 /**
  * Listing of devices types available.
  * Just handheld or desktop, no mobile / phone / laptop because we manage this via mediaQueries.
