@@ -19,10 +19,10 @@ export class TimerUtils
 			// We add a exclamation mark here because typescript is lost somehow ...
 			// https://stackoverflow.com/questions/44147937/property-does-not-exist-on-type-never
 			window!.requestAnimationFrame = (
-				window['webkitRequestAnimationFrame'] ||
-				window['mozRequestAnimationFrame'] ||
-				window['oRequestAnimationFrame'] ||
-				window['msRequestAnimationFrame'] ||
+				window!['webkitRequestAnimationFrame'] ||
+				window!['mozRequestAnimationFrame'] ||
+				window!['oRequestAnimationFrame'] ||
+				window!['msRequestAnimationFrame'] ||
 				function (pCallback)
 				{
 					window.setTimeout(pCallback, 1000 / TimerUtils.__fps);

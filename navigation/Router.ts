@@ -373,11 +373,11 @@ export class Router
 		if ('ga' in window)
 		{
 			// Track page view
-			window['ga']('send', 'pageview', path);
+			window!['ga']('send', 'pageview', path);
 		}
 
 		// If GTAG library is loaded
-		if ( typeof window['gtag'] == 'function' && 'dataLayer' in window )
+		if ( typeof window!['gtag'] == 'function' && 'dataLayer' in window )
 		{
 			// Target dataLayer object
 			const dataLayer = (window['dataLayer'] as any[]);
@@ -398,7 +398,7 @@ export class Router
 			}
 
 			// Track page view
-			window['gtag']('config', this._gtagId, {
+			window!['gtag']('config', this._gtagId, {
 				page_title : document.getElementsByTagName('title')[0].text,
 				page_path: path
 			});
@@ -432,7 +432,7 @@ export class Router
 		}
 
 		// Track event
-		window['gtag']('event', pAction, eventData);
+		window!['gtag']('event', pAction, eventData);
 	}
 
 
