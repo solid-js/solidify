@@ -49,7 +49,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 * ex : if (this._animating) return
 	 * To implement animation, please override playInPromiseHandler.
 	 */
-	playIn ():Promise<any>
+	playIn (...rest):Promise<any>
 	{
 		return new Promise( resolve =>
 		{
@@ -76,7 +76,7 @@ export class ReactPage<Props, States> extends ReactView<Props, States> implement
 	 * ex : if (this._animating) return
 	 * To implement animation, please override playOutPromiseHandler.
 	 */
-	playOut ():Promise<any>
+	playOut (...rest):Promise<any>
 	{
 		return new Promise( resolve =>
 		{
