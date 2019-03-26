@@ -164,4 +164,27 @@ export class ArrayUtils
 		// Return results
 		return results;
 	}
+	
+	/**
+	 * Chunk
+	 * Creates an array of elements split into groups the length of size.
+	 * If array can't be split evenly, the final chunk will be the remaining elements.
+	 *
+	 * ex:
+	 * chunkArray([1, 2, 3, 4, 5], 2);
+	 * // => [[1,2], [3,4], [5]]
+	 *
+	 * Link https://gist.github.com/webinista/11240585#gistcomment-1781756
+	 * @param {any[]} pArray
+	 * @param {number} pGroupSize
+	 * @return {any[]}
+	 */
+	static chunk (pArray:any[], pGroupSize:number) :any[]
+	{
+		return pArray.reduce( (a,b,i,g) =>
+			!(i % pGroupSize)
+			? a.concat([g.slice(i,i+pGroupSize)])
+			: a, []
+		)
+	}
 }
