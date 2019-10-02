@@ -59,11 +59,11 @@ export class UnityGateway
 			if ( UnityGateway.isUnity )
 			{
 				// Créer le handler pour que Unity puisse répondre
-				UnityGateway.__pendingDirectHandler = ( ...rest ) =>
+				UnityGateway.__pendingDirectHandler = ( answer ) =>
 				{
 					// Exécuter la promesse et passer les paramètres
 					resolve({
-						...rest,
+						...answer,
 						isUnity: true
 					});
 
